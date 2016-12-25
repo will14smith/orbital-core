@@ -3,7 +3,11 @@
   "buildOptions": {
     "debugType": "portable"
   },
-  "dependencies": {},
+  "dependencies": {
+    "Orbital.Models": {
+      "target": "project"
+    }
+  },
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {

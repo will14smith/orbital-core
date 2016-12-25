@@ -4,7 +4,19 @@
     "debugType": "portable",
     "emitEntryPoint": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "GraphQL": "0.14.*",
+    "SimpleInjector": "3.3.*",
+    "Orbital.Data": {
+      "target": "project"
+    },
+    "Orbital.Models": {
+      "target": "project"
+    },
+    "Orbital.Schema": {
+      "target": "project"
+    }
+  },
   "frameworks": {
     "netcoreapp1.1": {
       "dependencies": {

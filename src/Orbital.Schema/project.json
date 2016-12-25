@@ -3,7 +3,12 @@
   "buildOptions": {
     "debugType": "portable"
   },
-  "dependencies": {},
+  "dependencies": {
+    "GraphQL": "0.14.*",
+    "Orbital.Models": {
+      "target": "project"
+    }
+  },
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {
