@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using GraphQL;
 using GraphQL.Http;
 using GraphQL.Instrumentation;
@@ -8,6 +9,7 @@ using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
 using Orbital.Schema;
 using Orbital.Schema.Clubs;
+using Orbital.Schema.People;
 using SimpleInjector;
 
 namespace Orbital.Web
@@ -29,14 +31,7 @@ namespace Orbital.Web
 
     private static async void RunAsync(Container container)
     {
-      var query = @"
-        query {
-            clubs {
-                id,
-                name,
-            }
-        }
-      ";
+      var query = GraphQL.Introspection.SchemaIntrospection.IntrospectionQuery;
 
       var documentExecuter = new DocumentExecuter();
       var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -49,7 +44,7 @@ namespace Orbital.Web
       }).ConfigureAwait(false);
       var json = new DocumentWriter(true).Write(executionResult);
 
-      Console.WriteLine(json);
+      File.WriteAllText("output.json", json);
     }
 
     private static Container BuildContainer()
@@ -57,8 +52,10 @@ namespace Orbital.Web
       var container = new Container();
 
       container.Register<IClubRepository, InMemoryClubRepository>(Lifestyle.Singleton);
+      container.Register<IPersonRepository, InMemoryPersonRepository>(Lifestyle.Singleton);
 
       container.Register<IClubService, ClubServiceImpl>(Lifestyle.Transient);
+      container.Register<IPersonService, PersonServiceImpl>(Lifestyle.Transient);
 
       container.Verify();
       return container;
@@ -79,12 +76,27 @@ namespace Orbital.Web
       return context =>
       {
         Console.WriteLine("Entered {0}", context.FieldName);
-        var result = next(context);
+        try
+        {
+          var result = next(context);
 
-        Console.WriteLine("Exception: {0}", result.Exception);
+          if (result?.Exception != null)
+          {
+            Console.WriteLine("Exception: {0}", result.Exception);
+          }
 
-        Console.WriteLine("Finished {0}", context.FieldName);
-        return result;
+          return result;
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine("Exception: {0}", ex);
+        }
+        finally
+        {
+          Console.WriteLine("Finished {0}", context.FieldName);
+        }
+
+        return null;
       };
     }
   }

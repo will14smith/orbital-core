@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using Orbital.Schema.Clubs;
+using Orbital.Schema.People;
 
 namespace Orbital.Schema
 {
@@ -10,6 +11,9 @@ namespace Orbital.Schema
       Field<ListGraphType<ClubType>>(
         name: "clubs",
         resolve: context => context.ResolveService<object, IClubService>().GetRoot());
+      Field<ListGraphType<PersonType>>(
+        name: "people",
+        resolve: context => context.ResolveService<object, IPersonService>().GetRoot());
     }
   }
 }

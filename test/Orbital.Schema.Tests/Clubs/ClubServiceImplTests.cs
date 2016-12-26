@@ -1,7 +1,6 @@
 using System.Linq;
-using Moq;
+using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
-using Orbital.Models.Repositories;
 using Orbital.Schema.Clubs;
 using Xunit;
 
@@ -13,15 +12,24 @@ namespace Orbital.Schema.Tests.Clubs
     public void TestGetRoot()
     {
       var club = new Club(1, "Hello");
-      var clubRepository = Mock.Of<IClubRepository>(
-        x => x.GetAll() == new[] { club }
-      );
+      var clubRepository = InMemoryClubRepository.New(club);
 
       var service = new ClubServiceImpl(clubRepository);
 
       var result = service.GetRoot();
-      Assert.Equal(result.Count, 1);
-      Assert.Equal(result.First(), club);
+      Assert.Single(result, club);
+    }
+
+    [Fact]
+    public void TestGetById()
+    {
+      var club = new Club(1, "Hello");
+      var clubRepository = InMemoryClubRepository.New(club);
+
+      var service = new ClubServiceImpl(clubRepository);
+
+      var result = service.GetById(club.Id);
+      Assert.Equal(club, result);
     }
   }
 }

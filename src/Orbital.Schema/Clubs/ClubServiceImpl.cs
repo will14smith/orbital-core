@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
@@ -16,6 +17,11 @@ namespace Orbital.Schema.Clubs
     public IReadOnlyCollection<Club> GetRoot()
     {
       return _clubRepository.GetAll();
+    }
+
+    public Club GetById(int id)
+    {
+      return _clubRepository.GetById(id);
     }
   }
 }

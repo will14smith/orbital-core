@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Orbital.Models.Domain;
@@ -13,6 +12,11 @@ namespace Orbital.Data.Repositories
     public InMemoryClubRepository()
     {
       _clubs = new List<Club>();
+    }
+
+    public static InMemoryClubRepository New(params Club[] clubs)
+    {
+      return new InMemoryClubRepository { _clubs = clubs.ToList() };
     }
 
     public IReadOnlyCollection<Club> GetAll() { return _clubs; }
