@@ -9,9 +9,7 @@ namespace Orbital.Schema
     {
       Field<ListGraphType<ClubType>>(
         name: "clubs",
-        resolve: context => context
-          .ResolveService<object, IClubService>()
-          .GetRoot(context));
+        resolve: context => context.ResolveService<object, IClubService>().GetRoot());
     }
   }
 }

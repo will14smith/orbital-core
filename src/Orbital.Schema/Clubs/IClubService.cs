@@ -6,6 +6,6 @@ namespace Orbital.Schema.Clubs
 {
   public interface IClubService
   {
-    IReadOnlyCollection<Club> GetRoot<TSource>(ResolveFieldContext<TSource> parent);
+    IReadOnlyCollection<Club> GetRoot();
   }
 }

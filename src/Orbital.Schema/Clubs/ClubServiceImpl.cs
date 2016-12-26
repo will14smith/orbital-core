@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GraphQL.Types;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
 
@@ -14,7 +13,7 @@ namespace Orbital.Schema.Clubs
       _clubRepository = clubRepository;
     }
 
-    public IReadOnlyCollection<Club> GetRoot<TSource>(ResolveFieldContext<TSource> parent)
+    public IReadOnlyCollection<Club> GetRoot()
     {
       return _clubRepository.GetAll();
     }
