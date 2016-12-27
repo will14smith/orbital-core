@@ -2,39 +2,53 @@ using System;
 
 namespace Orbital.Models.Domain
 {
-  public class Person
-  {
-    public Person(
-      int id, int clubId,
-      string name,
-      Gender gender, Bowstyle? bowstyle = null,
-      string archeryGBNumber = null,
-      DateTime? dateOfBirth = null, DateTime? dateStartedArchery = null
-      )
+    public class Person
     {
-      Id = id;
-      ClubId = clubId;
+        public Person(int id, Person person)
+            : this(
+                id: id, 
+                clubId: person.ClubId, 
+                name: person.Name, 
+                gender: person.Gender, 
+                bowstyle: person.Bowstyle, 
+                archeryGBNumber: person.ArcheryGBNumber, 
+                dateOfBirth: person.DateOfBirth, 
+                dateStartedArchery: person.DateStartedArchery)
+        {
+            
+        }
 
-      Name = name;
+        public Person(
+          int id, int clubId,
+          string name,
+          Gender gender, Bowstyle? bowstyle = null,
+          string archeryGBNumber = null,
+          DateTime? dateOfBirth = null, DateTime? dateStartedArchery = null
+          )
+        {
+            Id = id;
+            ClubId = clubId;
 
-      Gender = gender;
-      Bowstyle = bowstyle;
+            Name = name;
 
-      ArcheryGBNumber = archeryGBNumber;
+            Gender = gender;
+            Bowstyle = bowstyle;
 
-      DateOfBirth = dateOfBirth;
-      DateStartedArchery = dateStartedArchery;
+            ArcheryGBNumber = archeryGBNumber;
+
+            DateOfBirth = dateOfBirth;
+            DateStartedArchery = dateStartedArchery;
+        }
+
+        public int Id { get; private set; }
+        public int ClubId { get; private set; }
+
+        public string Name { get; private set; }
+
+        public Gender Gender { get; private set; }
+        public Bowstyle? Bowstyle { get; private set; }
+        public string ArcheryGBNumber { get; private set; }
+        public DateTime? DateOfBirth { get; private set; }
+        public DateTime? DateStartedArchery { get; private set; }
     }
-
-    public int Id { get; private set; }
-    public int ClubId { get; private set; }
-
-    public string Name { get; private set; }
-
-    public Gender Gender { get; private set; }
-    public Bowstyle? Bowstyle { get; private set; }
-    public string ArcheryGBNumber { get; private set; }
-    public DateTime? DateOfBirth { get; private set; }
-    public DateTime? DateStartedArchery { get; private set; }
-  }
 }
