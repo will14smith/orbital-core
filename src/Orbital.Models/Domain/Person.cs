@@ -6,16 +6,16 @@ namespace Orbital.Models.Domain
     {
         public Person(int id, Person person)
             : this(
-                id: id, 
-                clubId: person.ClubId, 
-                name: person.Name, 
-                gender: person.Gender, 
-                bowstyle: person.Bowstyle, 
-                archeryGBNumber: person.ArcheryGBNumber, 
-                dateOfBirth: person.DateOfBirth, 
+                id: id,
+                clubId: person.ClubId,
+                name: person.Name,
+                gender: person.Gender,
+                bowstyle: person.Bowstyle,
+                archeryGBNumber: person.ArcheryGBNumber,
+                dateOfBirth: person.DateOfBirth,
                 dateStartedArchery: person.DateStartedArchery)
         {
-            
+
         }
 
         public Person(
@@ -50,5 +50,37 @@ namespace Orbital.Models.Domain
         public string ArcheryGBNumber { get; private set; }
         public DateTime? DateOfBirth { get; private set; }
         public DateTime? DateStartedArchery { get; private set; }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Person;
+            if (other == null) return false;
+
+            return Id == other.Id
+                && ClubId == other.ClubId
+                && Name == other.Name
+                && Gender == other.Gender
+                && Bowstyle == other.Bowstyle
+                && ArcheryGBNumber == other.ArcheryGBNumber
+                && DateOfBirth == other.DateOfBirth
+                && DateStartedArchery == other.DateStartedArchery;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Id;
+                hashCode += ClubId * 317;
+                hashCode += Name.GetHashCode() * 317;
+                hashCode += Gender.GetHashCode() * 317;
+                hashCode += (Bowstyle != null ? Bowstyle.GetHashCode() * 317 : 0);
+                hashCode += (ArcheryGBNumber != null ? ArcheryGBNumber.GetHashCode() * 317 : 0);
+                hashCode += (DateOfBirth != null ? DateOfBirth.GetHashCode() * 317 : 0);
+                hashCode += (DateStartedArchery != null ? DateStartedArchery.GetHashCode() * 317 : 0);
+
+                return hashCode;
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <DebugType>portable</DebugType>
@@ -12,10 +12,12 @@
     <EmbeddedResource Include="compiler\resources\**\*" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\DbUp.Postgresql\DbUp.Postgresql.csproj" />
     <ProjectReference Include="..\..\src\Orbital.Data\Orbital.Data.csproj" />
     <ProjectReference Include="..\..\src\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="dbup4-core" Version="4.0.0-beta0003" />
     <PackageReference Include="Microsoft.NET.Test.Sdk">
       <Version>15.0.0-preview-20161227-02</Version>
     </PackageReference>

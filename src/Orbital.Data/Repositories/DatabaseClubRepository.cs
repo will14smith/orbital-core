@@ -18,13 +18,12 @@ namespace Orbital.Data.Repositories
         public IReadOnlyCollection<Club> GetAll()
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
+                command.CommandText = $"SELECT {SelectFields} FROM Club";
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandText = $"SELECT {SelectFields} FROM Club";
-
-                    var reader = command.ExecuteReader();
-
                     return reader.ReadAll(MapToClub);
                 }
             }
@@ -33,14 +32,13 @@ namespace Orbital.Data.Repositories
         public Club GetById(int id)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
+                command.CommandText = $"SELECT {SelectFields} FROM Club WHERE Id = @Id";
+                command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandText = $"SELECT {SelectFields} FROM Club WHERE Id = @Id";
-                    command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
-
-                    var reader = command.ExecuteReader();
-
                     return reader.ReadOne(MapToClub);
                 }
             }
@@ -49,34 +47,29 @@ namespace Orbital.Data.Repositories
         public Club Create(Club club)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = $"INSERT INTO Club (Name) VALUES (@Name) RETURNING Id";
+                command.CommandText = $"INSERT INTO Club (Name) VALUES (@Name) RETURNING Id";
 
-                    command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
+                command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
 
-                    var insertId = (int)command.ExecuteScalar();
-                    return new Club(insertId, club.Name);
-                }
+                var insertId = (int)command.ExecuteScalar();
+                return new Club(insertId, club.Name);
             }
         }
 
         public Club Update(Club club)
         {
-
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = $"UPDATE Club SET Name = @Name WHERE Id = @Id";
+                command.CommandText = $"UPDATE Club SET Name = @Name WHERE Id = @Id";
 
-                    command.Parameters.Add(command.CreateParameter("Id", club.Id, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
+                command.Parameters.Add(command.CreateParameter("Id", club.Id, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
 
-                    command.ExecuteNonQuery();
-                    return club;
-                }
+                command.ExecuteNonQuery();
+                return club;
             }
         }
 

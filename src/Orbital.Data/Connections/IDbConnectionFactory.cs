@@ -1,9 +1,9 @@
-﻿using System.Data.Common;
+﻿using System.Data;
 
 namespace Orbital.Data.Connections
 {
     public interface IDbConnectionFactory
     {
-        DbConnection GetConnection();
+        IDbConnection GetConnection();
     }
 }

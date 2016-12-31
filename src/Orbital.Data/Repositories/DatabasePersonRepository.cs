@@ -19,29 +19,27 @@ namespace Orbital.Data.Repositories
         public IReadOnlyCollection<Person> GetAll()
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
+                command.CommandText = $"SELECT {SelectFields} FROM Person";
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandText = $"SELECT {SelectFields} FROM Person";
-
-                    var reader = command.ExecuteReader();
-
                     return reader.ReadAll(MapToPerson);
                 }
             }
         }
-        
+
         public IReadOnlyCollection<Person> GetAllByClubId(int clubId)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
+                command.CommandText = $"SELECT {SelectFields} FROM Person WHERE ClubId = @ClubId";
+                command.Parameters.Add(command.CreateParameter("ClubId", clubId, DbType.Int32));
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandText = $"SELECT {SelectFields} FROM Person WHERE ClubId = @ClubId";
-                    command.Parameters.Add(command.CreateParameter("ClubId", clubId, DbType.Int32));
-
-                    var reader = command.ExecuteReader();
-
                     return reader.ReadAll(MapToPerson);
                 }
             }
@@ -50,14 +48,13 @@ namespace Orbital.Data.Repositories
         public Person GetById(int id)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
+                command.CommandText = $"SELECT {SelectFields} FROM Person WHERE Id = @Id";
+                command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandText = $"SELECT {SelectFields} FROM Person WHERE Id = @Id";
-                    command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
-
-                    var reader = command.ExecuteReader();
-
                     return reader.ReadOne(MapToPerson);
                 }
             }
@@ -66,71 +63,65 @@ namespace Orbital.Data.Repositories
         public Person Create(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = 
-                        $"INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery)" +
-                        $" VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id";
+                command.CommandText =
+                    $"INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery)" +
+                    $" VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id";
 
-                    command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
-                    command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
+                command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
+                command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
+                command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
+                command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
 
-                    var insertId = (int)command.ExecuteScalar();
-                    return new Person(insertId, person);
-                }
+                var insertId = (int)command.ExecuteScalar();
+                return new Person(insertId, person);
             }
         }
 
         public Person Update(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = $"UPDATE Person SET " +
-                        $" ClubId = @ClubId," +
-                        $" Name = @Name," +
-                        $" Gender = @Gender," +
-                        $" Bowstyle = @Bowstyle," +
-                        $" ArcheryGBNumber = @ArcheryGBNumber," +
-                        $" DateOfBirth = @DateOfBirth," +
-                        $" DateStartedArchery = @DateStartedArchery" +
-                        $" WHERE Id = @Id";
+                command.CommandText = $"UPDATE Person SET " +
+                    $" ClubId = @ClubId," +
+                    $" Name = @Name," +
+                    $" Gender = @Gender," +
+                    $" Bowstyle = @Bowstyle," +
+                    $" ArcheryGBNumber = @ArcheryGBNumber," +
+                    $" DateOfBirth = @DateOfBirth," +
+                    $" DateStartedArchery = @DateStartedArchery" +
+                    $" WHERE Id = @Id";
 
-                    command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
-                    command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
+                command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
+                command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
+                command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
+                command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
+                command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
 
-                    command.ExecuteNonQuery();
-                    return person;
-                }
+                command.ExecuteNonQuery();
+                return person;
             }
         }
 
         public bool Delete(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
+            using (var command = connection.CreateCommand())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "DELETE FROM Person WHERE Id = @Id";
-                    command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
+                command.CommandText = "DELETE FROM Person WHERE Id = @Id";
+                command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
 
-                    var rowsChanged = command.ExecuteNonQuery();
+                var rowsChanged = command.ExecuteNonQuery();
 
-                    return rowsChanged == 1;
-                }
+                return rowsChanged == 1;
             }
         }
 
@@ -141,10 +132,10 @@ namespace Orbital.Data.Repositories
             var clubId = record.GetValue<int>(1);
             var name = record.GetValue<string>(2);
             var gender = record.GetValue<Gender>(3);
-            var bowstyle = record.GetValueOrDefault<Bowstyle>(4);
-            var archeryGBNumber = record.GetValueOrDefault<string>(5);
-            var dateOfBirth = record.GetValueOrDefault<DateTime>(6);
-            var dateStartedArchery = record.GetValueOrDefault<DateTime>(7);
+            var bowstyle = record.GetValue<Bowstyle?>(4);
+            var archeryGBNumber = record.GetValue<string>(5);
+            var dateOfBirth = record.GetValue<DateTime?>(6);
+            var dateStartedArchery = record.GetValue<DateTime?>(7);
 
             return new Person(id, clubId, name, gender, bowstyle, archeryGBNumber, dateOfBirth, dateStartedArchery);
 

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Data.Common;
-using Orbital.Data.Connections;
+﻿using Orbital.Data.Connections;
 using Npgsql;
+using System.Data;
 
 namespace Orbital.Web
 {
@@ -14,7 +13,7 @@ namespace Orbital.Web
             _connectionString = connectionString;
         }
 
-        public DbConnection GetConnection()
+        public IDbConnection GetConnection()
         {
             var connection = new NpgsqlConnection(_connectionString);
             connection.Open();

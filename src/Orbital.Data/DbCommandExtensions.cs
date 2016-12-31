@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace Orbital.Data
 {
@@ -9,8 +10,8 @@ namespace Orbital.Data
             var param = command.CreateParameter();
 
             param.ParameterName = name;
-            param.Value = value;
-            param.DbType = type;    
+            param.Value = value ?? DBNull.Value;
+            param.DbType = type;
             param.Direction = direction;
 
             return param;
