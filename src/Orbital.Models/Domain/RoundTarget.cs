@@ -2,14 +2,14 @@
 {
     public class RoundTarget
     {
-        public RoundTarget(int id, ScoringType scoringType, Length distance, Length targetSize, int arrowCount)
+        public RoundTarget(int id, ScoringType scoringType, Length distance, Length faceSize, int arrowCount)
         {
             Id = id;
 
             ScoringType = scoringType;
 
             Distance = distance;
-            TargetSize = targetSize;
+            FaceSize = faceSize;
 
             ArrowCount = arrowCount;
         }
@@ -19,7 +19,7 @@
         public ScoringType ScoringType { get; private set; }
 
         public Length Distance { get; private set; }
-        public Length TargetSize { get; private set; }
+        public Length FaceSize { get; private set; }
 
         public int ArrowCount { get; private set; }
     }

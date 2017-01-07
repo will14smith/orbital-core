@@ -23,6 +23,7 @@ namespace Orbital.Models.Domain
 
         public string Category { get; private set; }
         public string Name { get; private set; }
+        // TODO enum this?
         public bool Indoor { get; private set; }
 
         public IReadOnlyList<RoundTarget> Targets { get; private set; }
