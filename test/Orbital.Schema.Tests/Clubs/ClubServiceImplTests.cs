@@ -1,4 +1,4 @@
-using System.Linq;
+using System;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Orbital.Schema.Clubs;
@@ -6,30 +6,42 @@ using Xunit;
 
 namespace Orbital.Schema.Tests.Clubs
 {
-  public class ClubServiceImplTests
-  {
-    [Fact]
-    public void TestGetRoot()
+    public class ClubServiceImplTests
     {
-      var club = new Club(1, "Hello");
-      var clubRepository = InMemoryClubRepository.New(club);
+        [Fact]
+        public void TestGetRoot()
+        {
+            var club = new Club(1, "Hello");
+            var clubRepository = InMemoryClubRepository.New(club);
 
-      var service = new ClubServiceImpl(clubRepository);
+            var service = new ClubServiceImpl(clubRepository);
 
-      var result = service.GetRoot();
-      Assert.Single(result, club);
+            var result = service.GetRoot();
+            Assert.Single(result, club);
+        }
+
+        [Fact]
+        public void TestGetById()
+        {
+            var club = new Club(1, "Hello");
+            var clubRepository = InMemoryClubRepository.New(club);
+
+            var service = new ClubServiceImpl(clubRepository);
+
+            var result = service.GetById(club.Id);
+            Assert.Equal(club, result);
+        }
+
+        [Fact]
+        public void TestAdd()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void TestUpdate()
+        {
+            throw new NotImplementedException();
+        }
     }
-
-    [Fact]
-    public void TestGetById()
-    {
-      var club = new Club(1, "Hello");
-      var clubRepository = InMemoryClubRepository.New(club);
-
-      var service = new ClubServiceImpl(clubRepository);
-
-      var result = service.GetById(club.Id);
-      Assert.Equal(club, result);
-    }
-  }
 }
