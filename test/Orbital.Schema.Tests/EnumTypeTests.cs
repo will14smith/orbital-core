@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
-using GraphQL.Types;
-using Moq;
 using Xunit;
+using Orbital.Schema.Common;
 
 namespace Orbital.Schema.Tests
 {
-  public class EnumTypeTests
+    public class EnumTypeTests
   {
     [Fact]
     public void TestCreatingWithAnEnum()

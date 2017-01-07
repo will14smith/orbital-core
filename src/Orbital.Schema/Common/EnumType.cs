@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using GraphQL.Types;
 
-namespace Orbital.Schema
+namespace Orbital.Schema.Common
 {
   public class EnumType<TEnum> : EnumerationGraphType
   {
