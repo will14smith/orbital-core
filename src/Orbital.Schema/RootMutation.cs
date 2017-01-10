@@ -10,7 +10,7 @@ namespace Orbital.Schema
         public RootMutation()
         {
             ClubMutations.AddToRoot(this);
-            PeopleMutation.AddToRoot(this);
+            PersonMutations.AddToRoot(this);
             RoundsMutation.AddToRoot(this);
         }
     }
