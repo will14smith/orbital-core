@@ -11,7 +11,7 @@ namespace Orbital.Schema
         {
             ClubMutations.AddToRoot(this);
             PersonMutations.AddToRoot(this);
-            RoundsMutation.AddToRoot(this);
+            RoundMutations.AddToRoot(this);
         }
     }
 }

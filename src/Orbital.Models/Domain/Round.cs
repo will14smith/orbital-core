@@ -4,7 +4,7 @@ namespace Orbital.Models.Domain
 {
     public class Round
     {
-        public Round(int id, int variantOfId, string category, string name, bool indoor, IReadOnlyList<RoundTarget> targets)
+        public Round(int id, int? variantOfId, string category, string name, bool indoor, IReadOnlyList<RoundTarget> targets)
         {
             Id = id;
 
@@ -19,7 +19,7 @@ namespace Orbital.Models.Domain
 
         public int Id { get; private set; }
 
-        public int VariantOfId { get; private set; }
+        public int? VariantOfId { get; private set; }
 
         public string Category { get; private set; }
         public string Name { get; private set; }
