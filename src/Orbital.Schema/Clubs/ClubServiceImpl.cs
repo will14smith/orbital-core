@@ -26,12 +26,14 @@ namespace Orbital.Schema.Clubs
 
         public Club Add(Club input)
         {
-            throw new NotImplementedException();
+            return _clubRepository.Create(input);
         }
 
         public Club Update(int id, Club input)
         {
-            throw new NotImplementedException();
+            var club = new Club(id, input.Name);
+
+            return _clubRepository.Update(club);
         }
     }
 }

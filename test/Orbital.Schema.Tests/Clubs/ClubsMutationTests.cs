@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using Moq;
+using Orbital.Models.Domain;
 using Orbital.Schema.Clubs;
 using Xunit;
 
@@ -8,28 +11,63 @@ namespace Orbital.Schema.Tests.Clubs
 {
     public class ClubsMutationTests
     {
+        private readonly ObjectGraphType _mutations;
+
+        public ClubsMutationTests()
+        {
+            _mutations = new ObjectGraphType();
+            ClubMutations.AddToRoot(_mutations);
+        }
+
         [Fact]
         public void TestAddToRoot()
         {
-            var type = new ObjectGraphType();
-            ClubMutations.AddToRoot(type);
-
             Assert.Equal(
               new[] { "addClub", "updateClub" }.OrderBy(x => x),
-              type.Fields.Select(x => x.Name).OrderBy(x => x)
+              _mutations.Fields.Select(x => x.Name).OrderBy(x => x)
             );
         }
 
         [Fact]
         public void TestAddClubResolve()
         {
-            throw new NotImplementedException();
+            var club = new Club(0, "ClubName");
+            var input = new Dictionary<string, object> { { "name", club.Name } };
+
+            var clubServiceMock = new Mock<IClubService>();
+            clubServiceMock.Setup(x => x.Add(It.IsAny<Club>())).Returns(club).Verifiable();
+            var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubServiceMock.Object);
+
+            var field = _mutations.Fields.First(x => x.Name == "addClub");
+            var result = field.Resolver.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> { { "club", input } },
+                UserContext = userContext
+            });
+
+            Assert.Equal(club, result);
+            clubServiceMock.Verify();
         }
 
         [Fact]
         public void TestUpdateClubResolve()
         {
-            throw new NotImplementedException();
+            var club = new Club(1, "ClubName");
+            var input = new Dictionary<string, object> { { "name", club.Name } };
+
+            var clubServiceMock = new Mock<IClubService>();
+            clubServiceMock.Setup(x => x.Update(club.Id, It.IsAny<Club>())).Returns(club).Verifiable();
+            var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubServiceMock.Object);
+
+            var field = _mutations.Fields.First(x => x.Name == "updateClub");
+            var result = field.Resolver.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> { { "id", club.Id }, { "club", input } },
+                UserContext = userContext
+            });
+
+            Assert.Equal(club, result);
+            clubServiceMock.Verify();
         }
     }
 }
