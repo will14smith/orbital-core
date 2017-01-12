@@ -35,7 +35,7 @@ namespace Orbital.Schema.Tests.Clubs
             var input = new Dictionary<string, object> { { "name", club.Name } };
 
             var clubServiceMock = new Mock<IClubService>();
-            clubServiceMock.Setup(x => x.Add(It.IsAny<Club>())).Returns(club).Verifiable();
+            clubServiceMock.Setup(x => x.Add(It.IsAny<Club>())).Returns<Club>(x => new Club(1, x.Name)).Verifiable();
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubServiceMock.Object);
 
             var field = _mutations.Fields.First(x => x.Name == "addClub");
@@ -45,7 +45,7 @@ namespace Orbital.Schema.Tests.Clubs
                 UserContext = userContext
             });
 
-            Assert.Equal(club, result);
+            Assert.Equal(new Club(1, club.Name), result);
             clubServiceMock.Verify();
         }
 
@@ -56,7 +56,7 @@ namespace Orbital.Schema.Tests.Clubs
             var input = new Dictionary<string, object> { { "name", club.Name } };
 
             var clubServiceMock = new Mock<IClubService>();
-            clubServiceMock.Setup(x => x.Update(club.Id, It.IsAny<Club>())).Returns(club).Verifiable();
+            clubServiceMock.Setup(x => x.Update(club.Id, It.IsAny<Club>())).Returns<int, Club>((id, x) => new Club(id, x.Name)).Verifiable();
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubServiceMock.Object);
 
             var field = _mutations.Fields.First(x => x.Name == "updateClub");

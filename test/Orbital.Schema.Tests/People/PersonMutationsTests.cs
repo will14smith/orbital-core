@@ -30,7 +30,7 @@ namespace Orbital.Schema.Tests.People
         [Fact]
         public void TestAddPersonResolve()
         {
-            var person = new Person(1, 2, "PersonName", Gender.Male);
+            var person = new Person(0, 2, "PersonName", Gender.Male);
             var input = new Dictionary<string, object>
             {
                 { "clubId", person.ClubId },
@@ -43,7 +43,7 @@ namespace Orbital.Schema.Tests.People
             };
 
             var personServiceMock = new Mock<IPersonService>();
-            personServiceMock.Setup(x => x.Add(It.IsAny<Person>())).Returns(person).Verifiable();
+            personServiceMock.Setup(x => x.Add(It.IsAny<Person>())).Returns<Person>(x => new Person(1, x)).Verifiable();
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IPersonService>() == personServiceMock.Object);
 
             var field = _mutations.Fields.First(x => x.Name == "addPerson");
@@ -53,7 +53,7 @@ namespace Orbital.Schema.Tests.People
                 UserContext = userContext
             });
 
-            Assert.Equal(person, result);
+            Assert.Equal(new Person(1, person), result);
             personServiceMock.Verify();
         }
 
@@ -73,7 +73,7 @@ namespace Orbital.Schema.Tests.People
             };
 
             var personServiceMock = new Mock<IPersonService>();
-            personServiceMock.Setup(x => x.Update(person.Id, It.IsAny<Person>())).Returns(person).Verifiable();
+            personServiceMock.Setup(x => x.Update(person.Id, It.IsAny<Person>())).Returns<int, Person>((id, x) => new Person(id, x)).Verifiable();
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IPersonService>() == personServiceMock.Object);
 
             var field = _mutations.Fields.First(x => x.Name == "updatePerson");
