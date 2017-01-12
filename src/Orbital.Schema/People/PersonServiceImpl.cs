@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
@@ -26,12 +25,14 @@ namespace Orbital.Schema.People
 
         public Person Add(Person input)
         {
-            throw new NotImplementedException();
+            return _personRepository.Create(input);
         }
 
         public Person Update(int id, Person input)
         {
-            throw new NotImplementedException();
+            var person = new Person(id, input);
+
+            return _personRepository.Update(person);
         }
     }
 }
