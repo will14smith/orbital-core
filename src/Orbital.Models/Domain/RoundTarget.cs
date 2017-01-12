@@ -1,7 +1,13 @@
-﻿namespace Orbital.Models.Domain
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Orbital.Models.Domain
 {
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class RoundTarget
     {
+        // needed for deserialisation
+        public RoundTarget() { }
+
         public RoundTarget(int id, ScoringType scoringType, Length distance, Length faceSize, int arrowCount)
         {
             Id = id;

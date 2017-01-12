@@ -1,7 +1,13 @@
-﻿namespace Orbital.Models.Domain
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Orbital.Models.Domain
 {
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Length
     {
+        // needed for deserialisation
+        public Length() { }
+
         public Length(decimal value, LengthUnit unit)
         {
             Value = value;
