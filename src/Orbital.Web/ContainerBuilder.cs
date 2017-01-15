@@ -3,6 +3,7 @@ using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
 using Orbital.Schema.Clubs;
 using Orbital.Schema.People;
+using Orbital.Schema.Rounds;
 using SimpleInjector;
 
 namespace Orbital.Web
@@ -16,7 +17,7 @@ namespace Orbital.Web
             RegisterDatabase(container, connectionString);
             RegisterRepositories(container);
             RegisterGraphQLServices(container);
-            
+
             container.Verify();
             return container;
         }
@@ -29,11 +30,13 @@ namespace Orbital.Web
         {
             container.Register<IClubRepository, DatabaseClubRepository>();
             container.Register<IPersonRepository, DatabasePersonRepository>();
+            container.Register<IRoundRepository, DatabaseRoundRepository>();
         }
         private static void RegisterGraphQLServices(Container container)
         {
             container.Register<IClubService, ClubServiceImpl>(Lifestyle.Transient);
             container.Register<IPersonService, PersonServiceImpl>(Lifestyle.Transient);
+            container.Register<IRoundService, RoundServiceImpl>(Lifestyle.Transient);
         }
     }
 }
