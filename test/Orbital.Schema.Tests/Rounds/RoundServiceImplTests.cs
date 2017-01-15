@@ -1,3 +1,4 @@
+using System.Linq;
 using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
@@ -19,6 +20,32 @@ namespace Orbital.Schema.Tests.Rounds
 
             var result = service.GetRoot();
             Assert.Single(result, round);
+        }
+
+        [Fact]
+        public void TestGetVariants()
+        {
+            var round1 = RoundTypeTests.WA18;
+            var round2 = new Round(round1.VariantOfId.Value, null, "A", "B", false, new RoundTarget[0]);
+            var roundRepository = InMemoryRoundRepository.New(round1, round2);
+
+            var service = new RoundServiceImpl(roundRepository);
+
+            var result = service.GetVariants(round2.Id);
+            Assert.Single(result, round1);
+        }
+
+        [Fact]
+        public void TestGetById()
+        {
+            var round = RoundTypeTests.WA18;
+            var roundRepository = InMemoryRoundRepository.New(round);
+
+            var service = new RoundServiceImpl(roundRepository);
+
+            var result = service.GetById(round.Id);
+            Assert.Equal(1, result.Id);
+            Assert.Equal(round, result, new Round.EqualWithoutId());
         }
 
         [Fact]

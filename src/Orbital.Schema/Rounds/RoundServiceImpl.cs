@@ -21,11 +21,11 @@ namespace Orbital.Schema.Rounds
 
         public IReadOnlyCollection<Round> GetVariants(int parentId)
         {
-            throw new NotImplementedException();
+            return _roundRepository.GetAllVariantsById(parentId);
         }
         public Round GetById(int id)
         {
-            throw new NotImplementedException();
+            return _roundRepository.GetById(id);
         }
 
 
