@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GraphQL">
-      <Version>0.14.1.638</Version>
+      <Version>0.14.4.649</Version>
     </PackageReference>
     <PackageReference Include="Npgsql" Version="3.1.9" />
     <PackageReference Include="SimpleInjector">

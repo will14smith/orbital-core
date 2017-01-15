@@ -1,7 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Orbital.Models.Domain
 {
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Club
     {
+        // needed for deserialisation
+        public Club() { }
+
         public Club(int id, string name)
         {
             Id = id;

@@ -96,7 +96,6 @@ namespace Orbital.Data.Repositories
             var name = record.GetValue<string>(1);
 
             return new Club(id, name);
-
         }
     }
 }

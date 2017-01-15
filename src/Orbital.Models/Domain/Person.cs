@@ -1,9 +1,14 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Orbital.Models.Domain
 {
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Person
     {
+        // needed for deserialisation
+        public Person() { }
+
         public Person(int id, Person person)
             : this(
                 id: id,
