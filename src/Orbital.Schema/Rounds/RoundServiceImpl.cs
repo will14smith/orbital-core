@@ -19,6 +19,16 @@ namespace Orbital.Schema.Rounds
             return _roundRepository.GetAll();
         }
 
+        public IReadOnlyCollection<Round> GetVariants(int parentId)
+        {
+            throw new NotImplementedException();
+        }
+        public Round GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Round Add(Round input)
         {
             return _roundRepository.Create(input);
