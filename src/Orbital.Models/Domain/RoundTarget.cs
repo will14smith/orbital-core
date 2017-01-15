@@ -10,6 +10,17 @@ namespace Orbital.Models.Domain
         // needed for deserialisation
         public RoundTarget() { }
 
+        public RoundTarget(int id, RoundTarget target)
+            : this(
+                id: id,
+                scoringType: target.ScoringType,
+                distance: target.Distance,
+                faceSize: target.FaceSize,
+                arrowCount: target.ArrowCount
+            )
+        {
+        }
+
         public RoundTarget(int id, ScoringType scoringType, Length distance, Length faceSize, int arrowCount)
         {
             Id = id;

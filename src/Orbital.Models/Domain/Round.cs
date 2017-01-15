@@ -18,7 +18,7 @@ namespace Orbital.Models.Domain
             )
         {
         }
-        public Round(int id, Round round, IReadOnlyList<RoundTarget> targets)
+        public Round(int id, Round round, IReadOnlyCollection<RoundTarget> targets)
             : this(
             id: id,
             variantOfId: round.VariantOfId,
@@ -31,7 +31,7 @@ namespace Orbital.Models.Domain
             Id = id;
         }
 
-        public Round(int id, int? variantOfId, string category, string name, bool indoor, IReadOnlyList<RoundTarget> targets)
+        public Round(int id, int? variantOfId, string category, string name, bool indoor, IReadOnlyCollection<RoundTarget> targets)
         {
             Id = id;
 
@@ -53,7 +53,7 @@ namespace Orbital.Models.Domain
         // TODO enum this?
         public bool Indoor { get; private set; }
 
-        public IReadOnlyList<RoundTarget> Targets { get; private set; }
+        public IReadOnlyCollection<RoundTarget> Targets { get; private set; }
 
         public class EqualWithoutId : IEqualityComparer<Round>
         {

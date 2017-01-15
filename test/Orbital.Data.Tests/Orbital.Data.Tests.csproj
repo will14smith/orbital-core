@@ -12,6 +12,7 @@
     <EmbeddedResource Include="compiler\resources\**\*" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Respawn\Respawn.csproj" />
     <ProjectReference Include="..\..\src\DbUp.Postgresql\DbUp.Postgresql.csproj" />
     <ProjectReference Include="..\..\src\Orbital.Data\Orbital.Data.csproj" />
     <ProjectReference Include="..\..\src\Orbital.Models\Orbital.Models.csproj" />

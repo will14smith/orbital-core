@@ -66,8 +66,8 @@ namespace Orbital.Data.Repositories
             using (var command = connection.CreateCommand())
             {
                 command.CommandText =
-                    $"INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery)" +
-                    $" VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id";
+                    "INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery)" +
+                    " VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id";
 
                 command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
                 command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
@@ -87,15 +87,15 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"UPDATE Person SET " +
-                    $" ClubId = @ClubId," +
-                    $" Name = @Name," +
-                    $" Gender = @Gender," +
-                    $" Bowstyle = @Bowstyle," +
-                    $" ArcheryGBNumber = @ArcheryGBNumber," +
-                    $" DateOfBirth = @DateOfBirth," +
-                    $" DateStartedArchery = @DateStartedArchery" +
-                    $" WHERE Id = @Id";
+                command.CommandText = "UPDATE Person SET " +
+                    " ClubId = @ClubId," +
+                    " Name = @Name," +
+                    " Gender = @Gender," +
+                    " Bowstyle = @Bowstyle," +
+                    " ArcheryGBNumber = @ArcheryGBNumber," +
+                    " DateOfBirth = @DateOfBirth," +
+                    " DateStartedArchery = @DateStartedArchery" +
+                    " WHERE Id = @Id";
 
                 command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
                 command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));

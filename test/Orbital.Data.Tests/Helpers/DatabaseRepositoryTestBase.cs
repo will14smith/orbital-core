@@ -1,21 +1,25 @@
 ﻿using Orbital.Data.Connections;
 using System;
 using System.Data;
+using Respawn;
 using Xunit;
 
 namespace Orbital.Data.Tests.Helpers
 {
     public abstract class DatabaseRepositoryTestBase : IDisposable, IClassFixture<DatabaseFixture>
     {
-        private readonly DatabaseFixture _databaseFixture;
         private readonly IDbConnection _connection;
-        private readonly IDbTransaction _transaction;
+        private readonly Checkpoint _checkpoint;
 
         protected DatabaseRepositoryTestBase(DatabaseFixture databaseFixture)
         {
-            _databaseFixture = databaseFixture;
             _connection = new ExternallyManagedConnection(databaseFixture.GetConnection());
-            _transaction = _connection.BeginTransaction(IsolationLevel.Snapshot);
+            _checkpoint = new Checkpoint
+            {
+                DbAdapter = DbAdapter.Postgres,
+                SchemasToExclude = new[] { "pg_catalog", "information_schema" }
+            };
+            _checkpoint.Reset(_connection);
         }
 
         protected IDbConnectionFactory GetConnectionFactory()
@@ -25,15 +29,14 @@ namespace Orbital.Data.Tests.Helpers
 
         public void Dispose()
         {
-            _transaction.Rollback();
-            _transaction.Dispose();
+            _checkpoint.Reset(_connection);
             _connection.Dispose();
         }
     }
 
     internal class TestConnectionFactory : IDbConnectionFactory
     {
-        private Func<IDbConnection> _connectionFactory;
+        private readonly Func<IDbConnection> _connectionFactory;
 
         public TestConnectionFactory(Func<IDbConnection> connectionFactory)
         {

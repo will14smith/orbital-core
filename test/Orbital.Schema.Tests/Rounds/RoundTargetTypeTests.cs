@@ -8,7 +8,7 @@ namespace Orbital.Schema.Tests.Rounds
 {
     public class RoundTargetTypeTests
     {
-        private static readonly RoundTarget WA18Target = RoundTypeTests.WA18.Targets[0];
+        private static readonly RoundTarget WA18Target = RoundTypeTests.WA18.Targets.First();
 
         [Fact]
         public void TestFields()
