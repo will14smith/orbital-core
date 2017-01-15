@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Orbital.Models.Domain
 {
@@ -28,5 +30,28 @@ namespace Orbital.Models.Domain
         public Length FaceSize { get; private set; }
 
         public int ArrowCount { get; private set; }
+
+        public class EqualWithoutId : IEqualityComparer<RoundTarget>
+        {
+            public bool Equals(RoundTarget x, RoundTarget y)
+            {
+                return x.ScoringType == y.ScoringType
+                    && Equals(x.Distance, y.Distance)
+                    && Equals(x.FaceSize, y.FaceSize)
+                    && x.ArrowCount == y.ArrowCount;
+            }
+
+            public int GetHashCode(RoundTarget obj)
+            {
+                unchecked
+                {
+                    var hashCode = (int)obj.ScoringType;
+                    hashCode = (hashCode * 397) ^ obj.Distance.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.FaceSize.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.ArrowCount;
+                    return hashCode;
+                }
+            }
+        }
     }
 }

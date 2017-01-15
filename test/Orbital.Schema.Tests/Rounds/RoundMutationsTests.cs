@@ -61,7 +61,7 @@ namespace Orbital.Schema.Tests.Rounds
                 UserContext = userContext
             });
 
-            Assert.Equal(new Round(1, round), result);
+            Assert.Equal(new Round(1, round), (Round)result, new Round.EqualWithoutId());
             personServiceMock.Verify();
         }
 
@@ -98,7 +98,7 @@ namespace Orbital.Schema.Tests.Rounds
                 UserContext = userContext
             });
 
-            Assert.Equal(round, result);
+            Assert.Equal(round, (Round)result, new Round.EqualWithoutId());
             personServiceMock.Verify();
         }
     }

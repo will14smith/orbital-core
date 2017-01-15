@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Orbital.Models.Domain
 {
@@ -53,5 +54,30 @@ namespace Orbital.Models.Domain
         public bool Indoor { get; private set; }
 
         public IReadOnlyList<RoundTarget> Targets { get; private set; }
+
+        public class EqualWithoutId : IEqualityComparer<Round>
+        {
+            public bool Equals(Round x, Round y)
+            {
+                return x.VariantOfId == y.VariantOfId
+                    && string.Equals(x.Category, y.Category)
+                    && string.Equals(x.Name, y.Name)
+                    && x.Indoor == y.Indoor
+                    && x.Targets.SequenceEqual(y.Targets, new RoundTarget.EqualWithoutId());
+            }
+
+            public int GetHashCode(Round obj)
+            {
+                unchecked
+                {
+                    var hashCode = obj.VariantOfId.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.Category.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.Name.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.Indoor.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.Targets.GetHashCode();
+                    return hashCode;
+                }
+            }
+        }
     }
 }
