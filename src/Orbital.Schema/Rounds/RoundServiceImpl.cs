@@ -23,6 +23,12 @@ namespace Orbital.Schema.Rounds
         {
             return _roundRepository.GetAllVariantsById(parentId);
         }
+
+        public IReadOnlyCollection<Round> GetByCompetition(Competition competition)
+        {
+            throw new NotImplementedException();
+        }
+
         public Round GetById(int id)
         {
             return _roundRepository.GetById(id);

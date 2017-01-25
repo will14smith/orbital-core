@@ -7,6 +7,7 @@ namespace Orbital.Schema.Rounds
     {
         IReadOnlyCollection<Round> GetRoot();
         IReadOnlyCollection<Round> GetVariants(int parentId);
+        IReadOnlyCollection<Round> GetByCompetition(Competition competition);
         Round GetById(int id);
 
         Round Add(Round input);
