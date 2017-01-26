@@ -1,4 +1,4 @@
-using System.Linq;
+using System;
 using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
@@ -33,6 +33,31 @@ namespace Orbital.Schema.Tests.Rounds
 
             var result = service.GetVariants(round2.Id);
             Assert.Single(result, round1);
+        }
+
+        [Fact]
+        public void TestGetByCompetition_Empty()
+        {
+            var competition = new Competition(1, "CompName", new DateTime(2017, 1, 1), new DateTime(2017, 1, 2), new int[0]);
+            var roundRepository = InMemoryRoundRepository.New();
+
+            var service = new RoundServiceImpl(roundRepository);
+
+            var result = service.GetByCompetition(competition);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void TestGetByCompetition()
+        {
+            var round = RoundTypeTests.WA18;
+            var roundRepository = InMemoryRoundRepository.New(round);
+            var competition = new Competition(1, "CompName", new DateTime(2017, 1, 1), new DateTime(2017, 1, 2), new[] { round.Id });
+
+            var service = new RoundServiceImpl(roundRepository);
+
+            var result = service.GetByCompetition(competition);
+            Assert.Single(result, round);
         }
 
         [Fact]

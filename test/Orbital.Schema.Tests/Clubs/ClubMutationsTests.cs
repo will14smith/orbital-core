@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using Moq;
@@ -9,11 +8,11 @@ using Xunit;
 
 namespace Orbital.Schema.Tests.Clubs
 {
-    public class ClubsMutationTests
+    public class ClubMutationsTests
     {
         private readonly ObjectGraphType _mutations;
 
-        public ClubsMutationTests()
+        public ClubMutationsTests()
         {
             _mutations = new ObjectGraphType();
             ClubMutations.AddToRoot(_mutations);

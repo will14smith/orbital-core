@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
 
@@ -23,6 +23,12 @@ namespace Orbital.Schema.Rounds
         {
             return _roundRepository.GetAllVariantsById(parentId);
         }
+
+        public IReadOnlyCollection<Round> GetByCompetition(Competition competition)
+        {
+            return competition.Rounds.Select(roundId => _roundRepository.GetById(roundId)).ToList();
+        }
+
         public Round GetById(int id)
         {
             return _roundRepository.GetById(id);

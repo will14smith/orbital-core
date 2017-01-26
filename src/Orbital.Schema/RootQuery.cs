@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using Orbital.Schema.Clubs;
+using Orbital.Schema.Competitions;
 using Orbital.Schema.People;
 using Orbital.Schema.Rounds;
 
@@ -18,6 +19,9 @@ namespace Orbital.Schema
             Field<ListGraphType<RoundType>>(
                 name: "rounds",
                 resolve: context => context.ResolveService<object, IRoundService>().GetRoot());
+            Field<ListGraphType<CompetitionType>>(
+                name: "competitions",
+                resolve: context => context.ResolveService<object, ICompetitionService>().GetRoot());
         }
     }
 }
