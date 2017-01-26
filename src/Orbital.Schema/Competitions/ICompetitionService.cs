@@ -7,5 +7,8 @@ namespace Orbital.Schema.Competitions
     {
         IReadOnlyCollection<Competition> GetRoot();
         Competition GetById(int id);
+
+        Competition Add(Competition input);
+        Competition Update(int id, Competition input);
     }
 }
