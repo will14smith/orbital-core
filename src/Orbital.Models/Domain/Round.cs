@@ -28,7 +28,6 @@ namespace Orbital.Models.Domain
             targets: targets
             )
         {
-            Id = id;
         }
 
         public Round(int id, int? variantOfId, string category, string name, bool indoor, IReadOnlyCollection<RoundTarget> targets)
