@@ -23,7 +23,7 @@ namespace Orbital.Web
             var dbName = parsedConnectionString.Database;
 
             parsedConnectionString.Database = null;
-            using (var connection = new NpgsqlConnection(parsedConnectionString))
+            using (var connection = new NpgsqlConnection(parsedConnectionString.ToString()))
             {
                 connection.Open();
 

@@ -1,26 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <DebugType>portable</DebugType>
     <AssemblyName>Orbital.Data</AssemblyName>
-    <NuGetPackageRoot>$(USERPROFILE)\.nuget\packages\</NuGetPackageRoot>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="**\*.cs" />
-    <EmbeddedResource Include="**\*.resx" />
-    <EmbeddedResource Include="compiler\resources\**\*" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="NETStandard.Library">
-      <Version>1.6.1</Version>
-    </PackageReference>
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="dbup4-core" Version="4.0.0-beta0003" />
-    <PackageReference Include="Npgsql" Version="3.1.9" />
+    <PackageReference Include="Npgsql" Version="3.2.1" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -30,7 +18,4 @@
     <Message Text="@(Content)" Importance="high" Condition="%(Content.Extension) == '.sql'" />
     <Error Condition="%(Content.Extension) == '.sql'" Text="Nothing should be marked as Content, check your scripts are marked as Embedded Resource" />
   </Target>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
 </Project>

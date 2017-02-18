@@ -2,9 +2,7 @@
 using Npgsql;
 using Orbital.Data.Migrations;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using Npgsql.Logging;
 
 namespace Orbital.Data.Tests.Helpers
 {
@@ -23,7 +21,7 @@ namespace Orbital.Data.Tests.Helpers
 
         public IDbConnection GetConnection()
         {
-            var connection = new NpgsqlConnection(_connectionString);
+            var connection = new NpgsqlConnection(_connectionString.ToString());
             connection.Open();
             return connection;
         }
@@ -81,7 +79,7 @@ namespace Orbital.Data.Tests.Helpers
                 Database = null
             };
 
-            var connection = new NpgsqlConnection(parsedConnectionString);
+            var connection = new NpgsqlConnection(parsedConnectionString.ToString());
             connection.Open();
             return connection;
         }
