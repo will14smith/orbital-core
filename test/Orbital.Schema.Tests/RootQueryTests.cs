@@ -20,7 +20,7 @@ namespace Orbital.Schema.Tests
             var resolver = type.Fields.ToList();
 
             Assert.Equal(
-              new[] { "clubs", "people", "rounds" }.OrderBy(x => x),
+              new[] { "clubs", "people", "rounds", "competitions" }.OrderBy(x => x),
               resolver.Select(x => x.Name).OrderBy(x => x)
             );
         }
