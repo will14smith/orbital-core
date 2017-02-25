@@ -1,21 +1,15 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Club
     {
-        // needed for deserialisation
-        public Club() { }
-
         public Club(int id, string name)
         {
             Id = id;
             Name = name;
         }
 
-        public int Id { get; private set; }
-        public string Name { get; private set; }
+        public int Id { get; }
+        public string Name { get; }
 
         public override bool Equals(object obj)
         {
@@ -29,7 +23,7 @@ namespace Orbital.Models.Domain
         {
             unchecked
             {
-                return Id * 317 + (Name.GetHashCode());
+                return Id * 317 + Name.GetHashCode();
             }
         }
     }

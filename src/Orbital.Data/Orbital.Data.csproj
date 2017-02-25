@@ -7,6 +7,7 @@
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.2" />
     <PackageReference Include="dbup4-core" Version="4.0.0-beta0003" />
     <PackageReference Include="Npgsql" Version="3.2.1" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />

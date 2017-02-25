@@ -1,8 +1,11 @@
-﻿using Orbital.Models.Repositories;
-using System.Collections.Generic;
-using Orbital.Models.Domain;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dapper;
 using Orbital.Data.Connections;
-using System.Data;
+using Orbital.Data.Entities;
+using Orbital.Data.Mapping;
+using Orbital.Models.Domain;
+using Orbital.Models.Repositories;
 
 namespace Orbital.Data.Repositories
 {
@@ -18,58 +21,44 @@ namespace Orbital.Data.Repositories
         public IReadOnlyCollection<Club> GetAll()
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM Club";
+                var clubs = connection.Query<ClubEntity>("SELECT * FROM Club");
 
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadAll(MapToClub);
-                }
+                return clubs.Select(ClubMapper.ToDomain).ToList();
             }
         }
 
         public Club GetById(int id)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM Club WHERE Id = @Id";
-                command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
+                var club = connection.QuerySingleOrDefault<ClubEntity>("SELECT * FROM Club WHERE Id = @Id", new { Id = id });
 
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadOne(MapToClub);
-                }
+                return club?.ToDomain();
             }
         }
 
         public Club Create(Club club)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"INSERT INTO Club (Name) VALUES (@Name) RETURNING Id";
+                var entity = club.ToEntity();
 
-                command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
+                entity.Id = connection.ExecuteScalar<int>("INSERT INTO Club (Name) VALUES (@Name) RETURNING Id", entity);
 
-                var insertId = (int)command.ExecuteScalar();
-                return new Club(insertId, club.Name);
+                return entity.ToDomain();
             }
         }
 
         public Club Update(Club club)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"UPDATE Club SET Name = @Name WHERE Id = @Id";
+                var entity = club.ToEntity();
 
-                command.Parameters.Add(command.CreateParameter("Id", club.Id, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("Name", club.Name, DbType.String));
+                connection.Execute("UPDATE Club SET Name = @Name WHERE Id = @Id", entity);
 
-                command.ExecuteNonQuery();
-                return club;
+                return entity.ToDomain();
             }
         }
 
@@ -77,25 +66,12 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "DELETE FROM Club WHERE Id = @Id";
-                    command.Parameters.Add(command.CreateParameter("Id", club.Id, DbType.Int32));
+                var entity = club.ToEntity();
 
-                    var rowsChanged = command.ExecuteNonQuery();
+                var rowsChanged = connection.Execute("DELETE FROM Club WHERE Id = @Id", entity);
 
-                    return rowsChanged == 1;
-                }
+                return rowsChanged == 1;
             }
-        }
-
-        private static readonly string SelectFields = "Id, Name";
-        private Club MapToClub(IDataRecord record)
-        {
-            var id = record.GetValue<int>(0);
-            var name = record.GetValue<string>(1);
-
-            return new Club(id, name);
         }
     }
 }
