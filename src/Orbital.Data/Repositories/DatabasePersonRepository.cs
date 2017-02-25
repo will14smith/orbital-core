@@ -1,9 +1,11 @@
-﻿using Orbital.Models.Repositories;
-using System.Collections.Generic;
-using Orbital.Models.Domain;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dapper;
 using Orbital.Data.Connections;
-using System.Data;
-using System;
+using Orbital.Data.Entities;
+using Orbital.Data.Mapping;
+using Orbital.Models.Domain;
+using Orbital.Models.Repositories;
 
 namespace Orbital.Data.Repositories
 {
@@ -19,126 +21,78 @@ namespace Orbital.Data.Repositories
         public IReadOnlyCollection<Person> GetAll()
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM Person";
+                var people = connection.Query<PersonEntity>("SELECT * FROM Person");
 
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadAll(MapToPerson);
-                }
+                return people.Select(PersonMapper.ToDomain).ToList();
             }
         }
 
         public IReadOnlyCollection<Person> GetAllByClubId(int clubId)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM Person WHERE ClubId = @ClubId";
-                command.Parameters.Add(command.CreateParameter("ClubId", clubId, DbType.Int32));
+                var people = connection.Query<PersonEntity>("SELECT * FROM Person WHERE ClubId = @ClubId", new {ClubId = clubId});
 
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadAll(MapToPerson);
-                }
+                return people.Select(PersonMapper.ToDomain).ToList();
             }
         }
 
         public Person GetById(int id)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM Person WHERE Id = @Id";
-                command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
+                var person = connection.QuerySingleOrDefault<PersonEntity>("SELECT * FROM Person WHERE Id = @Id", new {Id = id});
 
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadOne(MapToPerson);
-                }
+                return person?.ToDomain();
             }
         }
 
         public Person Create(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText =
-                    "INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery)" +
-                    " VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id";
+                var entity = person.ToEntity();
 
-                command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
-                command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
-                command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
-                command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
+                entity.Id = connection.ExecuteScalar<int>(@"
+                    INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery) 
+                    VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id", entity);
 
-                var insertId = (int)command.ExecuteScalar();
-                return new Person(insertId, person);
+                return entity.ToDomain();
             }
         }
 
         public Person Update(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = "UPDATE Person SET " +
-                    " ClubId = @ClubId," +
-                    " Name = @Name," +
-                    " Gender = @Gender," +
-                    " Bowstyle = @Bowstyle," +
-                    " ArcheryGBNumber = @ArcheryGBNumber," +
-                    " DateOfBirth = @DateOfBirth," +
-                    " DateStartedArchery = @DateStartedArchery" +
-                    " WHERE Id = @Id";
+                var entity = person.ToEntity();
 
-                command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("ClubId", person.ClubId, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("Name", person.Name, DbType.String));
-                command.Parameters.Add(command.CreateParameter("Gender", (int)person.Gender, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("Bowstyle", (int?)person.Bowstyle, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("ArcheryGBNumber", person.ArcheryGBNumber, DbType.String));
-                command.Parameters.Add(command.CreateParameter("DateOfBirth", person.DateOfBirth, DbType.DateTime2));
-                command.Parameters.Add(command.CreateParameter("DateStartedArchery", person.DateStartedArchery, DbType.DateTime2));
+                connection.Execute(@"
+                    UPDATE Person SET 
+                        ClubId = @ClubId, 
+                        Name = @Name, 
+                        Gender = @Gender, 
+                        Bowstyle = @Bowstyle, 
+                        ArcheryGBNumber = @ArcheryGBNumber, 
+                        DateOfBirth = @DateOfBirth, 
+                        DateStartedArchery = @DateStartedArchery 
+                    WHERE Id = @Id", entity);
 
-                command.ExecuteNonQuery();
-                return person;
+                return entity.ToDomain();
             }
         }
 
         public bool Delete(Person person)
         {
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = "DELETE FROM Person WHERE Id = @Id";
-                command.Parameters.Add(command.CreateParameter("Id", person.Id, DbType.Int32));
+                var entity = person.ToEntity();
 
-                var rowsChanged = command.ExecuteNonQuery();
+                var rowsChanged = connection.Execute("DELETE FROM Person WHERE Id = @Id", entity);
 
                 return rowsChanged == 1;
             }
-        }
-
-        private static readonly string SelectFields = "Id, ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery";
-        private Person MapToPerson(IDataRecord record)
-        {
-            var id = record.GetValue<int>(0);
-            var clubId = record.GetValue<int>(1);
-            var name = record.GetValue<string>(2);
-            var gender = record.GetValue<Gender>(3);
-            var bowstyle = record.GetValue<Bowstyle?>(4);
-            var archeryGBNumber = record.GetValue<string>(5);
-            var dateOfBirth = record.GetValue<DateTime?>(6);
-            var dateStartedArchery = record.GetValue<DateTime?>(7);
-
-            return new Person(id, clubId, name, gender, bowstyle, archeryGBNumber, dateOfBirth, dateStartedArchery);
-
         }
     }
 }

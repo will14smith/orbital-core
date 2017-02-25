@@ -3,12 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Person
     {
-        // needed for deserialisation
-        public Person() { }
-
         public Person(int id, Person person)
             : this(
                 id: id,
@@ -45,16 +41,16 @@ namespace Orbital.Models.Domain
             DateStartedArchery = dateStartedArchery;
         }
 
-        public int Id { get; private set; }
-        public int ClubId { get; private set; }
+        public int Id { get; }
+        public int ClubId { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public Gender Gender { get; private set; }
-        public Bowstyle? Bowstyle { get; private set; }
-        public string ArcheryGBNumber { get; private set; }
-        public DateTime? DateOfBirth { get; private set; }
-        public DateTime? DateStartedArchery { get; private set; }
+        public Gender Gender { get; }
+        public Bowstyle? Bowstyle { get; }
+        public string ArcheryGBNumber { get; }
+        public DateTime? DateOfBirth { get; }
+        public DateTime? DateStartedArchery { get; }
 
         public override bool Equals(object obj)
         {
