@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Orbital.Models.Services;
 using Orbital.Schema.Clubs;
 using Orbital.Schema.Competitions;
 using Orbital.Schema.People;

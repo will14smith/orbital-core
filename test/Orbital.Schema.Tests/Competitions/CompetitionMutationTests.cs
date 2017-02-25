@@ -4,6 +4,7 @@ using System.Linq;
 using GraphQL.Types;
 using Moq;
 using Orbital.Models.Domain;
+using Orbital.Models.Services;
 using Orbital.Schema.Clubs;
 using Orbital.Schema.Competitions;
 using Xunit;

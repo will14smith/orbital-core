@@ -4,7 +4,7 @@ using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
 using Orbital.Models.Services;
 
-namespace Orbital.Schema.Rounds
+namespace Orbital.Services
 {
     public class RoundServiceImpl : IRoundService
     {

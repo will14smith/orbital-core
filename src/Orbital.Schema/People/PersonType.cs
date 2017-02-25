@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using Orbital.Models.Domain;
+using Orbital.Models.Services;
 using Orbital.Schema.Clubs;
 using Orbital.Schema.Common;
 

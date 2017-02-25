@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Orbital.Models.Domain;
 
-namespace Orbital.Schema.People
+namespace Orbital.Models.Services
 {
     public interface IPersonService
     {

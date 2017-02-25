@@ -1,12 +1,10 @@
-using System;
 using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
-using Orbital.Schema.Clubs;
 using Xunit;
 
-namespace Orbital.Schema.Tests.Clubs
+namespace Orbital.Services.Test
 {
     public class ClubServiceImplTests
     {

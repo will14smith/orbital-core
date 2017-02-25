@@ -3,10 +3,9 @@ using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
-using Orbital.Schema.Competitions;
 using Xunit;
 
-namespace Orbital.Schema.Tests.Competitions
+namespace Orbital.Services.Test
 {
     public class CompetitionServiceImplTests
     {

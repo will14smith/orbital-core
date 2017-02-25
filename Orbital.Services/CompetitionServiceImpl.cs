@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
+using Orbital.Models.Services;
 
-namespace Orbital.Schema.Competitions
+namespace Orbital.Services
 {
     public class CompetitionServiceImpl : ICompetitionService
     {

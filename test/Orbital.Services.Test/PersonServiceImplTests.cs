@@ -2,10 +2,9 @@ using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
-using Orbital.Schema.People;
 using Xunit;
 
-namespace Orbital.Schema.Tests.People
+namespace Orbital.Services.Test
 {
     public class PersonServiceImplTests
     {

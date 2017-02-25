@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
+using Orbital.Models.Services;
 
-namespace Orbital.Schema.People
+namespace Orbital.Services
 {
     public class PersonServiceImpl : IPersonService
     {

@@ -1,7 +1,7 @@
-﻿using Orbital.Models.Domain;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Orbital.Models.Domain;
 
-namespace Orbital.Schema.Rounds
+namespace Orbital.Models.Services
 {
     public interface IRoundService
     {

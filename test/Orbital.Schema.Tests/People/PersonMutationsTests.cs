@@ -5,6 +5,7 @@ using Moq;
 using Orbital.Schema.People;
 using Xunit;
 using Orbital.Models.Domain;
+using Orbital.Models.Services;
 
 namespace Orbital.Schema.Tests.People
 {

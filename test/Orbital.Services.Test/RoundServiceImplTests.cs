@@ -3,17 +3,18 @@ using Moq;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
-using Orbital.Schema.Rounds;
 using Xunit;
 
-namespace Orbital.Schema.Tests.Rounds
+namespace Orbital.Services.Test
 {
     public class RoundServiceImplTests
     {
+        internal static readonly Round WA18 = new Round(1, 2, "World Archery", "WA18", true, new[] { new RoundTarget(3, ScoringType.FiveZone, new Length(18, LengthUnit.Meters), new Length(40, LengthUnit.Centimeters), 60) });
+
         [Fact]
         public void TestGetRoot()
         {
-            var round = RoundTypeTests.WA18;
+            var round = WA18;
             var roundRepository = InMemoryRoundRepository.New(round);
 
             var service = new RoundServiceImpl(roundRepository);
@@ -25,7 +26,7 @@ namespace Orbital.Schema.Tests.Rounds
         [Fact]
         public void TestGetVariants()
         {
-            var round1 = RoundTypeTests.WA18;
+            var round1 = WA18;
             var round2 = new Round(round1.VariantOfId.Value, null, "A", "B", false, new RoundTarget[0]);
             var roundRepository = InMemoryRoundRepository.New(round1, round2);
 
@@ -50,7 +51,7 @@ namespace Orbital.Schema.Tests.Rounds
         [Fact]
         public void TestGetByCompetition()
         {
-            var round = RoundTypeTests.WA18;
+            var round = WA18;
             var roundRepository = InMemoryRoundRepository.New(round);
             var competition = new Competition(1, "CompName", new DateTime(2017, 1, 1), new DateTime(2017, 1, 2), new[] { round.Id });
 
@@ -63,7 +64,7 @@ namespace Orbital.Schema.Tests.Rounds
         [Fact]
         public void TestGetById()
         {
-            var round = RoundTypeTests.WA18;
+            var round = WA18;
             var roundRepository = InMemoryRoundRepository.New(round);
 
             var service = new RoundServiceImpl(roundRepository);
@@ -76,7 +77,7 @@ namespace Orbital.Schema.Tests.Rounds
         [Fact]
         public void TestAdd()
         {
-            var round = new Round(0, RoundTypeTests.WA18);
+            var round = new Round(0, WA18);
             var roundRepositoryMock = new Mock<IRoundRepository>();
             roundRepositoryMock.Setup(x => x.Create(round)).Returns<Round>(x => new Round(1, round)).Verifiable();
 
@@ -92,7 +93,7 @@ namespace Orbital.Schema.Tests.Rounds
         [Fact]
         public void TestUpdate()
         {
-            var round = RoundTypeTests.WA18;
+            var round = WA18;
             var roundRepositoryMock = new Mock<IRoundRepository>();
             roundRepositoryMock.Setup(x => x.Update(It.IsAny<Round>())).Returns<Round>(x => x).Verifiable();
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using GraphQL.Types;
 using Orbital.Models.Domain;
+using Orbital.Models.Services;
 
 namespace Orbital.Schema.Rounds
 {

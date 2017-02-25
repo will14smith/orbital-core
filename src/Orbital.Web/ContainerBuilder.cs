@@ -1,9 +1,8 @@
 ﻿using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
-using Orbital.Schema.Clubs;
-using Orbital.Schema.People;
-using Orbital.Schema.Rounds;
+using Orbital.Models.Services;
+using Orbital.Services;
 using SimpleInjector;
 
 namespace Orbital.Web

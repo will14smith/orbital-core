@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Orbital.Models.Domain;
 
-namespace Orbital.Schema.Competitions
+namespace Orbital.Models.Services
 {
     public interface ICompetitionService
     {
