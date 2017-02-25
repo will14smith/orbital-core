@@ -1,11 +1,20 @@
-﻿using Orbital.Data.Repositories;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 using Xunit;
 
 namespace Orbital.Data.Tests.Repositories
 {
-    public class InMemoryClubRepositoryTests
+    public class InMemoryRepositoryTests
     {
+        private class Repository : InMemoryRepository<Club>
+        {
+            public Repository(IEnumerable<Club> clubs) : base(clubs.ToList()) { }
+
+            protected override int GetId(Club item) { return item.Id; }
+        }
+
         [Fact]
         public void TestGetAll()
         {
@@ -15,7 +24,7 @@ namespace Orbital.Data.Tests.Repositories
                 new Club(2, "Club2")
             };
 
-            var repo = InMemoryClubRepository.New(clubs);
+            var repo = new Repository(clubs);
 
             var result = repo.GetAll();
             Assert.Equal(clubs, result);
@@ -24,7 +33,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact]
         public void TestGetAllEmpty()
         {
-            var repo = InMemoryClubRepository.New();
+            var repo = new Repository(Enumerable.Empty<Club>());
 
             var result = repo.GetAll();
             Assert.Empty(result);
@@ -34,7 +43,7 @@ namespace Orbital.Data.Tests.Repositories
         public void TestGetById()
         {
             var club = new Club(1, "Club1");
-            var repo = InMemoryClubRepository.New(club);
+            var repo = new Repository(new[] { club });
 
             var result = repo.GetById(1);
             Assert.Equal(club, result);
@@ -43,7 +52,7 @@ namespace Orbital.Data.Tests.Repositories
         public void TestGetById_Missing()
         {
             var club = new Club(1, "Club1");
-            var repo = InMemoryClubRepository.New(club);
+            var repo = new Repository(new[] { club });
 
             var result = repo.GetById(2);
             Assert.Null(result);
@@ -53,7 +62,7 @@ namespace Orbital.Data.Tests.Repositories
         public void TestCreate()
         {
             var club = new Club(1, "Club1");
-            var repo = InMemoryClubRepository.New();
+            var repo = new Repository(Enumerable.Empty<Club>());
 
             var createResult = repo.Create(club);
             Assert.Equal(club, createResult);
@@ -66,7 +75,7 @@ namespace Orbital.Data.Tests.Repositories
         public void TestUpdate()
         {
             var club = new Club(1, "Club1");
-            var repo = InMemoryClubRepository.New(club);
+            var repo = new Repository(new[] { club });
 
             var newClub = new Club(1, "Club1-Updated");
 
@@ -81,7 +90,7 @@ namespace Orbital.Data.Tests.Repositories
         public void TestRemove()
         {
             var club = new Club(1, "Club1");
-            var repo = InMemoryClubRepository.New(club);
+            var repo = new Repository(new[] { club });
 
             var deleteResult = repo.Delete(club);
             Assert.True(deleteResult);

@@ -3,14 +3,8 @@ using System.Collections.Generic;
 
 namespace Orbital.Models.Repositories
 {
-    public interface IRoundRepository
+    public interface IRoundRepository : IRepository<Round>
     {
-        IReadOnlyCollection<Round> GetAll();
         IReadOnlyCollection<Round> GetAllVariantsById(int parentRoundId);
-        Round GetById(int id);
-
-        Round Create(Round round);
-        Round Update(Round round);
-        bool Delete(Round round);
     }
 }

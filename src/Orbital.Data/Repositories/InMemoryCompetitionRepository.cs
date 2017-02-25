@@ -5,25 +5,15 @@ using Orbital.Models.Repositories;
 
 namespace Orbital.Data.Repositories
 {
-    public class InMemoryCompetitionRepository : ICompetitionRepository
+    public class InMemoryCompetitionRepository : InMemoryRepository<Competition>, ICompetitionRepository
     {
-        private List<Competition> _competitions;
-
-        public InMemoryCompetitionRepository()
-        {
-            _competitions = new List<Competition>();
-        }
+        private InMemoryCompetitionRepository(List<Competition> data) : base(data) { }
 
         public static InMemoryCompetitionRepository New(params Competition[] competitions)
         {
-            return new InMemoryCompetitionRepository { _competitions = competitions.ToList() };
+            return new InMemoryCompetitionRepository(competitions.ToList());
         }
 
-        public IReadOnlyCollection<Competition> GetAll() { return _competitions; }
-        public Competition GetById(int id) { return _competitions.FirstOrDefault(x => x.Id == id); }
-
-        public Competition Create(Competition competition) { _competitions.Add(competition); return competition; }
-        public Competition Update(Competition competition) { Delete(competition); return Create(competition); }
-        public bool Delete(Competition competition) { return _competitions.Remove(GetById(competition.Id)); }
+        protected override int GetId(Competition item) => item.Id;
     }
 }

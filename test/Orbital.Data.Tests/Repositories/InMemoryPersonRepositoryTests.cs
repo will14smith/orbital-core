@@ -7,86 +7,40 @@ namespace Orbital.Data.Tests.Repositories
     public class InMemoryPersonRepositoryTests
     {
         [Fact]
-        public void TestGetAll()
+        public void TestGetAllByClubId()
         {
             var people = new[]
             {
-                new Person(1, 0, "Person1", Gender.Male),
-                new Person(2, 0, "Person2", Gender.Male)
+                new Person(1, 1, "Person1", Gender.Male),
+                new Person(2, 1, "Person2", Gender.Male)
             };
 
             var repo = InMemoryPersonRepository.New(people);
 
-            var result = repo.GetAll();
+            var result = repo.GetAllByClubId(1);
             Assert.Equal(people, result);
         }
 
         [Fact]
-        public void TestGetAllEmpty()
+        public void TestGetAllByClubIdNoResults()
         {
-            var repo = InMemoryPersonRepository.New();
+            var people = new[]
+            {
+                new Person(1, 1, "Person1", Gender.Male),
+            };
 
-            var result = repo.GetAll();
+            var repo = InMemoryPersonRepository.New(people);
+
+            var result = repo.GetAllByClubId(2);
             Assert.Empty(result);
         }
 
         [Fact]
-        public void TestGetById()
+        public void TestGetAllByClubIdEmpty()
         {
-            var person = new Person(1, 0, "Person1", Gender.Male);
-            var repo = InMemoryPersonRepository.New(person);
-
-            var result = repo.GetById(1);
-            Assert.Equal(person, result);
-        }
-        [Fact]
-        public void TestGetById_Missing()
-        {
-            var person = new Person(1, 0, "Person1", Gender.Male);
-            var repo = InMemoryPersonRepository.New(person);
-
-            var result = repo.GetById(2);
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public void TestCreate()
-        {
-            var person = new Person(1, 0, "Person1", Gender.Male);
             var repo = InMemoryPersonRepository.New();
 
-            var createResult = repo.Create(person);
-            Assert.Equal(person, createResult);
-
-            var result = repo.GetById(1);
-            Assert.Equal(person, result);
-        }
-
-        [Fact]
-        public void TestUpdate()
-        {
-            var person = new Person(1, 0, "Person1", Gender.Male);
-            var repo = InMemoryPersonRepository.New(person);
-
-            var newPerson = new Person(1, 0, "Person1-Updated", Gender.Female);
-
-            var updateResult = repo.Update(newPerson);
-            Assert.Equal(newPerson, updateResult);
-
-            var result = repo.GetById(1);
-            Assert.Equal(newPerson, result);
-        }
-
-        [Fact]
-        public void TestRemove()
-        {
-            var person = new Person(1, 0, "Person1", Gender.Male);
-            var repo = InMemoryPersonRepository.New(person);
-
-            var deleteResult = repo.Delete(person);
-            Assert.True(deleteResult);
-
-            var result = repo.GetAll();
+            var result = repo.GetAllByClubId(1);
             Assert.Empty(result);
         }
     }
