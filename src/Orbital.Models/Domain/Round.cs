@@ -1,31 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Round
     {
-        // needed for deserialisation
-        public Round() { }
-
         public Round(int id, Round round)
-            : this(
-            id: id,
-            round: round,
-            targets: round.Targets
-            )
-        {
-        }
-        public Round(int id, Round round, IReadOnlyCollection<RoundTarget> targets)
             : this(
             id: id,
             variantOfId: round.VariantOfId,
             category: round.Category,
             name: round.Name,
             indoor: round.Indoor,
-            targets: targets
+            targets: round.Targets
             )
         {
         }
@@ -43,16 +30,16 @@ namespace Orbital.Models.Domain
             Targets = targets;
         }
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
-        public int? VariantOfId { get; private set; }
+        public int? VariantOfId { get; }
 
-        public string Category { get; private set; }
-        public string Name { get; private set; }
+        public string Category { get; }
+        public string Name { get; }
         // TODO enum this?
-        public bool Indoor { get; private set; }
+        public bool Indoor { get; }
 
-        public IReadOnlyCollection<RoundTarget> Targets { get; private set; }
+        public IReadOnlyCollection<RoundTarget> Targets { get; }
 
         public class EqualWithoutId : IEqualityComparer<Round>
         {
