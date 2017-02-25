@@ -11,19 +11,19 @@ namespace Orbital.Schema.Rounds
             Field(x => x.Id).Description("The ID of the round");
 
             Field<NonNullGraphType<EnumType<ScoringType>>>(
-                name: "scoringType",
+                name: "ScoringType",
                 description: "The type of scoring used on this target",
                 resolve: context => context.Source.ScoringType
             );
 
 
             Field<LengthType>(
-                name: "distance",
+                name: "Distance",
                 description: "The distance this target is placed at",
                 resolve: context => context.Source.Distance
             );
             Field<LengthType>(
-                name: "faceSize",
+                name: "FaceSize",
                 description: "The size of target face used on this target",
                 resolve: context => context.Source.FaceSize
             );

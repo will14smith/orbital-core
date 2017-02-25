@@ -12,16 +12,16 @@ namespace Orbital.Schema
         public RootQuery()
         {
             Field<ListGraphType<ClubType>>(
-                name: "clubs",
+                name: "Clubs",
                 resolve: context => context.ResolveService<object, IClubService>().GetRoot());
             Field<ListGraphType<PersonType>>(
-                name: "people",
+                name: "People",
                 resolve: context => context.ResolveService<object, IPersonService>().GetRoot());
             Field<ListGraphType<RoundType>>(
-                name: "rounds",
+                name: "Rounds",
                 resolve: context => context.ResolveService<object, IRoundService>().GetRoot());
             Field<ListGraphType<CompetitionType>>(
-                name: "competitions",
+                name: "Competitions",
                 resolve: context => context.ResolveService<object, ICompetitionService>().GetRoot());
         }
     }

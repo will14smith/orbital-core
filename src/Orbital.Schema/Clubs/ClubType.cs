@@ -13,7 +13,7 @@ namespace Orbital.Schema.Clubs
       Field(x => x.Name).Description("The name of the club");
 
       Field<ListGraphType<PersonType>>(
-        name: "people",
+        name: "People",
         description: "The people who have this club as their primary",
         resolve: context => context.ResolveService<Club, IPersonService>().GetByClub(context.Source)
       );

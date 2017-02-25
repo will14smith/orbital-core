@@ -21,7 +21,7 @@ namespace Orbital.Schema.Tests
             var resolver = type.Fields.ToList();
 
             Assert.Equal(
-              new[] { "clubs", "people", "rounds", "competitions" }.OrderBy(x => x),
+              new[] { "Clubs", "People", "Rounds", "Competitions" }.OrderBy(x => x),
               resolver.Select(x => x.Name).OrderBy(x => x)
             );
         }
@@ -35,7 +35,7 @@ namespace Orbital.Schema.Tests
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubService);
 
             var type = new RootQuery();
-            var resolver = type.Fields.First(x => x.Name == "clubs").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Clubs").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext
             {
                 UserContext = userContext,
@@ -55,7 +55,7 @@ namespace Orbital.Schema.Tests
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IPersonService>() == personService);
 
             var type = new RootQuery();
-            var resolver = type.Fields.First(x => x.Name == "people").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "People").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext
             {
                 UserContext = userContext,
@@ -75,7 +75,7 @@ namespace Orbital.Schema.Tests
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IRoundService>() == roundService);
 
             var type = new RootQuery();
-            var resolver = type.Fields.First(x => x.Name == "rounds").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Rounds").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext
             {
                 UserContext = userContext,

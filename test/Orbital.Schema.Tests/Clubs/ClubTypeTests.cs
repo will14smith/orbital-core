@@ -19,7 +19,7 @@ namespace Orbital.Schema.Tests.Clubs
       var resolver = type.Fields.ToList();
 
       Assert.Equal(
-        new[] { "id", "name", "people" }.OrderBy(x => x),
+        new[] { "Id", "Name", "People" }.OrderBy(x => x),
         resolver.Select(x => x.Name).OrderBy(x => x)
       );
     }
@@ -30,7 +30,7 @@ namespace Orbital.Schema.Tests.Clubs
       var club = new Club(1, "ClubName");
       var type = new ClubType();
 
-      var resolver = type.Fields.First(x => x.Name == "id").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Id").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = club });
       Assert.Equal(club.Id, value);
     }
@@ -41,7 +41,7 @@ namespace Orbital.Schema.Tests.Clubs
       var club = new Club(1, "ClubName");
       var type = new ClubType();
 
-      var resolver = type.Fields.First(x => x.Name == "name").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Name").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = club });
       Assert.Equal(club.Name, value);
     }
@@ -56,7 +56,7 @@ namespace Orbital.Schema.Tests.Clubs
       var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IPersonService>() == personService);
 
       var type = new ClubType();
-      var resolver = type.Fields.First(x => x.Name == "people").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "People").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext
       {
         Source = club,

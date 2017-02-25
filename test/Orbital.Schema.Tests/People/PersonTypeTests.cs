@@ -4,7 +4,6 @@ using GraphQL.Types;
 using Moq;
 using Orbital.Models.Domain;
 using Orbital.Models.Services;
-using Orbital.Schema.Clubs;
 using Orbital.Schema.People;
 using Xunit;
 
@@ -19,7 +18,7 @@ namespace Orbital.Schema.Tests.People
       var resolver = type.Fields.ToList();
 
       Assert.Equal(
-        new[] { "id", "club", "name", "gender", "bowstyle", "archeryGBNumber", "dateOfBirth", "dateStartedArchery" }.OrderBy(x => x),
+        new[] { "Id", "Club", "Name", "Gender", "Bowstyle", "ArcheryGBNumber", "DateOfBirth", "DateStartedArchery" }.OrderBy(x => x),
         resolver.Select(x => x.Name).OrderBy(x => x)
       );
     }
@@ -30,7 +29,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Male);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "id").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Id").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.Id, value);
     }
@@ -45,7 +44,7 @@ namespace Orbital.Schema.Tests.People
       var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IClubService>() == clubService);
 
       var type = new PersonType();
-      var resolver = type.Fields.First(x => x.Name == "club").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Club").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext
       {
         Source = person,
@@ -63,7 +62,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Male);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "name").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Name").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.Name, value);
     }
@@ -74,7 +73,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "gender").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Gender").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.Gender, value);
     }
@@ -85,7 +84,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female, bowstyle: Bowstyle.Longbow);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "bowstyle").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Bowstyle").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.Bowstyle, value);
     }
@@ -95,7 +94,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "bowstyle").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "Bowstyle").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Null(value);
     }
@@ -106,7 +105,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female, archeryGBNumber: "ArcheryGB");
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "archeryGBNumber").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "ArcheryGBNumber").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.ArcheryGBNumber, value);
     }
@@ -116,7 +115,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "archeryGBNumber").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "ArcheryGBNumber").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.ArcheryGBNumber, value);
     }
@@ -128,7 +127,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female, dateOfBirth: new DateTime());
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "dateOfBirth").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "DateOfBirth").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.DateOfBirth, value);
     }
@@ -138,7 +137,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "dateOfBirth").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "DateOfBirth").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.DateOfBirth, value);
     }
@@ -150,7 +149,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female, dateStartedArchery: new DateTime());
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "dateStartedArchery").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "DateStartedArchery").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.DateStartedArchery, value);
     }
@@ -160,7 +159,7 @@ namespace Orbital.Schema.Tests.People
       var person = new Person(1, 2, "PersonName", Gender.Female);
       var type = new PersonType();
 
-      var resolver = type.Fields.First(x => x.Name == "dateStartedArchery").Resolver;
+      var resolver = type.Fields.First(x => x.Name == "DateStartedArchery").Resolver;
       var value = resolver.Resolve(new ResolveFieldContext { Source = person });
       Assert.Equal(person.DateStartedArchery, value);
     }

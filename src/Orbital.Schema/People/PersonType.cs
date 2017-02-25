@@ -12,7 +12,7 @@ namespace Orbital.Schema.People
     {
       Field(x => x.Id).Description("The ID of the person");
       Field<NonNullGraphType<ClubType>>(
-        name: "club",
+        name: "Club",
         description: "The primary club that the person belongs to",
         resolve: context => context.ResolveService<Person, IClubService>().GetById(context.Source.ClubId)
       );
@@ -20,12 +20,12 @@ namespace Orbital.Schema.People
       Field(x => x.Name).Description("The name of the person");
 
       Field<NonNullGraphType<EnumType<Gender>>>(
-        name: "gender",
+        name: "Gender",
         description: "The gender of the person",
         resolve: context => context.Source.Gender
       );
       Field<EnumType<Bowstyle>>(
-        name: "bowstyle",
+        name: "Bowstyle",
         description: "The bowstyle of the person",
         resolve: context => context.Source.Bowstyle
       );

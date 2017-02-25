@@ -21,7 +21,7 @@ namespace Orbital.Schema.Tests.Rounds
             var resolver = type.Fields.ToList();
 
             Assert.Equal(
-              new[] { "id", "variantOfId", "category", "name", "indoor", "targets", "parent", "variants" }.OrderBy(x => x),
+              new[] { "Id", "VariantOfId", "Category", "Name", "Indoor", "Targets", "Parent", "Variants" }.OrderBy(x => x),
               resolver.Select(x => x.Name).OrderBy(x => x)
             );
         }
@@ -32,7 +32,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "id").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Id").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.Id, value);
         }
@@ -43,7 +43,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "variantOfId").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "VariantOfId").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.VariantOfId, value);
         }
@@ -54,7 +54,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "category").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Category").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.Category, value);
         }
@@ -65,7 +65,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "name").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Name").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.Name, value);
         }
@@ -76,7 +76,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "indoor").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Indoor").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.Indoor, value);
         }
@@ -87,7 +87,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "targets").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Targets").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = round });
             Assert.Equal(round.Targets, value);
         }
@@ -98,7 +98,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "parent").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Parent").Resolver;
 
             // NOTE: this is returning on the VariantId, NOT the id - querying the orignal id will return null
             var roundService = Mock.Of<IRoundService>(x => x.GetById(round.VariantOfId.Value) == round);
@@ -113,7 +113,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "parent").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Parent").Resolver;
 
             var roundService = Mock.Of<IRoundService>();
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IRoundService>() == roundService);
@@ -128,7 +128,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "variants").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Variants").Resolver;
             var roundService = Mock.Of<IRoundService>(x => x.GetVariants(round.Id) == new[] { round, round });
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IRoundService>() == roundService);
 
@@ -141,7 +141,7 @@ namespace Orbital.Schema.Tests.Rounds
             var round = WA18;
             var type = new RoundType();
 
-            var resolver = type.Fields.First(x => x.Name == "variants").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Variants").Resolver;
             var roundService = Mock.Of<IRoundService>(x => x.GetVariants(round.Id) == new Round[0]);
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IRoundService>() == roundService);
 

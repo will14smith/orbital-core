@@ -18,18 +18,18 @@ namespace Orbital.Schema.Rounds
             Field(x => x.Indoor).Description("If the round is shot indoors or outdoors");
 
             Field<ListGraphType<RoundTargetType>>(
-                name: "targets",
+                name: "Targets",
                 description: "A list of all the targets that are used in this round",
                 resolve: x => x.Source.Targets
             );
 
             Field<RoundType>(
-                name: "parent",
+                name: "Parent",
                 description: "The optional parent round that this round is a variant of",
                 resolve: GetParent
             );
             Field<ListGraphType<RoundType>>(
-                name: "variants",
+                name: "Variants",
                 description: "The list of rounds that are variants of this round",
                 resolve: GetVariants
             );

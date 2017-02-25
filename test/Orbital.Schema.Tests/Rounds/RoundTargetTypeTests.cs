@@ -17,7 +17,7 @@ namespace Orbital.Schema.Tests.Rounds
             var resolver = type.Fields.ToList();
 
             Assert.Equal(
-              new[] { "id", "scoringType", "distance", "faceSize", "arrowCount" }.OrderBy(x => x),
+              new[] { "Id", "ScoringType", "Distance", "FaceSize", "ArrowCount" }.OrderBy(x => x),
               resolver.Select(x => x.Name).OrderBy(x => x)
             );
         }
@@ -28,7 +28,7 @@ namespace Orbital.Schema.Tests.Rounds
             var target = WA18Target;
             var type = new RoundTargetType();
 
-            var resolver = type.Fields.First(x => x.Name == "id").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Id").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = target });
             Assert.Equal(target.Id, value);
         }
@@ -39,7 +39,7 @@ namespace Orbital.Schema.Tests.Rounds
             var target = WA18Target;
             var type = new RoundTargetType();
 
-            var resolver = type.Fields.First(x => x.Name == "scoringType").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "ScoringType").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = target });
             Assert.Equal(target.ScoringType, value);
         }
@@ -50,7 +50,7 @@ namespace Orbital.Schema.Tests.Rounds
             var target = WA18Target;
             var type = new RoundTargetType();
 
-            var resolver = type.Fields.First(x => x.Name == "distance").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Distance").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = target });
             Assert.Equal(target.Distance, value);
         }
@@ -61,7 +61,7 @@ namespace Orbital.Schema.Tests.Rounds
             var target = WA18Target;
             var type = new RoundTargetType();
 
-            var resolver = type.Fields.First(x => x.Name == "faceSize").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "FaceSize").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = target });
             Assert.Equal(target.FaceSize, value);
         }
@@ -72,7 +72,7 @@ namespace Orbital.Schema.Tests.Rounds
             var target = WA18Target;
             var type = new RoundTargetType();
 
-            var resolver = type.Fields.First(x => x.Name == "arrowCount").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "ArrowCount").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = target });
             Assert.Equal(target.ArrowCount, value);
         }

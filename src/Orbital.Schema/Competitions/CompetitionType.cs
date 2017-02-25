@@ -15,7 +15,7 @@ namespace Orbital.Schema.Competitions
       Field(x => x.End).Description("The end time of the competition");
 
       Field<ListGraphType<RoundType>>(
-        name: "rounds",
+        name: "Rounds",
         description: "Rounds shot at this comptition",
         resolve: context => context.ResolveService<Competition, IRoundService>().GetByCompetition(context.Source)
       );

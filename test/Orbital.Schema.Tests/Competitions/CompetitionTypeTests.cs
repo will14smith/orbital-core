@@ -23,7 +23,7 @@ namespace Orbital.Schema.Tests.Competitions
             var resolver = type.Fields.ToList();
 
             Assert.Equal(
-              new[] { "id", "name", "start", "end", "rounds" }.OrderBy(x => x),
+              new[] { "Id", "Name", "Start", "End", "Rounds" }.OrderBy(x => x),
               resolver.Select(x => x.Name).OrderBy(x => x)
             );
         }
@@ -34,7 +34,7 @@ namespace Orbital.Schema.Tests.Competitions
             var competition = new Competition(1, "CompetitionName", Start, End, new int[0]);
             var type = new CompetitionType();
 
-            var resolver = type.Fields.First(x => x.Name == "id").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Id").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = competition });
             Assert.Equal(competition.Id, value);
         }
@@ -45,7 +45,7 @@ namespace Orbital.Schema.Tests.Competitions
             var competition = new Competition(1, "CompetitionName", Start, End, new int[0]);
             var type = new CompetitionType();
 
-            var resolver = type.Fields.First(x => x.Name == "name").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Name").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = competition });
             Assert.Equal(competition.Name, value);
         }
@@ -56,7 +56,7 @@ namespace Orbital.Schema.Tests.Competitions
             var competition = new Competition(1, "CompetitionName", Start, End, new int[0]);
             var type = new CompetitionType();
 
-            var resolver = type.Fields.First(x => x.Name == "start").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Start").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = competition });
             Assert.Equal(competition.Start, value);
         }
@@ -67,7 +67,7 @@ namespace Orbital.Schema.Tests.Competitions
             var competition = new Competition(1, "CompetitionName", Start, End, new int[0]);
             var type = new CompetitionType();
 
-            var resolver = type.Fields.First(x => x.Name == "end").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "End").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext { Source = competition });
             Assert.Equal(competition.End, value);
         }
@@ -82,7 +82,7 @@ namespace Orbital.Schema.Tests.Competitions
             var userContext = Mock.Of<IUserContext>(x => x.ResolveService<IRoundService>() == roundService);
 
             var type = new CompetitionType();
-            var resolver = type.Fields.First(x => x.Name == "rounds").Resolver;
+            var resolver = type.Fields.First(x => x.Name == "Rounds").Resolver;
             var value = resolver.Resolve(new ResolveFieldContext
             {
                 Source = competition,
