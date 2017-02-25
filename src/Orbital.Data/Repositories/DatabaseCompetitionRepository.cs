@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using NpgsqlTypes;
+using Dapper;
 using Orbital.Data.Connections;
+using Orbital.Data.Entities;
+using Orbital.Data.Mapping;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
 
@@ -20,67 +22,35 @@ namespace Orbital.Data.Repositories
 
         public IReadOnlyCollection<Competition> GetAll()
         {
-            IReadOnlyCollection<Competition> competitions;
-
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM competition";
+                var results = connection.QueryMultiple(@"
+                    SELECT * FROM competition;
+                    SELECT * FROM competition_round
+                ");
 
-                using (var reader = command.ExecuteReader())
-                {
-                    competitions = reader.ReadAll(MapToCompetition);
-                }
+                var competitions = results.Read<CompetitionEntity>();
+                var competitionRounds = results.Read<CompetitionRoundEntity>()
+                    .GroupBy(x => x.CompetitionId)
+                    .ToDictionary(x => x.Key, x => (IEnumerable<int>)x.Select(cr => cr.RoundId).ToList());
+
+                return competitions.Select(x => x.ToDomain(competitionRounds.SafeGet(x.Id, () => new int[0]))).ToList();
             }
-
-            var roundIds = GetRoundIdsByCompetitionIds(competitions.Select(x => x.Id).ToList());
-
-            return competitions
-                .Select(x => new Competition(x.Id, x, roundIds.SafeGet(x.Id, _ => new int[0])))
-                .ToList();
         }
 
         public Competition GetById(int id)
         {
-            Competition competition;
-
             using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT {SelectFields} FROM competition WHERE Id = @Id";
-                command.Parameters.Add(command.CreateParameter("Id", id, DbType.Int32));
+                var results = connection.QueryMultiple(@"
+                    SELECT * FROM competition WHERE Id = @Id;
+                    SELECT * FROM competition_round WHERE CompetitionId = @Id
+                ", new { Id = id });
 
-                using (var reader = command.ExecuteReader())
-                {
-                    competition = reader.ReadOne(MapToCompetition);
-                }
-            }
+                var competition = results.Read<CompetitionEntity>().SingleOrDefault();
+                var competitionRounds = results.Read<CompetitionRoundEntity>();
 
-            if (competition == null)
-            {
-                return null;
-            }
-
-            var roundIds = GetRoundIdsByCompetitionIds(new[] { competition.Id });
-
-            return new Competition(competition.Id, competition, roundIds.SafeGet(competition.Id, _ => new int[0]));
-        }
-
-
-        private IReadOnlyDictionary<int, IReadOnlyCollection<int>> GetRoundIdsByCompetitionIds(IReadOnlyCollection<int> competitionIds)
-        {
-            using (var connection = _dbFactory.GetConnection())
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = $"SELECT CompetitionId, RoundId FROM competition_round WHERE CompetitionId = ANY(@CompetitionIds)";
-                command.Parameters.Add(command.CreateParameter("CompetitionIds", competitionIds.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Integer));
-
-                using (var reader = command.ExecuteReader())
-                {
-                    return reader.ReadAll(MapToCompetitionRound)
-                        .GroupBy(x => x.CompetitionId)
-                        .ToDictionary(x => x.Key, x => (IReadOnlyCollection<int>)x.Select(y => y.RoundId).ToList());
-                }
+                return competition?.ToDomain(competitionRounds.Select(x => x.RoundId));
             }
         }
 
@@ -89,36 +59,19 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             using (var transaction = connection.BeginTransaction())
             {
-                int competitionId;
+                var entity = competition.ToEntity();
 
-                using (var command = connection.CreateCommand())
+                entity.Id = connection.ExecuteScalar<int>(@"INSERT INTO competition (Name, Start, ""End"") VALUES (@Name, @Start, @End) RETURNING Id", entity);
+
+                if (!InsertRounds(connection, entity.Id, competition.Rounds))
                 {
-                    command.CommandText =
-                        "INSERT INTO competition (Name, Start, \"End\")" +
-                        " VALUES (@Name, @Start, @End) RETURNING Id";
-
-                    command.Parameters.Add(command.CreateParameter("Name", competition.Name, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("Start", competition.Start, DbType.DateTime));
-                    command.Parameters.Add(command.CreateParameter("End", competition.End, DbType.DateTime));
-
-                    competitionId = (int)command.ExecuteScalar();
-                }
-
-                var roundIds = new List<int>();
-                foreach (var round in competition.Rounds)
-                {
-                    if (!InsertRound(connection, competitionId, round))
-                    {
-                        transaction.Rollback();
-                        throw new NotImplementedException("TODO");
-                    }
-
-                    roundIds.Add(round);
+                    transaction.Rollback();
+                    throw new NotImplementedException("TODO");
                 }
 
                 transaction.Commit();
 
-                return new Competition(competitionId, competition, roundIds);
+                return entity.ToDomain(competition.Rounds);
             }
         }
 
@@ -127,60 +80,29 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             using (var transaction = connection.BeginTransaction())
             {
-                using (var command = connection.CreateCommand())
+                var entity = competition.ToEntity();
+
+                connection.Execute(@"UPDATE competition SET Name = @Name, Start = @Start, ""End"" = @End WHERE Id = @Id", entity);
+                connection.Execute("DELETE FROM competition_round WHERE CompetitionId = @Id", entity);
+
+                if (!InsertRounds(connection, entity.Id, competition.Rounds))
                 {
-                    command.CommandText = "UPDATE competition SET" +
-                        " Name = @Name, " +
-                        " Start = @Start, " +
-                        " \"End\" = @End " +
-                        " WHERE Id = @Id";
-
-                    command.Parameters.Add(command.CreateParameter("Id", competition.Id, DbType.Int32));
-                    command.Parameters.Add(command.CreateParameter("Name", competition.Name, DbType.String));
-                    command.Parameters.Add(command.CreateParameter("Start", competition.Start, DbType.DateTime));
-                    command.Parameters.Add(command.CreateParameter("End", competition.End, DbType.DateTime));
-
-                    command.ExecuteNonQuery();
-                }
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "DELETE FROM competition_round WHERE CompetitionId = @CompetitionId";
-                    command.Parameters.Add(command.CreateParameter("CompetitionId", competition.Id, DbType.Int32));
-                    command.ExecuteNonQuery();
-                }
-
-                var roundIds = new List<int>();
-                foreach (var round in competition.Rounds)
-                {
-                    if (!InsertRound(connection, competition.Id, round))
-                    {
-                        transaction.Rollback();
-                        throw new NotImplementedException("TODO");
-                    }
-
-                    roundIds.Add(round);
+                    transaction.Rollback();
+                    throw new NotImplementedException("TODO");
                 }
 
                 transaction.Commit();
 
-                return new Competition(competition.Id, competition, roundIds);
+                return entity.ToDomain(competition.Rounds);
             }
         }
 
-        private static bool InsertRound(IDbConnection connection, int competitionId, int roundId)
+        private static bool InsertRounds(IDbConnection connection, int competitionId, IEnumerable<int> roundId)
         {
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText =
-                    "INSERT INTO competition_round (CompetitionId, RoundId)" +
-                    " VALUES (@CompetitionId, @RoundId)";
+            var rounds = roundId.Select(x => new CompetitionRoundEntity { CompetitionId = competitionId, RoundId = x }).ToList();
+            var count = connection.Execute("INSERT INTO competition_round (CompetitionId, RoundId) VALUES (@CompetitionId, @RoundId)", rounds);
 
-                command.Parameters.Add(command.CreateParameter("CompetitionId", competitionId, DbType.Int32));
-                command.Parameters.Add(command.CreateParameter("RoundId", roundId, DbType.Int32));
-
-                return command.ExecuteNonQuery() == 1;
-            }
+            return count == rounds.Count;
         }
 
         public bool Delete(Competition competition)
@@ -188,61 +110,21 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             using (var transaction = connection.BeginTransaction())
             {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "DELETE FROM competition_round WHERE CompetitionId = @CompetitionId";
-                    command.Parameters.Add(command.CreateParameter("CompetitionId", competition.Id, DbType.Int32));
-                    command.ExecuteNonQuery();
-                }
+                var entity = competition.ToEntity();
 
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "DELETE FROM competition WHERE Id = @Id";
-                    command.Parameters.Add(command.CreateParameter("Id", competition.Id, DbType.Int32));
-                    var rowsChanged = command.ExecuteNonQuery();
+                connection.Execute("DELETE FROM competition_round WHERE CompetitionId = @Id", entity);
+                var rowsChanged = connection.Execute("DELETE FROM competition WHERE Id = @Id", entity);
 
-                    if (rowsChanged != 1)
-                    {
-                        return false;
-                    }
+                if (rowsChanged != 1)
+                {
+                    // TODO explicitly abort transaction?
+                    return false;
                 }
 
                 transaction.Commit();
 
                 return true;
             }
-        }
-
-        private static readonly string SelectFields = "Id, Name, Start, \"End\"";
-        private Competition MapToCompetition(IDataRecord record)
-        {
-            var id = record.GetValue<int>(0);
-
-            var name = record.GetValue<string>(1);
-
-            var start = record.GetValue<DateTime>(2);
-            var end = record.GetValue<DateTime>(3);
-
-            return new Competition(id, name, start, end, new int[0]);
-        }
-        private CompetitionIdAndRoundId MapToCompetitionRound(IDataRecord record)
-        {
-            var competitionId = record.GetValue<int>(0);
-            var roundId = record.GetValue<int>(1);
-
-            return new CompetitionIdAndRoundId(competitionId, roundId);
-        }
-
-        private class CompetitionIdAndRoundId
-        {
-            public CompetitionIdAndRoundId(int competitionId, int roundId)
-            {
-                CompetitionId = competitionId;
-                RoundId = roundId;
-            }
-
-            public int CompetitionId { get; }
-            public int RoundId { get; }
         }
     }
 }
