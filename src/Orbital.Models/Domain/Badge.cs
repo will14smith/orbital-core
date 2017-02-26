@@ -1,13 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Orbital.Models.Domain
+﻿namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Badge
     {
-        // needed for deserialisation
-        public Badge() { }
-
         public Badge(int id, Badge badge)
             : this(
                 id: id,
@@ -24,7 +18,7 @@ namespace Orbital.Models.Domain
         public Badge(int id, string name, string description, string algorithm, string category, bool multiple, string imageUrl)
         {
             Id = id;
-            
+
             Name = name;
             Description = description;
             Algorithm = algorithm;
@@ -33,14 +27,47 @@ namespace Orbital.Models.Domain
             ImageUrl = imageUrl;
         }
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Algorithm { get; private set; }
-        public string Category { get; private set; }
-        public bool Multiple { get; private set; }
-        public string ImageUrl { get; private set; }
+        public string Name { get; }
+        public string Description { get; }
+        public string Algorithm { get; }
+        public string Category { get; }
+        public bool Multiple { get; }
+        public string ImageUrl { get; }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            var other = obj as Badge;
+            return other != null && Equals(other);
+        }
+
+        protected bool Equals(Badge other)
+        {
+            return Id == other.Id
+                && string.Equals(Name, other.Name)
+                && string.Equals(Description, other.Description)
+                && string.Equals(Algorithm, other.Algorithm)
+                && string.Equals(Category, other.Category)
+                && Multiple == other.Multiple
+                && string.Equals(ImageUrl, other.ImageUrl);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Id;
+                hashCode = (hashCode * 397) ^ (Name?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Description?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Algorithm?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Category?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ Multiple.GetHashCode();
+                hashCode = (hashCode * 397) ^ (ImageUrl?.GetHashCode() ?? 0);
+                return hashCode;
+            }
+        }
     }
-
 }
