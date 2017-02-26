@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Orbital.Data.Connections;
 using Orbital.Data.Entities;
 using Orbital.Data.Mapping;
@@ -22,7 +23,7 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                var people = connection.Query<PersonEntity>("SELECT * FROM Person");
+                var people = connection.GetAll<PersonEntity>();
 
                 return people.Select(PersonMapper.ToDomain).ToList();
             }
@@ -32,7 +33,7 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                var people = connection.Query<PersonEntity>("SELECT * FROM Person WHERE ClubId = @ClubId", new {ClubId = clubId});
+                var people = connection.Query<PersonEntity>(@"SELECT * FROM Person WHERE ""ClubId"" = @ClubId", new { ClubId = clubId });
 
                 return people.Select(PersonMapper.ToDomain).ToList();
             }
@@ -42,7 +43,7 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                var person = connection.QuerySingleOrDefault<PersonEntity>("SELECT * FROM Person WHERE Id = @Id", new {Id = id});
+                var person = connection.Get<PersonEntity>(id);
 
                 return person?.ToDomain();
             }
@@ -54,9 +55,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = person.ToEntity();
 
-                entity.Id = connection.ExecuteScalar<int>(@"
-                    INSERT INTO Person (ClubId, Name, Gender, Bowstyle, ArcheryGBNumber, DateOfBirth, DateStartedArchery) 
-                    VALUES (@ClubId, @Name, @Gender, @Bowstyle, @ArcheryGBNumber, @DateOfBirth, @DateStartedArchery) RETURNING Id", entity);
+                entity.Id = (int)connection.Insert(entity);
 
                 return entity.ToDomain();
             }
@@ -68,16 +67,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = person.ToEntity();
 
-                connection.Execute(@"
-                    UPDATE Person SET 
-                        ClubId = @ClubId, 
-                        Name = @Name, 
-                        Gender = @Gender, 
-                        Bowstyle = @Bowstyle, 
-                        ArcheryGBNumber = @ArcheryGBNumber, 
-                        DateOfBirth = @DateOfBirth, 
-                        DateStartedArchery = @DateStartedArchery 
-                    WHERE Id = @Id", entity);
+                connection.Update(entity);
 
                 return entity.ToDomain();
             }
@@ -89,9 +79,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = person.ToEntity();
 
-                var rowsChanged = connection.Execute("DELETE FROM Person WHERE Id = @Id", entity);
-
-                return rowsChanged == 1;
+                return connection.Delete(entity);
             }
         }
     }

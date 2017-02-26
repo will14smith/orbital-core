@@ -1,13 +1,13 @@
 CREATE TABLE person (
-    Id SERIAL PRIMARY KEY,
+    "Id" SERIAL PRIMARY KEY,
 
-    ClubId INT REFERENCES club (id),
+    "ClubId" INT REFERENCES club ("Id"),
 
-    Name TEXT NOT NULL,
+    "Name" TEXT NOT NULL,
 
-    Gender INT NOT NULL,
-    Bowstyle INT NULL,
-	ArcheryGBNumber TEXT NULL UNIQUE,
-    DateOfBirth DATE NULL,
-    DateStartedArchery DATE NULL
+    "Gender" INT NOT NULL,
+    "Bowstyle" INT NULL,
+	"ArcheryGBNumber" TEXT NULL UNIQUE,
+    "DateOfBirth" DATE NULL,
+    "DateStartedArchery" DATE NULL
 )

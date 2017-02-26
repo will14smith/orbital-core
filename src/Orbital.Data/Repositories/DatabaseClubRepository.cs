@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Dapper;
+using Dapper.Contrib.Extensions;
 using Orbital.Data.Connections;
 using Orbital.Data.Entities;
 using Orbital.Data.Mapping;
@@ -22,7 +22,7 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                var clubs = connection.Query<ClubEntity>("SELECT * FROM Club");
+                var clubs = connection.GetAll<ClubEntity>();
 
                 return clubs.Select(ClubMapper.ToDomain).ToList();
             }
@@ -32,7 +32,7 @@ namespace Orbital.Data.Repositories
         {
             using (var connection = _dbFactory.GetConnection())
             {
-                var club = connection.QuerySingleOrDefault<ClubEntity>("SELECT * FROM Club WHERE Id = @Id", new { Id = id });
+                var club = connection.Get<ClubEntity>(id);
 
                 return club?.ToDomain();
             }
@@ -44,7 +44,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = club.ToEntity();
 
-                entity.Id = connection.ExecuteScalar<int>("INSERT INTO Club (Name) VALUES (@Name) RETURNING Id", entity);
+                entity.Id = (int) connection.Insert(entity);
 
                 return entity.ToDomain();
             }
@@ -56,7 +56,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = club.ToEntity();
 
-                connection.Execute("UPDATE Club SET Name = @Name WHERE Id = @Id", entity);
+                connection.Update(entity);
 
                 return entity.ToDomain();
             }
@@ -68,9 +68,7 @@ namespace Orbital.Data.Repositories
             {
                 var entity = club.ToEntity();
 
-                var rowsChanged = connection.Execute("DELETE FROM Club WHERE Id = @Id", entity);
-
-                return rowsChanged == 1;
+                return connection.Delete(entity);
             }
         }
     }

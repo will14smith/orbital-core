@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Orbital.Data.Connections;
 using Orbital.Data.Entities;
 using Orbital.Data.Mapping;
@@ -43,8 +44,8 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             {
                 var results = connection.QueryMultiple(@"
-                    SELECT * FROM competition WHERE Id = @Id;
-                    SELECT * FROM competition_round WHERE CompetitionId = @Id
+                    SELECT * FROM competition WHERE ""Id"" = @Id;
+                    SELECT * FROM competition_round WHERE ""CompetitionId"" = @Id
                 ", new { Id = id });
 
                 var competition = results.Read<CompetitionEntity>().SingleOrDefault();
@@ -61,9 +62,9 @@ namespace Orbital.Data.Repositories
             {
                 var entity = competition.ToEntity();
 
-                entity.Id = connection.ExecuteScalar<int>(@"INSERT INTO competition (Name, Start, ""End"") VALUES (@Name, @Start, @End) RETURNING Id", entity);
+                entity.Id = (int)connection.Insert(entity, transaction);
 
-                if (!InsertRounds(connection, entity.Id, competition.Rounds))
+                if (!InsertRounds(connection, transaction, entity.Id, competition.Rounds))
                 {
                     transaction.Rollback();
                     throw new NotImplementedException("TODO");
@@ -82,10 +83,14 @@ namespace Orbital.Data.Repositories
             {
                 var entity = competition.ToEntity();
 
-                connection.Execute(@"UPDATE competition SET Name = @Name, Start = @Start, ""End"" = @End WHERE Id = @Id", entity);
-                connection.Execute("DELETE FROM competition_round WHERE CompetitionId = @Id", entity);
+                if (!connection.Update(entity, transaction))
+                {
+                    transaction.Rollback();
+                    throw new NotImplementedException("TODO");
+                }
 
-                if (!InsertRounds(connection, entity.Id, competition.Rounds))
+                connection.Execute(@"DELETE FROM competition_round WHERE ""CompetitionId"" = @Id", entity, transaction);
+                if (!InsertRounds(connection, transaction, entity.Id, competition.Rounds))
                 {
                     transaction.Rollback();
                     throw new NotImplementedException("TODO");
@@ -97,10 +102,10 @@ namespace Orbital.Data.Repositories
             }
         }
 
-        private static bool InsertRounds(IDbConnection connection, int competitionId, IEnumerable<int> roundId)
+        private static bool InsertRounds(IDbConnection connection, IDbTransaction transaction, int competitionId, IEnumerable<int> roundId)
         {
             var rounds = roundId.Select(x => new CompetitionRoundEntity { CompetitionId = competitionId, RoundId = x }).ToList();
-            var count = connection.Execute("INSERT INTO competition_round (CompetitionId, RoundId) VALUES (@CompetitionId, @RoundId)", rounds);
+            var count = connection.Insert(rounds, transaction);
 
             return count == rounds.Count;
         }
@@ -112,10 +117,9 @@ namespace Orbital.Data.Repositories
             {
                 var entity = competition.ToEntity();
 
-                connection.Execute("DELETE FROM competition_round WHERE CompetitionId = @Id", entity);
-                var rowsChanged = connection.Execute("DELETE FROM competition WHERE Id = @Id", entity);
+                connection.Execute(@"DELETE FROM competition_round WHERE ""CompetitionId"" = @Id", entity, transaction);
 
-                if (rowsChanged != 1)
+                if (!connection.Delete(entity, transaction))
                 {
                     // TODO explicitly abort transaction?
                     return false;

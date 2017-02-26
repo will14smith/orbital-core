@@ -1,11 +1,25 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
+using Dapper.Contrib.Extensions;
 
 namespace Orbital.Data.Tests.Helpers
 {
     internal class ExternallyManagedConnection : IDbConnection
     {
-        private IDbConnection _connection;
+        private readonly IDbConnection _connection;
+
+        static ExternallyManagedConnection()
+        {
+            var previous = SqlMapperExtensions.GetDatabaseType;
+            SqlMapperExtensions.GetDatabaseType = connection =>
+            {
+                if (connection is ExternallyManagedConnection)
+                {
+                    connection = ((ExternallyManagedConnection)connection)._connection;
+                }
+
+                return previous?.Invoke(connection).ToLower() ?? connection.GetType().Name.ToLower();
+            };
+        }
 
         public ExternallyManagedConnection(IDbConnection connection)
         {

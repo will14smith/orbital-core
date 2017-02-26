@@ -1,7 +1,9 @@
 ﻿using System;
+using Dapper.Contrib.Extensions;
 
 namespace Orbital.Data.Entities
 {
+    [Table("competition")]
     class CompetitionEntity
     {
         public int Id { get; set; }

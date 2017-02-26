@@ -1,15 +1,15 @@
 CREATE TABLE competition (
-    Id SERIAL PRIMARY KEY,
+    "Id" SERIAL PRIMARY KEY,
 
-    Name TEXT,
+    "Name" TEXT,
 
-	Start TIMESTAMP,
+	"Start" TIMESTAMP,
 	"End" TIMESTAMP
 );
 
 CREATE TABLE competition_round (
-	CompetitionId INT REFERENCES competition (id),
-	RoundId INT REFERENCES round (id),
+	"CompetitionId" INT REFERENCES competition ("Id"),
+	"RoundId" INT REFERENCES round ("Id"),
 
-	CONSTRAINT competition_round_pkey PRIMARY KEY (CompetitionId, RoundId)
+	CONSTRAINT competition_round_pkey PRIMARY KEY ("CompetitionId", "RoundId")
 )

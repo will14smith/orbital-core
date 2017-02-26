@@ -4,6 +4,7 @@
     <AssemblyName>Orbital.Data</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapper.Contrib\Dapper.Contrib.csproj" />
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
   <ItemGroup>

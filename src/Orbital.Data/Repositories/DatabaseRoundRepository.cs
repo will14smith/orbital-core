@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Orbital.Data.Connections;
 using Orbital.Data.Entities;
 using Orbital.Data.Mapping;
@@ -43,8 +44,8 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             {
                 var results = connection.QueryMultiple(@"
-                    SELECT * FROM round WHERE VariantOfId = @ParentRoundId;
-                    SELECT round_target.* FROM round_target INNER JOIN round ON round_target.RoundId = round.Id WHERE round.VariantOfId = @ParentRoundId
+                    SELECT * FROM round WHERE ""VariantOfId"" = @ParentRoundId;
+                    SELECT round_target.* FROM round_target INNER JOIN round ON round_target.""RoundId"" = round.""Id"" WHERE round.""VariantOfId"" = @ParentRoundId
                 ", new { ParentRoundId = parentRoundId });
 
                 var rounds = results.Read<RoundEntity>();
@@ -61,8 +62,8 @@ namespace Orbital.Data.Repositories
             using (var connection = _dbFactory.GetConnection())
             {
                 var results = connection.QueryMultiple(@"
-                    SELECT * FROM round WHERE Id = @Id;
-                    SELECT * FROM round_target WHERE RoundId = @Id
+                    SELECT * FROM round WHERE ""Id"" = @Id;
+                    SELECT * FROM round_target WHERE ""RoundId"" = @Id
                 ", new { Id = id });
 
                 var rounds = results.Read<RoundEntity>().SingleOrDefault();
@@ -79,13 +80,11 @@ namespace Orbital.Data.Repositories
             {
                 var entity = round.ToEntity();
 
-                entity.Id = connection.ExecuteScalar<int>(@"
-    INSERT INTO round (VariantOfId, Category, Name, Indoor) 
-    VALUES (@VariantOfId, @Category, @Name, @Indoor) RETURNING Id", entity);
+                entity.Id = (int)connection.Insert(entity, transaction);
 
                 var targets = round.Targets.Select(x => x.ToEntity(entity.Id)).ToList();
 
-                if (!InsertTargets(connection, targets))
+                if (!InsertTargets(connection, transaction, targets))
                 {
                     transaction.Rollback();
                     throw new NotImplementedException("TODO");
@@ -104,12 +103,16 @@ namespace Orbital.Data.Repositories
             {
                 var entity = round.ToEntity();
 
-                connection.Execute("UPDATE round SET VariantOfId = @VariantOfId, Category = @Category, Name = @Name, Indoor = @Indoor WHERE Id = @Id", entity);
-                connection.Execute("DELETE FROM round_target WHERE RoundId = @Id", entity);
+                if (!connection.Update(entity))
+                {
+                    transaction.Rollback();
+                    throw new NotImplementedException("TODO");
+                }
+
+                connection.Execute(@"DELETE FROM round_target WHERE ""RoundId"" = @Id", entity, transaction);
 
                 var targets = round.Targets.Select(x => x.ToEntity(entity.Id)).ToList();
-
-                if (!InsertTargets(connection, targets))
+                if (!InsertTargets(connection, transaction, targets))
                 {
                     transaction.Rollback();
                     throw new NotImplementedException("TODO");
@@ -121,13 +124,11 @@ namespace Orbital.Data.Repositories
             }
         }
 
-        private static bool InsertTargets(IDbConnection connection, IEnumerable<RoundTargetEntity> roundTargets)
+        private static bool InsertTargets(IDbConnection connection, IDbTransaction transaction, IEnumerable<RoundTargetEntity> roundTargets)
         {
             var targets = roundTargets.ToList();
 
-            var count = connection.Execute(@"
-    INSERT INTO round_target(RoundId, ScoringType, DistanceValue, DistanceUnit, FaceSizeValue, FaceSizeUnit, ArrowCount) 
-    VALUES(@RoundId, @ScoringType, @DistanceValue, @DistanceUnit, @FaceSizeValue, @FaceSizeUnit, @ArrowCount) RETURNING Id", targets);
+            var count = connection.Insert(targets, transaction);
 
             return count == targets.Count;
         }
@@ -139,10 +140,9 @@ namespace Orbital.Data.Repositories
             {
                 var entity = round.ToEntity();
 
-                connection.Execute("DELETE FROM round_target WHERE RoundId = @Id", entity);
-                var rowsChanged = connection.Execute("DELETE FROM round WHERE Id = @Id", entity);
+                connection.Execute(@"DELETE FROM round_target WHERE ""RoundId"" = @Id", entity, transaction);
 
-                if (rowsChanged != 1)
+                if (!connection.Delete(entity, transaction))
                 {
                     // TODO explicitly abort transaction?
                     return false;

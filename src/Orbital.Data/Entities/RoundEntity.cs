@@ -1,5 +1,8 @@
-﻿namespace Orbital.Data.Entities
+﻿using Dapper.Contrib.Extensions;
+
+namespace Orbital.Data.Entities
 {
+    [Table("round")]
     class RoundEntity
     {
         public int Id { get; set; }

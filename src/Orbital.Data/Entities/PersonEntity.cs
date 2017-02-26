@@ -1,7 +1,9 @@
 ﻿using System;
+using Dapper.Contrib.Extensions;
 
 namespace Orbital.Data.Entities
 {
+    [Table("person")]
     class PersonEntity
     {
         public int Id { get; set; }
