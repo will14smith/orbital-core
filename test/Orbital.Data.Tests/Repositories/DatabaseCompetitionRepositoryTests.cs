@@ -16,7 +16,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetNonExistant()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
 
             var result = repository.GetById(1);
             Assert.Null(result);
@@ -25,10 +25,10 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterCreate()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
 
-            var round = GetRound();
-            var competition = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round.Id });
+            var round = DataFixtures.GetRound(ConnectionFactory);
+            var competition = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round });
 
             var insertResult = repository.Create(competition);
             var getResult = repository.GetById(insertResult.Id);
@@ -38,7 +38,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetWithNoTargets()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
             var competition = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new int[0]);
 
             var insertResult = repository.Create(competition);
@@ -49,7 +49,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllEmpty()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
 
             var getAllResult = repository.GetAll();
             Assert.Equal(0, getAllResult.Count);
@@ -58,13 +58,13 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllAfterInsert()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
 
-            var round1 = GetRound();
-            var round2 = GetRound();
+            var round1 = DataFixtures.GetRound(ConnectionFactory);
+            var round2 = DataFixtures.GetRound(ConnectionFactory);
 
-            var competition1 = new Competition(0, "Name1", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1.Id });
-            var competition2 = new Competition(0, "Name2", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1.Id, round2.Id });
+            var competition1 = new Competition(0, "Name1", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1 });
+            var competition2 = new Competition(0, "Name2", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1, round2 });
 
             var insert1 = repository.Create(competition1);
             var insert2 = repository.Create(competition2);
@@ -78,14 +78,14 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterUpdate()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
-            var round1 = GetRound();
-            var round2 = GetRound();
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
+            var round1 = DataFixtures.GetRound(ConnectionFactory);
+            var round2 = DataFixtures.GetRound(ConnectionFactory);
 
-            var competition1 = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1.Id });
+            var competition1 = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round1 });
             var insertResult = repository.Create(competition1);
 
-            var updatedCompetition = new Competition(insertResult.Id, "Name1", new DateTime(2010, 1, 2), new DateTime(2011, 2, 3), new[] { round2.Id });
+            var updatedCompetition = new Competition(insertResult.Id, "Name1", new DateTime(2010, 1, 2), new DateTime(2011, 2, 3), new[] { round2 });
             var updateResult = repository.Update(updatedCompetition);
 
             Assert.Equal(updatedCompetition, updateResult);
@@ -97,9 +97,9 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterRemove()
         {
-            var repository = new DatabaseCompetitionRepository(GetConnectionFactory());
-            var round = GetRound();
-            var competition = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round.Id });
+            var repository = new DatabaseCompetitionRepository(ConnectionFactory);
+            var round = DataFixtures.GetRound(ConnectionFactory);
+            var competition = new Competition(0, "Name", new DateTime(2010, 1, 1), new DateTime(2011, 2, 3), new[] { round });
             var insertResult = repository.Create(competition);
 
             var removeResult = repository.Delete(insertResult);
@@ -107,15 +107,6 @@ namespace Orbital.Data.Tests.Repositories
 
             var result = repository.GetById(insertResult.Id);
             Assert.Null(result);
-        }
-
-        private int _counter;
-        private Round GetRound()
-        {
-            var count = _counter++;
-            var round = new Round(0, null, "Category" + count, "Name" + count, true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
-
-            return new DatabaseRoundRepository(GetConnectionFactory()).Create(round);
         }
     }
 }

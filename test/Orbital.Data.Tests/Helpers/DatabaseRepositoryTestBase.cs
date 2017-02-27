@@ -11,6 +11,8 @@ namespace Orbital.Data.Tests.Helpers
         private readonly IDbConnection _connection;
         private readonly Checkpoint _checkpoint;
 
+        protected readonly IDbConnectionFactory ConnectionFactory;
+
         protected DatabaseRepositoryTestBase(DatabaseFixture databaseFixture)
         {
             _connection = new ExternallyManagedConnection(databaseFixture.GetConnection());
@@ -20,11 +22,8 @@ namespace Orbital.Data.Tests.Helpers
                 SchemasToExclude = new[] { "pg_catalog", "information_schema" }
             };
             _checkpoint.Reset(_connection);
-        }
 
-        protected IDbConnectionFactory GetConnectionFactory()
-        {
-            return new TestConnectionFactory(() => _connection);
+            ConnectionFactory = new TestConnectionFactory(() => _connection);
         }
 
         public void Dispose()

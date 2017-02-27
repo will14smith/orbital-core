@@ -16,7 +16,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetNonExistant()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
+            var repository = new DatabasePersonRepository(ConnectionFactory);
 
             var result = repository.GetById(1);
             Assert.Null(result);
@@ -25,8 +25,8 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterCreate()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var person = new Person(0, GetClub().Id, "Person1", Gender.Female, Bowstyle.Recurve, "AGB", new DateTime(2010, 10, 2), new DateTime(2011, 2, 17));
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var person = new Person(0, DataFixtures.GetClub(ConnectionFactory), "Person1", Gender.Female, Bowstyle.Recurve, "AGB", new DateTime(2010, 10, 2), new DateTime(2011, 2, 17));
 
             var insertResult = repository.Create(person);
 
@@ -46,7 +46,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllEmpty()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
+            var repository = new DatabasePersonRepository(ConnectionFactory);
 
             var getAllResult = repository.GetAll();
             Assert.Equal(0, getAllResult.Count);
@@ -55,8 +55,8 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllAfterInsert()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var person = new Person(0, GetClub().Id, "Person1", Gender.Female);
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var person = new Person(0, DataFixtures.GetClub(ConnectionFactory), "Person1", Gender.Female);
             var insertResult = repository.Create(person);
 
             var getAllResult = repository.GetAll();
@@ -67,47 +67,47 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllByClubEmpty()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var club = GetClub();
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var club = DataFixtures.GetClub(ConnectionFactory);
 
-            var getAllResult = repository.GetAllByClubId(club.Id);
+            var getAllResult = repository.GetAllByClubId(club);
             Assert.Equal(0, getAllResult.Count);
         }
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllByClubAfterInsert()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var club = GetClub();
-            var person = new Person(0, club.Id, "Person1", Gender.Female);
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var club = DataFixtures.GetClub(ConnectionFactory);
+            var person = new Person(0, club, "Person1", Gender.Female);
             var insertResult = repository.Create(person);
 
-            var getAllResult = repository.GetAllByClubId(club.Id);
+            var getAllResult = repository.GetAllByClubId(club);
             Assert.Equal(1, getAllResult.Count);
             Assert.Equal(person.Name, getAllResult.First().Name);
         }
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllByClubAfterInsertEmpty()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var club1 = GetClub();
-            var club2 = GetClub();
-            var person = new Person(0, club1.Id, "Person1", Gender.Female);
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var club1 = DataFixtures.GetClub(ConnectionFactory);
+            var club2 = DataFixtures.GetClub(ConnectionFactory);
+            var person = new Person(0, club1, "Person1", Gender.Female);
             var insertResult = repository.Create(person);
 
-            var getAllResult = repository.GetAllByClubId(club2.Id);
+            var getAllResult = repository.GetAllByClubId(club2);
             Assert.Equal(0, getAllResult.Count);
         }
 
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterUpdate()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var club1 = GetClub();
-            var club2 = GetClub();
-            var person = new Person(0, club1.Id, "Person1", Gender.Female, Bowstyle.Recurve, "AGB", new DateTime(2010, 10, 2), new DateTime(2011, 2, 17));
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var club1 = DataFixtures.GetClub(ConnectionFactory);
+            var club2 = DataFixtures.GetClub(ConnectionFactory);
+            var person = new Person(0, club1, "Person1", Gender.Female, Bowstyle.Recurve, "AGB", new DateTime(2010, 10, 2), new DateTime(2011, 2, 17));
             var insertResult = repository.Create(person);
 
-            var updatedPerson = new Person(insertResult.Id, club2.Id, "Person1", Gender.Male);
+            var updatedPerson = new Person(insertResult.Id, club2, "Person1", Gender.Male);
             var updateResult = repository.Update(updatedPerson);
 
             Assert.Equal(updatedPerson.ClubId, updateResult.ClubId);
@@ -125,9 +125,9 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterRemove()
         {
-            var repository = new DatabasePersonRepository(GetConnectionFactory());
-            var club = GetClub();
-            var person = new Person(0, club.Id, "Person1", Gender.Female);
+            var repository = new DatabasePersonRepository(ConnectionFactory);
+            var club = DataFixtures.GetClub(ConnectionFactory);
+            var person = new Person(0, club, "Person1", Gender.Female);
             var insertResult = repository.Create(person);
 
             var removeResult = repository.Delete(insertResult);
@@ -135,14 +135,6 @@ namespace Orbital.Data.Tests.Repositories
 
             var result = repository.GetById(insertResult.Id);
             Assert.Null(result);
-        }
-
-        private int clubCounter = 1;
-        private Club GetClub()
-        {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
-            var club = new Club(0, "Club" + (clubCounter++));
-            return repository.Create(club);
         }
     }
 }

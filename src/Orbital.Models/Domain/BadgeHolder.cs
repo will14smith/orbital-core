@@ -40,5 +40,41 @@ namespace Orbital.Models.Domain
         public DateTime? ConfirmedOn { get; }
         public DateTime? MadeOn { get; }
         public DateTime? DeliveredOn { get; }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            var other = obj as BadgeHolder;
+            return other != null && Equals(other);
+        }
+
+        protected bool Equals(BadgeHolder other)
+        {
+            return Id == other.Id
+
+                && BadgeId == other.BadgeId
+                && PersonId == other.PersonId
+
+                && AwardedOn.Equals(other.AwardedOn)
+                && ConfirmedOn.Equals(other.ConfirmedOn)
+                && MadeOn.Equals(other.MadeOn)
+                && DeliveredOn.Equals(other.DeliveredOn);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Id;
+                hashCode = (hashCode * 397) ^ BadgeId;
+                hashCode = (hashCode * 397) ^ PersonId;
+                hashCode = (hashCode * 397) ^ AwardedOn.GetHashCode();
+                hashCode = (hashCode * 397) ^ (ConfirmedOn?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (MadeOn?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (DeliveredOn?.GetHashCode() ?? 0);
+                return hashCode;
+            }
+        }
     }
 }

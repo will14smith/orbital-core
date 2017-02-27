@@ -15,7 +15,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetNonExistant()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
 
             var result = repository.GetById(1);
             Assert.Null(result);
@@ -24,7 +24,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterCreate()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
             var badge = new Badge(0, "Badge1", "Description", "Algo", "Cate", true, "Image");
 
             var insertResult = repository.Create(badge);
@@ -38,7 +38,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllEmpty()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
 
             var getAllResult = repository.GetAll();
             Assert.Equal(0, getAllResult.Count);
@@ -47,7 +47,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllAfterInsert()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
             var badge = new Badge(0, "Badge1", "Description", "Algo", "Cate", true, "Image");
             var insertResult = repository.Create(badge);
 
@@ -59,7 +59,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterUpdate()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
             var badge = new Badge(0, "Badge1", "Description", "Algo", "Cate", true, "Image");
             var insertResult = repository.Create(badge);
 
@@ -74,7 +74,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterRemove()
         {
-            var repository = new DatabaseBadgeRepository(GetConnectionFactory());
+            var repository = new DatabaseBadgeRepository(ConnectionFactory);
             var badge = new Badge(0, "Badge1", "Description", "Algo", "Cate", true, "Image");
             var insertResult = repository.Create(badge);
 

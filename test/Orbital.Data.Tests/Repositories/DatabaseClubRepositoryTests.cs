@@ -15,7 +15,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetNonExistant()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
 
             var result = repository.GetById(1);
             Assert.Null(result);
@@ -24,7 +24,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterCreate()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
             var club = new Club(0, "Club1");
 
             var insertResult = repository.Create(club);
@@ -38,7 +38,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllEmpty()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
 
             var getAllResult = repository.GetAll();
             Assert.Equal(0, getAllResult.Count);
@@ -47,7 +47,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllAfterInsert()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
             var club = new Club(0, "Club1");
             var insertResult = repository.Create(club);
 
@@ -59,7 +59,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterUpdate()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
             var club = new Club(0, "Club1");
             var insertResult = repository.Create(club);
 
@@ -74,7 +74,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterRemove()
         {
-            var repository = new DatabaseClubRepository(GetConnectionFactory());
+            var repository = new DatabaseClubRepository(ConnectionFactory);
             var club = new Club(0, "Club1");
             var insertResult = repository.Create(club);
 

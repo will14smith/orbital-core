@@ -1,7 +1,6 @@
 ﻿using Orbital.Data.Repositories;
 using Orbital.Data.Tests.Helpers;
 using Orbital.Models.Domain;
-using System;
 using System.Linq;
 using Xunit;
 
@@ -16,7 +15,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetNonExistant()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
 
             var result = repository.GetById(1);
             Assert.Null(result);
@@ -25,7 +24,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterCreate()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round = new Round(0, null, "Category", "Name", true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
 
             var insertResult = repository.Create(round);
@@ -38,7 +37,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetWithNoTargets()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round = new Round(0, null, "Category", "Name", true, new RoundTarget[0]);
 
             var insertResult = repository.Create(round);
@@ -51,7 +50,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllEmpty()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
 
             var getAllResult = repository.GetAll();
             Assert.Equal(0, getAllResult.Count);
@@ -60,7 +59,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllAfterInsert()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round1 = new Round(0, null, "Category1", "Name1", true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
             var round2 = new Round(0, null, "Category2", "Name2", true, new[] { new RoundTarget(0, ScoringType.FiveZone, new Length(4, LengthUnit.Centimeters), new Length(5.5m, LengthUnit.Yards), 50) });
 
@@ -76,7 +75,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllVariantsByIdEmpty()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
 
             var result = repository.GetAllVariantsById(1);
             Assert.Empty(result);
@@ -84,7 +83,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllVariantsByIdAfterInsert()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round1 = new Round(0, null, "Category1", "Name1", true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
             var insertResult1 = repository.Create(round1);
 
@@ -97,7 +96,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAllVariantsByIdAfterInsertEmpty()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round1 = new Round(0, null, "Category1", "Name1", true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
             var insertResult1 = repository.Create(round1);
 
@@ -111,7 +110,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterUpdate()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round = new Round(0, null, "Category1", "Name1", true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
             var insertResult = repository.Create(round);
 
@@ -127,7 +126,7 @@ namespace Orbital.Data.Tests.Repositories
         [Fact, Trait("Type", "Integration")]
         public void TestGetAfterRemove()
         {
-            var repository = new DatabaseRoundRepository(GetConnectionFactory());
+            var repository = new DatabaseRoundRepository(ConnectionFactory);
             var round = new Round(0, null, "Category", "Name", true, new RoundTarget[0]);
             var insertResult = repository.Create(round);
 
