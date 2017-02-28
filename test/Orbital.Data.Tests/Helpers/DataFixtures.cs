@@ -1,4 +1,5 @@
-﻿using Orbital.Data.Connections;
+﻿using System;
+using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Domain;
 
@@ -34,6 +35,13 @@ namespace Orbital.Data.Tests.Helpers
             var round = new Round(0, null, "Category" + count, "Name" + count, true, new[] { new RoundTarget(0, ScoringType.Imperial, new Length(2, LengthUnit.Centimeters), new Length(1.5m, LengthUnit.Yards), 36) });
 
             return new DatabaseRoundRepository(connectionFactory).Create(round).Id;
+        }
+
+        private static int _competitionCounter;
+        public static int GetCompetition(IDbConnectionFactory connectionFactory)
+        {
+            var competition = new Competition(0, "Competition" + _competitionCounter++, new DateTime(2017, 1, 1), new DateTime(2017, 2, 2), new int[0]);
+            return new DatabaseCompetitionRepository(connectionFactory).Create(competition).Id;
         }
     }
 }

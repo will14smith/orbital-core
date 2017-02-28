@@ -1,13 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 
 namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class ScoreTarget
     {
-        // needed for deserialisation
-        public ScoreTarget(){}
-
         public ScoreTarget(int id, ScoreTarget scoreTarget)
             : this(
             id: id,
@@ -26,10 +22,28 @@ namespace Orbital.Models.Domain
         }
 
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
-        public decimal Score { get; private set; }
-        public decimal Golds { get; private set; }
-        public decimal Hits { get; private set; }
+        public decimal Score { get; }
+        public decimal Golds { get; }
+        public decimal Hits { get; }
+
+        public class EqualWithoutId : IEqualityComparer<ScoreTarget>
+        {
+            public bool Equals(ScoreTarget x, ScoreTarget y)
+            {
+                return x.Score == y.Score
+                    && x.Golds == y.Golds
+                    && x.Hits == y.Hits;
+            }
+
+            public int GetHashCode(ScoreTarget obj)
+            {
+                var hashCode = obj.Score.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Golds.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Hits.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }

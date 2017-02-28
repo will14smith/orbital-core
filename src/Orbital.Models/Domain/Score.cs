@@ -1,53 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Orbital.Models.Domain
 {
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local", Justification = "Private setters are needed for serialisation")]
     public class Score
     {
-        // needed for deserialisation
-        public Score() { }
-
         public Score(int id, Score score)
-            : this(
-                id: id,
-                score: score,
-                targets: score.Targets
-            )
-        {
-        }
-
-        public Score(int id, Score score, IReadOnlyCollection<ScoreTarget> targets)
             : this(
                 id: id,
 
                 personId: score.PersonId,
                 clubId: score.ClubId,
-                bowstyle: score.Bowstyle,
-
-                competitionId: score.CompetitionId,
                 roundId: score.RoundId,
+                competitionId: score.CompetitionId,
+
+                bowstyle: score.Bowstyle,
 
                 totalScore: score.TotalScore,
                 totalGolds: score.TotalGolds,
                 totalHits: score.TotalHits,
 
-                shotAt: score.ShotAt,
+                shotAt: score.ShotAt, 
                 enteredAt: score.EnteredAt,
-
-                targets: targets
-            )
+                
+                targets: score.Targets)
         {
         }
 
-        public Score(int id,
-            int personId, int clubId, Bowstyle bowstyle,
-            int? competitionId, int roundId,
-            decimal totalScore, decimal totalGolds, decimal totalHits,
-            DateTime shotAt, DateTime enteredAt,
-            IReadOnlyCollection<ScoreTarget> targets)
+        public Score(int id, int personId, int clubId, int roundId, int? competitionId, Bowstyle bowstyle, decimal totalScore, decimal totalGolds, decimal totalHits, DateTime shotAt, DateTime enteredAt, IReadOnlyCollection<ScoreTarget> targets)
         {
             Id = id;
 
@@ -68,22 +49,59 @@ namespace Orbital.Models.Domain
             Targets = targets;
         }
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
-        public int PersonId { get; private set; }
-        public int ClubId { get; private set; }
-        public Bowstyle Bowstyle { get; private set; }
+        public int PersonId { get; }
+        public int ClubId { get; }
+        public int RoundId { get; }
+        public int? CompetitionId { get; }
 
-        public int? CompetitionId { get; private set; }
-        public int RoundId { get; private set; }
+        public Bowstyle Bowstyle { get; }
 
-        public decimal TotalScore { get; private set; }
-        public decimal TotalGolds { get; private set; }
-        public decimal TotalHits { get; private set; }
+        public decimal TotalScore { get; }
+        public decimal TotalGolds { get; }
+        public decimal TotalHits { get; }
 
-        public DateTime ShotAt { get; private set; }
-        public DateTime EnteredAt { get; private set; }
+        public DateTime ShotAt { get; }
+        public DateTime EnteredAt { get; }
 
-        public IReadOnlyCollection<ScoreTarget> Targets { get; private set; }
+        public IReadOnlyCollection<ScoreTarget> Targets { get; }
+
+        public class EqualWithoutId : IEqualityComparer<Score>
+        {
+            public bool Equals(Score x, Score y)
+            {
+                return x.PersonId == y.PersonId 
+                    && x.ClubId == y.ClubId 
+                    && x.RoundId == y.RoundId 
+                    && x.CompetitionId == y.CompetitionId 
+                    && x.Bowstyle == y.Bowstyle
+                    && x.TotalScore == y.TotalScore
+                    && x.TotalGolds == y.TotalGolds
+                    && x.TotalHits == y.TotalHits 
+                    && x.ShotAt.Equals(y.ShotAt) 
+                    && x.EnteredAt.Equals(y.EnteredAt) 
+                    && x.Targets.SequenceEqual(y.Targets, new ScoreTarget.EqualWithoutId());
+            }
+
+            public int GetHashCode(Score obj)
+            {
+                unchecked
+                {
+                    var hashCode = obj.PersonId;
+                    hashCode = (hashCode * 397) ^ obj.ClubId;
+                    hashCode = (hashCode * 397) ^ obj.RoundId;
+                    hashCode = (hashCode * 397) ^ obj.CompetitionId.GetHashCode();
+                    hashCode = (hashCode * 397) ^ (int)obj.Bowstyle;
+                    hashCode = (hashCode * 397) ^ obj.TotalScore.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.TotalGolds.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.TotalHits.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.ShotAt.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.EnteredAt.GetHashCode();
+                    hashCode = (hashCode * 397) ^ (obj.Targets?.GetHashCode() ?? 0);
+                    return hashCode;
+                }
+            }
+        }
     }
 }

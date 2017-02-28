@@ -30,12 +30,7 @@ namespace Orbital.Data.Repositories
                     SELECT * FROM round_target
                 ");
 
-                var rounds = results.Read<RoundEntity>();
-                var roundTargets = results.Read<RoundTargetEntity>()
-                    .GroupBy(x => x.RoundId)
-                    .ToDictionary(x => x.Key, x => (IEnumerable<RoundTarget>)x.Select(rt => rt.ToDomain()).ToList());
-
-                return rounds.Select(x => x.ToDomain(roundTargets.SafeGet(x.Id, () => new RoundTarget[0]))).ToList();
+                return ReadAll(results);
             }
         }
 
@@ -48,13 +43,18 @@ namespace Orbital.Data.Repositories
                     SELECT round_target.* FROM round_target INNER JOIN round ON round_target.""RoundId"" = round.""Id"" WHERE round.""VariantOfId"" = @ParentRoundId
                 ", new { ParentRoundId = parentRoundId });
 
-                var rounds = results.Read<RoundEntity>();
-                var roundTargets = results.Read<RoundTargetEntity>()
-                    .GroupBy(x => x.RoundId)
-                    .ToDictionary(x => x.Key, x => (IEnumerable<RoundTarget>)x.Select(rt => rt.ToDomain()).ToList());
-
-                return rounds.Select(x => x.ToDomain(roundTargets.SafeGet(x.Id, () => new RoundTarget[0]))).ToList();
+                return ReadAll(results);
             }
+        }
+
+        private static IReadOnlyCollection<Round> ReadAll(SqlMapper.GridReader results)
+        {
+            var rounds = results.Read<RoundEntity>();
+            var roundTargets = results.Read<RoundTargetEntity>()
+                .GroupBy(x => x.RoundId)
+                .ToDictionary(x => x.Key, x => (IEnumerable<RoundTarget>)x.Select(rt => rt.ToDomain()).ToList());
+
+            return rounds.Select(x => x.ToDomain(roundTargets.SafeGet(x.Id, () => new RoundTarget[0]))).ToList();
         }
 
         public Round GetById(int id)

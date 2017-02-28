@@ -12,8 +12,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var scores = new[]
             {
-                new Score(1, 2, 3, Bowstyle.Recurve, null, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
-                new Score(2, 3, 3, Bowstyle.Recurve, null, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(1, 2, 3, 4, null, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(2, 3, 3, 4, null, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
             };
 
             var repo = InMemoryScoreRepository.New(scores);
@@ -39,8 +39,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var scores = new[]
             {
-                new Score(1, 2, 3, Bowstyle.Recurve, null, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
-                new Score(2, 2, 3, Bowstyle.Recurve, null, 5, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(1, 2, 3, 4, null, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(2, 2, 3, 5, null, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
             };
 
             var repo = InMemoryScoreRepository.New(scores);
@@ -66,8 +66,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var scores = new[]
             {
-                new Score(1, 2, 3, Bowstyle.Recurve, 8, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
-                new Score(2, 3, 3, Bowstyle.Recurve, 9, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(1, 2, 3, 4, 8, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(2, 3, 3, 4, 9, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
             };
 
             var repo = InMemoryScoreRepository.New(scores);
@@ -84,7 +84,7 @@ namespace Orbital.Data.Tests.Repositories
         {
             var scores = new[]
             {
-                new Score(1, 2, 3, Bowstyle.Recurve, null, 4, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
+                new Score(1, 2, 3, 4, null, Bowstyle.Recurve, 5, 6, 7, DateTime.Now, DateTime.Now, new ScoreTarget[0]),
             };
 
             var repo = InMemoryScoreRepository.New(scores);
