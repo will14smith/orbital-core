@@ -38,10 +38,26 @@ namespace Orbital.Data.Tests.Helpers
         }
 
         private static int _competitionCounter;
+
         public static int GetCompetition(IDbConnectionFactory connectionFactory)
         {
             var competition = new Competition(0, "Competition" + _competitionCounter++, new DateTime(2017, 1, 1), new DateTime(2017, 2, 2), new int[0]);
             return new DatabaseCompetitionRepository(connectionFactory).Create(competition).Id;
+        }
+
+        private static int _scoreCounter;
+        public static int GetScore(IDbConnectionFactory connectionFactory)
+        {
+            var count = _scoreCounter++;
+
+            var score = new Score(
+                0,
+                GetPerson(connectionFactory), GetClub(connectionFactory), GetRound(connectionFactory), GetCompetition(connectionFactory),
+                Bowstyle.Recurve, 120 + count, 30 + count, 60 + count, new DateTime(2016, 1, 1), new DateTime(2016, 2, 2),
+                new[] { new ScoreTarget(0, 300 + count, 85 + count, 40 + count) }
+            );
+
+            return new DatabaseScoreRepository(connectionFactory).Create(score).Id;
         }
     }
 }
