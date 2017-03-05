@@ -13,8 +13,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var records = new[]
             {
-                new Record(1, 1, new [] { new RecordClub(1, 2, DateTime.Now, DateTime.Now) }, null),
-                new Record(2, 1, new [] { new RecordClub(1, 3, DateTime.Now, DateTime.Now) }, null),
+                new Record(1, 1, new [] { new RecordClub(2, DateTime.Now, DateTime.Now) }, null),
+                new Record(2, 1, new [] { new RecordClub(3, DateTime.Now, DateTime.Now) }, null),
             };
 
             var repo = InMemoryRecordRepository.New(records);
@@ -31,8 +31,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var records = new[]
             {
-                new Record(1, 1, new [] { new RecordClub(1, 4, DateTime.Now, DateTime.Now), new RecordClub(1, 2, DateTime.Now, DateTime.Now) }, null),
-                new Record(2, 1, new [] { new RecordClub(1, 4, DateTime.Now, DateTime.Now), new RecordClub(1, 3, DateTime.Now, DateTime.Now) }, null),
+                new Record(1, 1, new [] { new RecordClub(4, DateTime.Now, DateTime.Now), new RecordClub(2, DateTime.Now, DateTime.Now) }, null),
+                new Record(2, 1, new [] { new RecordClub(4, DateTime.Now, DateTime.Now), new RecordClub(3, DateTime.Now, DateTime.Now) }, null),
             };
 
             var repo = InMemoryRecordRepository.New(records);
@@ -72,8 +72,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var records = new[]
             {
-                new Record(1, 1, null, new [] { new RecordRound(1, 2, 1, null, null, null) }),
-                new Record(2, 1, null, new [] { new RecordRound(1, 3, 1, null, null, null) }),
+                new Record(1, 1, null, new [] { new RecordRound(2, 1, null, null, null) }),
+                new Record(2, 1, null, new [] { new RecordRound(3, 1, null, null, null) }),
             };
 
             var repo = InMemoryRecordRepository.New(records);
@@ -90,8 +90,8 @@ namespace Orbital.Data.Tests.Repositories
         {
             var records = new[]
             {
-                new Record(1, 1, null, new [] { new RecordRound(1, 4, 1, null, null, null), new RecordRound(1, 2, 1, null, null, null) }),
-                new Record(2, 1, null, new [] { new RecordRound(1, 4, 1, null, null, null), new RecordRound(1, 3, 1, null, null, null) }),
+                new Record(1, 1, null, new [] { new RecordRound(4, 1, null, null, null), new RecordRound(2, 1, null, null, null) }),
+                new Record(2, 1, null, new [] { new RecordRound(4, 1, null, null, null), new RecordRound(3, 1, null, null, null) }),
             };
 
             var repo = InMemoryRecordRepository.New(records);

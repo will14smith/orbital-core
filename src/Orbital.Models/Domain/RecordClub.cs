@@ -4,21 +4,43 @@ namespace Orbital.Models.Domain
 {
     public class RecordClub
     {
-        public RecordClub(int id, int clubId, DateTime activeFrom, DateTime activeTo)
+        public RecordClub(int clubId, DateTime activeFrom, DateTime activeTo)
         {
-            Id = id;
-
             ClubId = clubId;
 
             ActiveFrom = activeFrom;
             ActiveTo = activeTo;
         }
 
-        public int Id { get; }
-
         public int ClubId { get; }
 
         public DateTime ActiveFrom { get; }
         public DateTime ActiveTo { get; }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            var other = obj as RecordClub;
+            return other != null && Equals(other);
+        }
+
+        protected bool Equals(RecordClub other)
+        {
+            return ClubId == other.ClubId 
+                && ActiveFrom.Equals(other.ActiveFrom) 
+                && ActiveTo.Equals(other.ActiveTo);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = ClubId;
+                hashCode = (hashCode * 397) ^ ActiveFrom.GetHashCode();
+                hashCode = (hashCode * 397) ^ ActiveTo.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }
