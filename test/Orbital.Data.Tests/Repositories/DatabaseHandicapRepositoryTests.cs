@@ -97,6 +97,7 @@ namespace Orbital.Data.Tests.Repositories
             Assert.Contains(new HandicapIdentifier(true, Bowstyle.Barebow), result.Select(x => x.Key));
         }
 
+        [Fact, Trait("Type", "Integration")]
         public void TestGetAllLatestByPersonId()
         {
             var repository = new DatabaseHandicapRepository(ConnectionFactory);
@@ -121,6 +122,7 @@ namespace Orbital.Data.Tests.Repositories
             }, result);
         }
 
+        [Fact, Trait("Type", "Integration")]
         public void TestGetLatestByPersonId()
         {
             var repository = new DatabaseHandicapRepository(ConnectionFactory);
@@ -140,6 +142,7 @@ namespace Orbital.Data.Tests.Repositories
             Assert.Equal(handicap2, result);
         }
 
+        [Fact, Trait("Type", "Integration")]
         public void TestGetByScoreId()
         {
             var repository = new DatabaseHandicapRepository(ConnectionFactory);
@@ -152,6 +155,7 @@ namespace Orbital.Data.Tests.Repositories
             var result = repository.GetByScoreId(score1);
             Assert.Equal(handicap1, result);
         }
+        [Fact, Trait("Type", "Integration")]
         public void TestGetByScoreId_Missing()
         {
             var repository = new DatabaseHandicapRepository(ConnectionFactory);

@@ -5,7 +5,6 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Orbital.Services\Orbital.Services.csproj" />
     <ProjectReference Include="..\DbUp.Postgresql\DbUp.Postgresql.csproj" />
     <ProjectReference Include="..\Orbital.Data\Orbital.Data.csproj" />
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
@@ -13,9 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GraphQL">
-      <Version>0.15.0.671</Version>
+      <Version>0.15.1.678</Version>
     </PackageReference>
-    <PackageReference Include="Npgsql" Version="3.2.1" />
+    <PackageReference Include="Npgsql" Version="3.2.2" />
     <PackageReference Include="SimpleInjector">
       <Version>3.3.2</Version>
     </PackageReference>

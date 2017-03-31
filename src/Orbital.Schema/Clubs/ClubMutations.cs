@@ -1,6 +1,6 @@
 ﻿using GraphQL.Types;
 using Orbital.Models.Domain;
-using Orbital.Models.Services;
+using Orbital.Models.Repositories;
 
 namespace Orbital.Schema.Clubs
 {
@@ -30,9 +30,9 @@ namespace Orbital.Schema.Clubs
         {
             var input = ctx.GetArgument<Club>("club");
 
-            var clubService = ctx.ResolveService<object, IClubService>();
+            var clubService = ctx.ResolveService<object, IClubRepository>();
 
-            return clubService.Add(input);
+            return clubService.Create(input);
         }
 
         internal static object UpdateClubResolve(ResolveFieldContext<object> ctx)
@@ -40,9 +40,9 @@ namespace Orbital.Schema.Clubs
             var id = ctx.GetArgument<int>("id");
             var input = ctx.GetArgument<Club>("club");
 
-            var clubService = ctx.ResolveService<object, IClubService>();
+            var clubService = ctx.ResolveService<object, IClubRepository>();
 
-            return clubService.Update(id, input);
+            return clubService.Update(new Club(id, input.Name));
         }
     }
 }

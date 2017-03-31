@@ -4,6 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="dbup4-core" Version="4.0.0-beta0003" />
-    <PackageReference Include="Npgsql" Version="3.2.1" />
+    <PackageReference Include="Npgsql" Version="3.2.2" />
   </ItemGroup>
 </Project>
