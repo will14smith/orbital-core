@@ -5,7 +5,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Orbital.Data\Orbital.Data.csproj" />
     <ProjectReference Include="..\..\src\Orbital.Models\Orbital.Models.csproj" />
-    <ProjectReference Include="..\..\src\Orbital.Schema\Orbital.Schema.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
