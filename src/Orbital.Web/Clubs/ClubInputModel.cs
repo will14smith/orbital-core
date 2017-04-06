@@ -1,4 +1,4 @@
-﻿namespace Orbital.Web.Models
+﻿namespace Orbital.Web.Clubs
 {
     public class ClubInputModel
     {

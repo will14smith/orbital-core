@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using Halcyon.HAL;
 using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
-using Orbital.Web.Models;
-using Orbital.Web.Services;
 
-namespace Orbital.Web.Controllers
+namespace Orbital.Web.Clubs
 {
     [Route("api/[controller]")]
     public class ClubController : Controller

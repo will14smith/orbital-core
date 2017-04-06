@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
-using Orbital.Web.Services;
+using Orbital.Web.Clubs;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Orbital.Web

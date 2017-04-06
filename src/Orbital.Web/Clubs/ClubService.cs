@@ -2,9 +2,8 @@
 using System.Linq;
 using Orbital.Models.Domain;
 using Orbital.Models.Repositories;
-using Orbital.Web.Models;
 
-namespace Orbital.Web.Services
+namespace Orbital.Web.Clubs
 {
     public class ClubService : IClubService
     {

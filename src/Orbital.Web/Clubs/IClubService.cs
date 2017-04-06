@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Orbital.Web.Models;
 
-namespace Orbital.Web.Services
+namespace Orbital.Web.Clubs
 {
     public interface IClubService
     {
