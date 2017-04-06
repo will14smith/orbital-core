@@ -7,6 +7,7 @@ using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
 using Orbital.Web.Clubs;
+using Orbital.Web.Rounds;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Orbital.Web
@@ -84,6 +85,7 @@ namespace Orbital.Web
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<IRoundService, RoundService>();
         }
     }
 }

@@ -57,6 +57,10 @@ namespace Orbital.Web.Clubs
         public IActionResult Get(int id)
         {
             var club = _clubService.GetById(id);
+            if (club == null)
+            {
+                return NotFound();
+            }
 
             var response = ViewModelToResponse(club);
 
