@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Converters;
 using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
@@ -36,12 +37,21 @@ namespace Orbital.Web
             services.AddRepositories();
             services.AddServices();
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(opt =>
+                {
+                    opt.SerializerSettings.Converters.Add(new StringEnumConverter
+                    {
+                        CamelCaseText = true
+                    });
+                });
             services.AddLogging();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Orbital", Version = "v1" });
+                c.DescribeAllEnumsAsStrings();
+                c.DescribeStringEnumsInCamelCase();
             });
         }
 
