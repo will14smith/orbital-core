@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Halcyon.HAL;
 using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
+using Orbital.Web.Helpers;
 
 namespace Orbital.Web.Rounds
 {
@@ -22,34 +22,8 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAll();
 
-            var page = 1;
-            var pageSize = 100000;
-            var total = rounds.Count;
-
-            var navLinks = BuildNavLinks(page, pageSize, total);
-
-            var response = new HALResponse(new { count = rounds.Count, total = total })
-                .AddSelfLink(Request)
-                .AddLinks(navLinks)
-                .AddEmbeddedCollection("rounds", rounds);
-
-            return Ok(response);
-        }
-
-        private IEnumerable<Link> BuildNavLinks(int page, int pageSize, int totalItemCount)
-        {
-            var totalPages = (int)Math.Ceiling((decimal)totalItemCount / pageSize);
-
-            yield return new Link("first", Url.Action("Get", new { page = 1 }));
-            if (page > 1)
-            {
-                yield return new Link("prev", Url.Action("Get", new { page = page - 1 }));
-            }
-            if (page < totalPages)
-            {
-                yield return new Link("next", Url.Action("Get", new { page = page + 1 }));
-            }
-            yield return new Link("last", Url.Action("Get", new { page = totalPages }));
+            // TODO get page from request
+            return this.Paginate(rounds, "rounds", 1);
         }
 
         // GET api/round/5
@@ -73,19 +47,8 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAllByVariant(id);
 
-            var page = 1;
-            var pageSize = 100000;
-            var total = rounds.Count;
-
-            var navLinks = BuildNavLinks(page, pageSize, total);
-
-            var response = new HALResponse(new { count = rounds.Count, total = total })
-                .AddSelfLink(Request)
-                .AddLinks(new Link("parent", Url.Action("Get", new { id })))
-                .AddLinks(navLinks)
-                .AddEmbeddedCollection("rounds", rounds);
-
-            return Ok(response);
+            // TODO get page from request
+            return this.Paginate(rounds, "rounds", 1);
         }
 
         // POST api/round

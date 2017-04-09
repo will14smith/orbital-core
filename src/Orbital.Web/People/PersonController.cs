@@ -3,61 +3,63 @@ using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
 using Orbital.Web.Helpers;
 
-namespace Orbital.Web.Clubs
+namespace Orbital.Web.People
 {
     [Route("api/[controller]")]
-    public class ClubController : Controller
+    public class PersonController : Controller
     {
-        private readonly IClubService _clubService;
+        private readonly IPersonService _personService;
 
-        public ClubController(IClubService clubService)
+        public PersonController(IPersonService personService)
         {
-            _clubService = clubService;
+            _personService = personService;
         }
 
-        // GET: api/club
+        // GET: api/person
         [HttpGet]
         public IActionResult Get()
         {
-            var clubs = _clubService.GetAll();
+            var people = _personService.GetAll();
 
             // TODO get page from request
-            return this.Paginate(clubs, "clubs", 1);
+            return this.Paginate(people, "people", 1);
         }
 
-        // GET api/club/5
+        // TODO GET api/club/5/people
+
+        // GET api/person/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var club = _clubService.GetById(id);
-            if (club == null)
+            var person = _personService.GetById(id);
+            if (person == null)
             {
                 return NotFound();
             }
 
-            var response = ViewModelToResponse(club);
+            var response = ViewModelToResponse(person);
 
             return Ok(response);
         }
 
-        // POST api/club
+        // POST api/person
         [HttpPost]
-        public IActionResult Post([FromBody]ClubInputModel input)
+        public IActionResult Post([FromBody]PersonInputModel input)
         {
             if (input == null)
             {
                 return BadRequest();
             }
 
-            var item = _clubService.Create(input);
+            var item = _personService.Create(input);
             var response = ViewModelToResponse(item);
 
             return CreatedAtAction(nameof(Get), new { id = item.Id }, response);
         }
 
-        // PUT api/club/5
+        // PUT api/person/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ClubInputModel input)
+        public IActionResult Put(int id, [FromBody]PersonInputModel input)
         {
             if (input == null)
             {
@@ -66,29 +68,29 @@ namespace Orbital.Web.Clubs
 
             input.Id = id;
 
-            var item = _clubService.Update(input);
+            var item = _personService.Update(input);
             var response = ViewModelToResponse(item);
 
             return AcceptedAtAction(nameof(Get), new { id = item.Id }, response);
         }
 
-        // DELETE api/club/5
+        // DELETE api/person/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var club = _clubService.GetById(id);
-            if (club == null)
+            var person = _personService.GetById(id);
+            if (person == null)
             {
                 return NotFound();
             }
 
-            _clubService.Delete(id);
+            _personService.Delete(id);
             return Accepted();
         }
 
-        private HALResponse ViewModelToResponse(ClubViewModel club)
+        private HALResponse ViewModelToResponse(PersonViewModel person)
         {
-            return new HALResponse(club)
+            return new HALResponse(person)
                 .AddSelfLink(Request);
         }
     }
