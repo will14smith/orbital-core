@@ -21,8 +21,7 @@ namespace Orbital.Web.People
         {
             var people = _personService.GetAll();
 
-            // TODO get page from request
-            return this.Paginate(people, "people", 1);
+            return this.Paginate(people, "people");
         }
 
         // TODO GET api/club/5/people

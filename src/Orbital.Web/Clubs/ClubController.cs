@@ -21,8 +21,7 @@ namespace Orbital.Web.Clubs
         {
             var clubs = _clubService.GetAll();
 
-            // TODO get page from request
-            return this.Paginate(clubs, "clubs", 1);
+            return this.Paginate(clubs, "clubs");
         }
 
         // GET api/club/5

@@ -22,8 +22,7 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAll();
 
-            // TODO get page from request
-            return this.Paginate(rounds, "rounds", 1);
+            return this.Paginate(rounds, "rounds");
         }
 
         // GET api/round/5
@@ -47,8 +46,7 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAllByVariant(id);
 
-            // TODO get page from request
-            return this.Paginate(rounds, "rounds", 1);
+            return this.Paginate(rounds, "rounds");
         }
 
         // POST api/round

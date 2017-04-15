@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orbital.Models", "src\Orbital.Models\Orbital.Models.csproj", "{A4FFF752-B30D-4A5C-9109-8C327C9BA1CD}"
 EndProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.Contrib", "src\Dapper.Contrib\Dapper.Contrib.csproj", "{E75924B9-3CA5-4EBB-881F-83992336A683}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbital.Web", "src\Orbital.Web\Orbital.Web.csproj", "{BE699997-A671-4CDA-9701-ABCA25536AB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbital.Web.Tests", "test\Orbital.Web.Tests\Orbital.Web.Tests.csproj", "{DAC2255D-5954-4711-B95D-542E469C31C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -118,6 +120,18 @@ Global
 		{BE699997-A671-4CDA-9701-ABCA25536AB4}.Release|x64.Build.0 = Release|Any CPU
 		{BE699997-A671-4CDA-9701-ABCA25536AB4}.Release|x86.ActiveCfg = Release|Any CPU
 		{BE699997-A671-4CDA-9701-ABCA25536AB4}.Release|x86.Build.0 = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|x64.Build.0 = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{DAC2255D-5954-4711-B95D-542E469C31C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Orbital.Web.Helpers
 {
-    public static class ControllerExtensions
+    public static class PaginationExtensions
     {
-        public static IActionResult Paginate<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page, int pageSize = 100000)
+        public static IActionResult Paginate<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page = -1, int pageSize = 100000)
         {
+            if (page == -1)
+            {
+                page = controller.GetPage();
+            }
+
             // TODO items displayed on page
             var count = data.Count;
             // TODO  total number of items
@@ -41,5 +46,14 @@ namespace Orbital.Web.Helpers
             yield return new Link("last", url.Action("Get", new { page = totalPages }));
         }
 
+        public static int GetPage(this Controller controller)
+        {
+            if (!controller.Request.Query.TryGetValue("page", out var pageStr))
+            {
+                return 1;
+            }
+
+            return int.TryParse(pageStr, out var page) ? page : 1;
+        }
     }
 }
