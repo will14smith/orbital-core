@@ -7,8 +7,8 @@ namespace Orbital.Web.Badges
         IReadOnlyCollection<BadgeViewModel> GetAll();
         BadgeViewModel GetById(int id);
 
-        BadgeViewModel Create(BadgeInputModel club);
-        BadgeViewModel Update(BadgeInputModel club);
+        BadgeViewModel Create(BadgeInputModel input);
+        BadgeViewModel Update(BadgeInputModel input);
         bool Delete(int id);
     }
 }

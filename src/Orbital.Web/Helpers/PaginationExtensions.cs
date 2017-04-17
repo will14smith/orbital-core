@@ -10,6 +10,11 @@ namespace Orbital.Web.Helpers
     {
         public static IActionResult Paginate<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page = -1, int pageSize = 100000)
         {
+            return controller.Ok(controller.PaginateResponse(data, dataName, page, pageSize));
+        }
+
+        public static HALResponse PaginateResponse<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page = -1, int pageSize = 100000)
+        {
             if (page == -1)
             {
                 page = controller.GetPage();
@@ -22,12 +27,10 @@ namespace Orbital.Web.Helpers
 
             var navLinks = controller.Url.PaginationLinks(page, pageSize, total);
 
-            var response = new HALResponse(new { count, total })
+            return new HALResponse(new { count, total })
                 .AddSelfLink(controller.Request)
                 .AddLinks(navLinks)
                 .AddEmbeddedCollection(dataName, data);
-
-            return controller.Ok(response);
         }
 
         public static IEnumerable<Link> PaginationLinks(this IUrlHelper url, int page, int pageSize, int totalItemCount)
