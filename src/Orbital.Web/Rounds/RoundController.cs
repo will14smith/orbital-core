@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Halcyon.HAL;
-using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
 using Orbital.Web.Helpers;
 
@@ -22,7 +22,7 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAll();
 
-            return this.Paginate(rounds, "rounds");
+            return this.Paginate(rounds.Select(ViewModelToResponse).ToList(), "rounds");
         }
 
         // GET api/round/5
@@ -31,9 +31,7 @@ namespace Orbital.Web.Rounds
         {
             var round = _roundService.GetById(id);
             if (round == null)
-            {
                 return NotFound();
-            }
 
             var response = ViewModelToResponse(round);
 
@@ -46,39 +44,35 @@ namespace Orbital.Web.Rounds
         {
             var rounds = _roundService.GetAllByVariant(id);
 
-            return this.Paginate(rounds, "rounds");
+            return this.Paginate(rounds.Select(ViewModelToResponse).ToList(), "rounds");
         }
 
         // POST api/round
         [HttpPost]
-        public IActionResult Post([FromBody]RoundInputModel input)
+        public IActionResult Post([FromBody] RoundInputModel input)
         {
             if (input == null)
-            {
                 return BadRequest();
-            }
 
             var item = _roundService.Create(input);
             var response = ViewModelToResponse(item);
 
-            return CreatedAtAction(nameof(Get), new { id = item.Id }, response);
+            return CreatedAtAction(nameof(Get), new {id = item.Id}, response);
         }
 
         // PUT api/round/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]RoundInputModel input)
+        public IActionResult Put(int id, [FromBody] RoundInputModel input)
         {
             if (input == null)
-            {
                 return BadRequest();
-            }
 
             input.Id = id;
 
             var item = _roundService.Update(input);
             var response = ViewModelToResponse(item);
 
-            return AcceptedAtAction(nameof(Get), new { id = item.Id }, response);
+            return AcceptedAtAction(nameof(Get), new {id = item.Id}, response);
         }
 
         // DELETE api/round/5
@@ -87,9 +81,7 @@ namespace Orbital.Web.Rounds
         {
             var round = _roundService.GetById(id);
             if (round == null)
-            {
                 return NotFound();
-            }
 
             _roundService.Delete(id);
             return Accepted();
@@ -99,16 +91,14 @@ namespace Orbital.Web.Rounds
         {
             var links = new List<Link>
             {
+                new Link("self", Url.Action("Get", new {id = round.Id})),
                 new Link("variants", Url.Action("GetVariants", new {id = round.Id}))
             };
 
             if (round.VariantOfId.HasValue)
-            {
-                links.Add(new Link("parent", Url.Action("Get", new { id = round.VariantOfId.Value })));
-            }
+                links.Add(new Link("parent", Url.Action("Get", new {id = round.VariantOfId.Value})));
 
             return new HALResponse(round)
-                .AddSelfLink(Request)
                 .AddLinks(links);
         }
     }

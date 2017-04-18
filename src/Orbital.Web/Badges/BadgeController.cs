@@ -1,4 +1,5 @@
-﻿using Halcyon.HAL;
+﻿using System.Linq;
+using Halcyon.HAL;
 using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
 using Orbital.Web.Helpers;
@@ -21,7 +22,7 @@ namespace Orbital.Web.Badges
         {
             var badges = _badgeService.GetAll();
 
-            return this.Paginate(badges, "badges");
+            return this.Paginate(badges.Select(ViewModelToResponse).ToList(), "badges");
         }
 
         // GET api/badge/5
@@ -88,7 +89,7 @@ namespace Orbital.Web.Badges
         private HALResponse ViewModelToResponse(BadgeViewModel badge)
         {
             return new HALResponse(badge)
-                .AddSelfLink(Request);
+                .AddLinks(new Link("self", Url.Action("Get", new { id = badge.Id })));
         }
     }
 }

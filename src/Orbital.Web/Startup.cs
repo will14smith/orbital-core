@@ -7,6 +7,7 @@ using Newtonsoft.Json.Converters;
 using Orbital.Data.Connections;
 using Orbital.Data.Repositories;
 using Orbital.Models.Repositories;
+using Orbital.Web.BadgeHolders;
 using Orbital.Web.Badges;
 using Orbital.Web.Clubs;
 using Orbital.Web.People;
@@ -97,6 +98,7 @@ namespace Orbital.Web
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IBadgeService, BadgeService>();
+            services.AddScoped<IBadgeHolderService, BadgeHolderService>();
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IRoundService, RoundService>();

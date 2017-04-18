@@ -77,7 +77,7 @@ namespace Orbital.Web.BadgeHolders
         private HALResponse ViewModelToResponse(BadgeHolderViewModel badgeHolder)
         {
             return new HALResponse(badgeHolder)
-                .AddSelfLink(Request);
+                .AddLinks(new Link("self", Url.Action("Get", new { id = badgeHolder.Id })));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Halcyon.HAL;
+﻿using System.Linq;
+using Halcyon.HAL;
 using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
 using Orbital.Web.Helpers;
@@ -21,7 +22,7 @@ namespace Orbital.Web.Clubs
         {
             var clubs = _clubService.GetAll();
 
-            return this.Paginate(clubs, "clubs");
+            return this.Paginate(clubs.Select(ViewModelToResponse).ToList(), "clubs");
         }
 
         // GET api/club/5
@@ -88,7 +89,7 @@ namespace Orbital.Web.Clubs
         private HALResponse ViewModelToResponse(ClubViewModel club)
         {
             return new HALResponse(club)
-                .AddSelfLink(Request);
+                .AddLinks(new Link("self", Url.Action("Get", new { id = club.Id })));
         }
     }
 }

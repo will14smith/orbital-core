@@ -8,12 +8,12 @@ namespace Orbital.Web.Helpers
 {
     public static class PaginationExtensions
     {
-        public static IActionResult Paginate<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page = -1, int pageSize = 100000)
+        public static IActionResult Paginate(this Controller controller, IReadOnlyCollection<HALResponse> data, string dataName, int page = -1, int pageSize = 100000)
         {
             return controller.Ok(controller.PaginateResponse(data, dataName, page, pageSize));
         }
 
-        public static HALResponse PaginateResponse<T>(this Controller controller, IReadOnlyCollection<T> data, string dataName, int page = -1, int pageSize = 100000)
+        public static HALResponse PaginateResponse(this Controller controller, IReadOnlyCollection<HALResponse> data, string dataName, int page = -1, int pageSize = 100000)
         {
             if (page == -1)
             {

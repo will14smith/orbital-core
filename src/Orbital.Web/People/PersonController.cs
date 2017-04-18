@@ -1,4 +1,5 @@
-﻿using Halcyon.HAL;
+﻿using System.Linq;
+using Halcyon.HAL;
 using Halcyon.Web.HAL;
 using Microsoft.AspNetCore.Mvc;
 using Orbital.Web.Helpers;
@@ -21,7 +22,7 @@ namespace Orbital.Web.People
         {
             var people = _personService.GetAll();
 
-            return this.Paginate(people, "people");
+            return this.Paginate(people.Select(ViewModelToResponse).ToList(), "people");
         }
 
         // TODO GET api/club/5/people
@@ -90,7 +91,7 @@ namespace Orbital.Web.People
         private HALResponse ViewModelToResponse(PersonViewModel person)
         {
             return new HALResponse(person)
-                .AddSelfLink(Request);
+                .AddLinks(new Link("self", Url.Action("Get", new { id = person.Id })));
         }
     }
 }
