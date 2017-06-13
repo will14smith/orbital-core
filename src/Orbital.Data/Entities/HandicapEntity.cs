@@ -1,15 +1,15 @@
 ﻿using System;
-using Dapper.Contrib.Extensions;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("handicap")]
-    class HandicapEntity
+    internal class HandicapEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public int PersonId { get; set; }
-        public int? ScoreId { get; set; }
+        public Guid PersonId { get; set; }
+        public Guid? ScoreId { get; set; }
 
         public int Type { get; set; }
         public DateTime Date { get; set; }
@@ -17,5 +17,10 @@ namespace Orbital.Data.Entities
 
         public bool Indoor { get; set; }
         public int Bowstyle { get; set; }
+
+        [ForeignKey(nameof(PersonId))]
+        public PersonEntity Person { get; set; }
+        [ForeignKey(nameof(ScoreId))]
+        public ScoreEntity Score { get; set; }
     }
 }

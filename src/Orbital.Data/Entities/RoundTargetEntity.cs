@@ -1,13 +1,14 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("round_target")]
-    class RoundTargetEntity
+    internal class RoundTargetEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public int RoundId { get; set; }
+        public Guid RoundId { get; set; }
 
         public int ScoringType { get; set; }
 
@@ -17,5 +18,8 @@ namespace Orbital.Data.Entities
         public int FaceSizeUnit { get; set; }
 
         public int ArrowCount { get; set; }
+
+        [ForeignKey(nameof(RoundId))]
+        public RoundEntity Round { get; set; }
     }
 }

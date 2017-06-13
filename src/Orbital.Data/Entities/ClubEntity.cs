@@ -1,11 +1,17 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("club")]
-    class ClubEntity
+    internal class ClubEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
+
+        [InverseProperty(nameof(PersonEntity.Club))]
+        public List<PersonEntity> Members { get; set; }
     }
 }

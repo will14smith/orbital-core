@@ -1,14 +1,15 @@
 ﻿using System;
-using Dapper.Contrib.Extensions;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("person")]
-    class PersonEntity
+    internal class PersonEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public int ClubId { get; set; }
+        public Guid ClubId { get; set; }
 
         public string Name { get; set; }
 
@@ -17,5 +18,15 @@ namespace Orbital.Data.Entities
         public string ArcheryGBNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateStartedArchery { get; set; }
+
+        [ForeignKey(nameof(ClubId))]
+        public ClubEntity Club { get; set; }
+
+        [InverseProperty(nameof(BadgeHolderEntity.Person))]
+        public List<BadgeHolderEntity> HeldBadges { get; set; }
+        [InverseProperty(nameof(HandicapEntity.Person))]
+        public List<HandicapEntity> Handicaps { get; set; }
+        [InverseProperty(nameof(ScoreEntity.Person))]
+        public List<ScoreEntity> Scores { get; set; }
     }
 }

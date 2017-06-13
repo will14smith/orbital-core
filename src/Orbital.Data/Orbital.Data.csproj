@@ -4,7 +4,9 @@
     <AssemblyName>Orbital.Data</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
 </Project>
