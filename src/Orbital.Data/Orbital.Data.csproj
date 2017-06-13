@@ -4,20 +4,7 @@
     <AssemblyName>Orbital.Data</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dapper.Contrib\Dapper.Contrib.csproj" />
-    <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.2" />
-    <PackageReference Include="dbup4-core" Version="4.0.0-beta0003" />
-    <PackageReference Include="Npgsql" Version="3.2.2" />
-    <PackageReference Include="System.Data.Common" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\*.sql" />
-  </ItemGroup>
-  <Target Name="AfterBuild">
-    <Message Text="@(Content)" Importance="high" Condition="%(Content.Extension) == '.sql'" />
-    <Error Condition="%(Content.Extension) == '.sql'" Text="Nothing should be marked as Content, check your scripts are marked as Embedded Resource" />
-  </Target>
 </Project>
