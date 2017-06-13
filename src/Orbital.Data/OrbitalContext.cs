@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using Orbital.Data.Entities;
+using Orbital.Data.Versioning;
 
 namespace Orbital.Data
 {
     internal class OrbitalContext : DbContext
     {
         public OrbitalContext(DbContextOptions<OrbitalContext> options)
-            : base(options.WithExtension(new Extension()))
+            : base(options.WithExtension(new VersionExtension()))
         {
         }
 
@@ -32,5 +22,18 @@ namespace Orbital.Data
         public DbSet<RoundTargetEntity> RoundTargets { get; set; }
         public DbSet<ScoreEntity> Scores { get; set; }
         public DbSet<ScoreTargetEntity> ScoreTargets { get; set; }
+
+        public override int SaveChanges()
+        {
+            this.SyncVersion();
+
+            return base.SaveChanges();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CompetitionRoundEntity>()
+                .HasKey(nameof(CompetitionRoundEntity.CompetitionId), nameof(CompetitionRoundEntity.RoundId));
+        }
     }
 }
