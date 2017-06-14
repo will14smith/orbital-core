@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
@@ -35,18 +34,13 @@ namespace Orbital.Data.Versioning
         private static Expression<Func<object, IEnumerable<Version<TEntity>>>> BuildMainLambda<TEntity>(
             Expression predicate, Expression projection, Type entityType)
         {
-            // TODO this isn't ideal, the ToList forces all the data to be loaded and then the filtering & projection is done in memory
-            // This is because EF tries to use GetCustomAttributes on the predicate properties (from the dynamic types) and this is not supported.
-            // Potential workaround is to replace the TypeBuilder code with Mono.Cecil to generate an actual assembly that can be loaded with all the features
-            // Alternatively, wait for .NET Core 2.0 which should support AssemblyBuilderAccess.Save (i.e. what Mono.Cecil would be doing)
-
-            // (object set) => ((DbSet<THistory>)set).ToList().Where(transformedPredicate).Select(ToVersion);
+            // (object set) => ((DbSet<THistory>)set).Where(transformedPredicate).ToList().Select(ToVersion);
             var setParam = Expression.Parameter(typeof(object), "set");
 
             var set = Expression.Convert(setParam, typeof(DbSet<>).MakeGenericType(entityType));
-            var toList = Expression.Call(null, EnumerableToList.MakeGenericMethod(entityType), set);
-            var where = Expression.Call(null, EnumerableWhere.MakeGenericMethod(entityType), toList, predicate);
-            var select = Expression.Call(null, EnumerableSelect.MakeGenericMethod(entityType, typeof(Version<TEntity>)), where, projection);
+            var where = Expression.Call(null, QueryableWhere.MakeGenericMethod(entityType), set, predicate);
+            var toList = Expression.Call(null, EnumerableToList.MakeGenericMethod(entityType), where);
+            var select = Expression.Call(null, EnumerableSelect.MakeGenericMethod(entityType, typeof(Version<TEntity>)), toList, projection);
 
             return Expression.Lambda<Func<object, IEnumerable<Version<TEntity>>>>(select, setParam);
         }

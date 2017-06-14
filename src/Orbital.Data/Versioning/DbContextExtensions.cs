@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,20 +9,21 @@ namespace Orbital.Data.Versioning
 {
     public static partial class DbContextExtensions
     {
-        private static readonly MethodInfo EnumerableWhere;
+        private static readonly MethodInfo QueryableWhere;
         private static readonly MethodInfo EnumerableToList;
         private static readonly MethodInfo EnumerableSelect;
 
         static DbContextExtensions()
         {
-            EnumerableWhere = typeof(Enumerable).GetRuntimeMethods()
-                .Where(x => x.Name == nameof(Enumerable.Where))
+            QueryableWhere = typeof(Queryable).GetRuntimeMethods()
+                .Where(x => x.Name == nameof(Queryable.Where))
                 .Where(x =>
                 {
                     var parameters = x.GetParameters();
                     return parameters.Length == 2
-                           && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                           && parameters[1].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>);
+                           && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(IQueryable<>)
+                           && parameters[1].ParameterType.GetGenericTypeDefinition() == typeof(Expression<>)
+                           && parameters[1].ParameterType.GenericTypeArguments[0].GetGenericTypeDefinition() == typeof(Func<,>);
                 })
                 .Single();
 

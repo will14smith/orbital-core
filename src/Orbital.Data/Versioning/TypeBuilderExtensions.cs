@@ -1,37 +1,46 @@
-using System;
-using System.Reflection;
-using System.Reflection.Emit;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Orbital.Data.Versioning
 {
     internal static class TypeBuilderExtensions
     {
-        public static PropertyBuilder DefineAutoProperty(this TypeBuilder typeBuilder, string name, Type type)
+        public static PropertyDefinition DefineAutoProperty(this TypeDefinition typeBuilder, string name, TypeReference type)
         {
-            var fieldBuilder = typeBuilder.DefineField("__" + name, type, FieldAttributes.Private);
+            // backing field
+            var field = new FieldDefinition("__" + name, FieldAttributes.Private, type);
+            typeBuilder.Fields.Add(field);
 
             const MethodAttributes propertyAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual;
 
-            var propertyGetBuilder = typeBuilder.DefineMethod("get_" + name, propertyAttr, type, Type.EmptyTypes);
-            var propertyGetIl = propertyGetBuilder.GetILGenerator();
-            propertyGetIl.Emit(OpCodes.Ldarg_0);
-            propertyGetIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            propertyGetIl.Emit(OpCodes.Ret);
+            // getter
+            var getBuilder = new MethodDefinition("get_" + name, propertyAttr, type);
+            typeBuilder.Methods.Add(getBuilder);
 
-            var propertSetBuilder = typeBuilder.DefineMethod("set_" + name, propertyAttr, null, new[] { type });
-            var propertySetIl = propertSetBuilder.GetILGenerator();
+            var getIL = getBuilder.Body.GetILProcessor();
+            getIL.Emit(OpCodes.Ldarg_0);
+            getIL.Emit(OpCodes.Ldfld, field);
+            getIL.Emit(OpCodes.Ret);
 
-            propertySetIl.Emit(OpCodes.Ldarg_0);
-            propertySetIl.Emit(OpCodes.Ldarg_1);
-            propertySetIl.Emit(OpCodes.Stfld, fieldBuilder);
-            propertySetIl.Emit(OpCodes.Ret);
+            // setter
+            var setBuilder = new MethodDefinition("set_" + name, propertyAttr, typeBuilder.Module.TypeSystem.Void);
+            setBuilder.Parameters.Add(new ParameterDefinition(type));
+            typeBuilder.Methods.Add(setBuilder);
 
-            var propertyBuilder = typeBuilder.DefineProperty(name, PropertyAttributes.None, type, Type.EmptyTypes);
+            var setIL = setBuilder.Body.GetILProcessor();
+            setIL.Emit(OpCodes.Ldarg_0);
+            setIL.Emit(OpCodes.Ldarg_1);
+            setIL.Emit(OpCodes.Stfld, field);
+            setIL.Emit(OpCodes.Ret);
+            
+            var property = new PropertyDefinition(name, PropertyAttributes.None, type);
+            typeBuilder.Properties.Add(property);
 
-            propertyBuilder.SetGetMethod(propertyGetBuilder);
-            propertyBuilder.SetSetMethod(propertSetBuilder);
+            property.GetMethod = getBuilder;
+            property.SetMethod = setBuilder;
 
-            return propertyBuilder;
+
+            return property;
         }
     }
 }

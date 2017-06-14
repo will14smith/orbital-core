@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
+using System.Runtime.Loader;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace Orbital.Data.Versioning
 {
@@ -18,100 +23,106 @@ namespace Orbital.Data.Versioning
         {
             base.Customize(modelBuilder, dbContext);
 
+            var assemblyBuilder = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Autogen.Versioning", new Version(1, 0)), "Autogen.Versioning", ModuleKind.Dll);
+            var entityBuilderMappings = new List<(IEntityType, TypeDefinition, IReadOnlyDictionary<IProperty, PropertyDefinition>)>();
+
+            var entityModels = modelBuilder.Model.GetEntityTypes().ToList();
+            foreach (var entityModel in entityModels)
+            {
+                var (versionEntityType, fieldMappings) = CreateVersionEntity(entityModel, assemblyBuilder.MainModule);
+                entityBuilderMappings.Add((entityModel, versionEntityType, fieldMappings));
+            }
+
+            Assembly asm;
+            using (var memoryStream = new MemoryStream())
+            {
+                assemblyBuilder.Write(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                asm = AssemblyLoadContext.Default.LoadFromStream(memoryStream);
+            }
+
             var modelMapping = new Dictionary<string, VersionEntityMapping>();
 
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("Autogen.Versioning"), AssemblyBuilderAccess.Run);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("Autogen.Versioning");
-
-            var entityTypes = modelBuilder.Model.GetEntityTypes().ToList();
-            foreach (var entityType in entityTypes)
+            foreach (var (entityModel, versionEntityBuilder, fieldBuilderMappings) in entityBuilderMappings)
             {
-                var historyModelType = CreateVersionEntity(modelBuilder, entityType, moduleBuilder);
-                modelMapping.Add(entityType.ClrType.Name, historyModelType);
+                var versionEntityType = asm.GetType(versionEntityBuilder.FullName);
+
+                modelBuilder.Entity(versionEntityType, entityBuilder =>
+                {
+                    var originalTableName = entityModel.FindAnnotation("Relational:TableName")?.Value ?? entityModel.ClrType.Name;
+                    entityBuilder.HasAnnotation("Relational:TableName", originalTableName + "_history");
+                });
+
+                modelMapping.Add(entityModel.ClrType.Name, new VersionEntityMapping(entityModel.ClrType, versionEntityType, fieldBuilderMappings));
             }
 
             modelBuilder.Model.AddAnnotation(ModelMappingAnnotation, modelMapping);
         }
 
-        private static VersionEntityMapping CreateVersionEntity(ModelBuilder modelBuilder, IMutableEntityType entityType, ModuleBuilder moduleBuilder)
+        private static (TypeDefinition, IReadOnlyDictionary<IProperty, PropertyDefinition>) CreateVersionEntity(IMutableEntityType entityModel, ModuleDefinition moduleBuilder)
         {
-            var entityClrType = entityType.ClrType;
-            var entityClrName = entityClrType.Name;
-            
-            var typeBuilder = moduleBuilder.DefineType(entityClrName + "Version");
+            var entityType = moduleBuilder.ImportReference(entityModel.ClrType);
+
+            var typeBuilder = new TypeDefinition("Autogen.Versioning", entityType.Name + "Version", TypeAttributes.Class | TypeAttributes.Public, moduleBuilder.TypeSystem.Object);
+            moduleBuilder.Types.Add(typeBuilder);
+
+            var versionEntityInterface = moduleBuilder.ImportReference(typeof(IVersionEntity<>));
+            var versionEntity = new GenericInstanceType(versionEntityInterface);
+            versionEntity.GenericArguments.Add(entityType);
 
             // Implement IVersionEntity<TEntity>
-            typeBuilder.AddInterfaceImplementation(typeof(IVersionEntity<>).MakeGenericType(entityClrType));
+            typeBuilder.Interfaces.Add(new InterfaceImplementation(versionEntity));
 
             // Id & Date columns
-            DefineColumnProperty(typeBuilder, nameof(IVersionEntity<object>.Id), typeof(long));
-            var dateColumn = DefineColumnProperty(typeBuilder, nameof(IVersionEntity<object>.Date), typeof(DateTime));
+            DefineColumnProperty(typeBuilder, nameof(IVersionEntity<object>.Id), moduleBuilder.TypeSystem.Int64);
+            var dateColumn = DefineColumnProperty(typeBuilder, nameof(IVersionEntity<object>.Date), moduleBuilder.ImportReference(typeof(DateTime)));
 
             // Copy all the non-navigation columns from the entity, prefix the with Field_ to avoid collisions with version columns
-            var fieldMappings = new Dictionary<IProperty, PropertyInfo>();
-            foreach (var prop in entityType.GetProperties())
+            var fieldMappings = new Dictionary<IProperty, PropertyDefinition>();
+            foreach (var prop in entityModel.GetProperties())
             {
-                var property = DefineColumnProperty(typeBuilder, "Field_" + prop.Name, prop.ClrType);
+                var property = DefineColumnProperty(typeBuilder, "Field_" + prop.Name, moduleBuilder.ImportReference(prop.ClrType));
                 fieldMappings.Add(prop, property);
             }
 
             // Define the default & entity constructors
-            DefineConstructors(typeBuilder, entityClrType, dateColumn, fieldMappings);
+            DefineConstructors(typeBuilder, entityType, dateColumn, fieldMappings);
             // Finish implementing IVersionEntity<TEntity>
-            DefineToEntity(typeBuilder, entityClrType, fieldMappings);
+            DefineToEntity(typeBuilder, entityType, moduleBuilder.ImportReference(entityModel.ClrType.GetTypeInfo().GetConstructor(Type.EmptyTypes)), fieldMappings);
 
-            // Register the new entity with EF
-            var versionEntityType = typeBuilder.CreateTypeInfo().AsType();
-            modelBuilder.Entity(versionEntityType, entityBuilder =>
-            {
-                var originalTableName = entityType.FindAnnotation("Relational:TableName")?.Value ?? entityClrName;
-                entityBuilder.HasAnnotation("Relational:TableName", originalTableName + "_history");
-            });
-            
-            return new VersionEntityMapping(entityClrType, versionEntityType, fieldMappings);
+            return (typeBuilder, fieldMappings);
         }
 
-        private static void DefineConstructors(TypeBuilder typeBuilder, Type entityType, PropertyBuilder dateColumn, Dictionary<IProperty, PropertyInfo> fieldMappings)
+        private static void DefineConstructors(TypeDefinition typeBuilder, TypeReference entityType, PropertyDefinition dateColumn, Dictionary<IProperty, PropertyDefinition> fieldMappings)
         {
+            const MethodAttributes constructorAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
+
             // default constructor
-            typeBuilder.DefineDefaultConstructor(MethodAttributes.Public);
+            var defaultContructor = new MethodDefinition(".ctor", constructorAttributes, typeBuilder.Module.TypeSystem.Void);
+            typeBuilder.Methods.Add(defaultContructor);
+
+            var defaultConstructorIL = defaultContructor.Body.GetILProcessor();
+
+            defaultConstructorIL.Emit(OpCodes.Ldarg_0);
+            defaultConstructorIL.Emit(OpCodes.Call, typeBuilder.Module.ImportReference(typeof(object).GetTypeInfo().GetConstructor(Type.EmptyTypes)));
+            defaultConstructorIL.Emit(OpCodes.Ret);
 
             // from entity constructor
-            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { entityType });
+            var entityContructor = new MethodDefinition(".ctor", constructorAttributes, typeBuilder.Module.TypeSystem.Void);
+            var entity = new ParameterDefinition(entityType);
+            entityContructor.Parameters.Add(entity);
+            typeBuilder.Methods.Add(entityContructor);
 
-            var il = constructorBuilder.GetILGenerator();
+            var entityContructorIL = entityContructor.Body.GetILProcessor();
 
             // base()
-            il.Emit(OpCodes.Ldarg_0); // this
-            il.Emit(OpCodes.Call, typeof(object).GetTypeInfo().GetConstructor(Type.EmptyTypes));
-
-            // var entity = param as entityType;
-            var entity = il.DeclareLocal(entityType);
-
-            il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Isinst, entityType);
-            il.Emit(OpCodes.Stloc, entity);
-
-            // if entity == null {
-            var successLabel = il.DefineLabel();
-
-            il.Emit(OpCodes.Ldloc, entity);
-            il.Emit(OpCodes.Ldnull);
-            il.Emit(OpCodes.Ceq);
-            il.Emit(OpCodes.Brfalse, successLabel);
-
-            //     throw new InvalidOperationException
-            il.Emit(OpCodes.Ldstr, "Unable to cast object to " + entityType.Name);
-            il.Emit(OpCodes.Newobj, typeof(InvalidOperationException).GetTypeInfo().GetConstructor(new[] { typeof(string) }));
-            il.Emit(OpCodes.Throw);
-
-            // }
-            il.MarkLabel(successLabel);
+            entityContructorIL.Emit(OpCodes.Ldarg_0); // this
+            entityContructorIL.Emit(OpCodes.Call, typeBuilder.Module.ImportReference(typeof(object).GetTypeInfo().GetConstructor(Type.EmptyTypes)));
 
             // this.Date = DateTime.UtcNow;
-            il.Emit(OpCodes.Ldarg_0); // this
-            il.EmitCall(OpCodes.Call, typeof(DateTime).GetRuntimeProperty(nameof(DateTime.UtcNow)).GetMethod, Type.EmptyTypes);
-            il.EmitCall(OpCodes.Call, dateColumn.SetMethod, Type.EmptyTypes);
+            entityContructorIL.Emit(OpCodes.Ldarg_0); // this
+            entityContructorIL.Emit(OpCodes.Call, typeBuilder.Module.ImportReference(typeof(DateTime).GetRuntimeProperty(nameof(DateTime.UtcNow)).GetMethod));
+            entityContructorIL.Emit(OpCodes.Call, dateColumn.SetMethod);
 
             foreach (var fieldMapping in fieldMappings)
             {
@@ -119,29 +130,27 @@ namespace Orbital.Data.Versioning
                 var entityField = fieldMapping.Key.PropertyInfo;
                 var historyField = fieldMapping.Value;
 
-                il.Emit(OpCodes.Ldarg_0); // this
-                il.Emit(OpCodes.Ldloc, entity);
-                il.EmitCall(OpCodes.Callvirt, entityField.GetMethod, Type.EmptyTypes);
-                il.EmitCall(OpCodes.Call, historyField.SetMethod, Type.EmptyTypes);
+                entityContructorIL.Emit(OpCodes.Ldarg_0); // this
+                entityContructorIL.Emit(OpCodes.Ldarg, entity);
+                entityContructorIL.Emit(OpCodes.Callvirt, typeBuilder.Module.ImportReference(entityField.GetMethod));
+                entityContructorIL.Emit(OpCodes.Call, historyField.SetMethod);
             }
 
             // return
-            il.Emit(OpCodes.Ret);
+            entityContructorIL.Emit(OpCodes.Ret);
         }
 
-        private static void DefineToEntity(TypeBuilder typeBuilder, Type entityType, Dictionary<IProperty, PropertyInfo> fieldMappings)
+        private static void DefineToEntity(TypeDefinition typeBuilder, TypeReference entityType, MethodReference entityConstructor, Dictionary<IProperty, PropertyDefinition> fieldMappings)
         {
-            var methodBuilder = typeBuilder.DefineMethod(
-                nameof(IVersionEntity<object>.ToEntity),
-                MethodAttributes.Public | MethodAttributes.Virtual,
-                entityType,
-                Type.EmptyTypes);
-            var il = methodBuilder.GetILGenerator();
+            var method = new MethodDefinition(nameof(IVersionEntity<object>.ToEntity), MethodAttributes.Public | MethodAttributes.Virtual, entityType);
+            typeBuilder.Methods.Add(method);
+            var il = method.Body.GetILProcessor();
 
             // var entity = new Entity();
-            var entity = il.DeclareLocal(entityType);
+            var entity = new VariableDefinition(entityType);
+            method.Body.Variables.Add(entity);
 
-            il.Emit(OpCodes.Newobj, entityType.GetTypeInfo().GetConstructor(Type.EmptyTypes));
+            il.Emit(OpCodes.Newobj, entityConstructor);
             il.Emit(OpCodes.Stloc, entity);
 
             foreach (var fieldMapping in fieldMappings)
@@ -152,28 +161,30 @@ namespace Orbital.Data.Versioning
 
                 il.Emit(OpCodes.Ldloc, entity);
                 il.Emit(OpCodes.Ldarg_0); // this
-                il.EmitCall(OpCodes.Call, historyField.GetMethod, Type.EmptyTypes);
-                il.EmitCall(OpCodes.Callvirt, entityField.SetMethod, Type.EmptyTypes);
+                il.Emit(OpCodes.Call, historyField.GetMethod);
+                il.Emit(OpCodes.Callvirt, typeBuilder.Module.ImportReference(entityField.SetMethod));
             }
 
             // return entity
             il.Emit(OpCodes.Ldloc, entity);
             il.Emit(OpCodes.Ret);
 
-            typeBuilder.DefineMethodOverride(
-                methodBuilder,
-                typeof(IVersionEntity<>).MakeGenericType(entityType).GetRuntimeMethod(nameof(IVersionEntity<object>.ToEntity), Type.EmptyTypes));
+            //TODO is this needed? 
+            // typeBuilder.DefineMethodOverride(
+            //    methodBuilder,
+            //    typeof(IVersionEntity<>).MakeGenericType(entityType).GetRuntimeMethod(nameof(IVersionEntity<object>.ToEntity), Type.EmptyTypes));
         }
 
-        private static PropertyBuilder DefineColumnProperty(TypeBuilder typeBuilder, string id, Type type)
+        private static PropertyDefinition DefineColumnProperty(TypeDefinition typeBuilder, string id, TypeReference type)
         {
-            var columnAttributeConstructor = typeof(ColumnAttribute).GetTypeInfo().GetConstructor(new[] { typeof(string) });
-            var columnAttributeBuilder = new CustomAttributeBuilder(columnAttributeConstructor, new object[] { id });
+            var columnAttributeConstructor = type.Module.ImportReference(typeof(ColumnAttribute).GetTypeInfo().GetConstructor(new[] { typeof(string) }));
+            var columnAttribute = new CustomAttribute(columnAttributeConstructor);
+            columnAttribute.ConstructorArguments.Add(new CustomAttributeArgument(typeBuilder.Module.TypeSystem.String, id));
 
-            var prop = typeBuilder.DefineAutoProperty(id, type);
-            prop.SetCustomAttribute(columnAttributeBuilder);
+            var property = typeBuilder.DefineAutoProperty(id, type);
+            property.CustomAttributes.Add(columnAttribute);
 
-            return prop;
+            return property;
         }
     }
 }

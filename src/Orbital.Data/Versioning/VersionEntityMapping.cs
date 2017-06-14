@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Mono.Cecil;
 
 namespace Orbital.Data.Versioning
 {
     public class VersionEntityMapping
     {
-        public VersionEntityMapping(Type entityType, Type versionEntityType, IReadOnlyDictionary<IProperty, PropertyInfo> fieldMappings)
+        public VersionEntityMapping(Type entityType, Type versionEntityType, IReadOnlyDictionary<IProperty, PropertyDefinition> fieldMappings)
         {
             EntityType = entityType;
             VersionEntityType = versionEntityType;
-            // The mapping passed in might include PropertyBuilders, this ensures they are all runtime properties
+            // Convert to runtime property
             FieldMappings = fieldMappings.ToDictionary(x => x.Key, x => versionEntityType.GetRuntimeProperty(x.Value.Name));
         }
 
