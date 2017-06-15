@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Orbital.Data.Entities;
-using Orbital.Data.Versioning;
+using Orbital.Versioning;
 using Xunit;
 
 namespace Orbital.Data.Tests

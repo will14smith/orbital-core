@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     public static partial class DbContextExtensions
     {
@@ -13,7 +13,7 @@ namespace Orbital.Data.Versioning
             var versionEntityMappings = context.GetVersionModels();
             if (!versionEntityMappings.TryGetValue(typeof(T).FullName, out var versionEntityMapping))
             {
-                throw new InvalidOperationException($"Couldn't find entity mapping for {typeof(T).Name}");   
+                throw new InvalidOperationException($"Couldn't find entity mapping for {typeof(T).Name}");
             }
 
             var setMethod = typeof(DbContext).GetRuntimeMethod("Set", Type.EmptyTypes);
@@ -51,7 +51,7 @@ namespace Orbital.Data.Versioning
             var entityParameter = Expression.Parameter(versionModel.VersionType, "entity");
 
             var entity = Expression.Convert(entityParameter, typeof(IVersionEntity<TEntity>));
-            var body = Expression.New(typeof(Version<TEntity>).GetTypeInfo().GetConstructor(new[] { typeof(IVersionEntity<TEntity>) }), entity);
+            var body = Expression.New(typeof(Version<TEntity>).GetConstructor(typeof(IVersionEntity<TEntity>)), entity);
 
             return Expression.Lambda(body, entityParameter);
         }
@@ -62,6 +62,5 @@ namespace Orbital.Data.Versioning
 
             return visitor.Visit(predicate);
         }
-
     }
 }

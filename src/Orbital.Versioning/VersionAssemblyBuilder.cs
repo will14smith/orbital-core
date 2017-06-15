@@ -11,7 +11,7 @@ using Mono.Cecil.Rocks;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal class VersionAssemblyBuilder
     {

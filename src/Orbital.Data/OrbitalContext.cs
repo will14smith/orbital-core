@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Orbital.Data.Entities;
-using Orbital.Data.Versioning;
+using Orbital.Versioning;
 
 namespace Orbital.Data
 {

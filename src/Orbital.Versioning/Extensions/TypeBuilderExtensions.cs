@@ -1,7 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal static class TypeBuilderExtensions
     {

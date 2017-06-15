@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     public static partial class DbContextExtensions
     {

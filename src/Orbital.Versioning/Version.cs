@@ -1,6 +1,6 @@
 using System;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     public class Version<T>
     {

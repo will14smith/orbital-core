@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal static class TypeExtensions
     {

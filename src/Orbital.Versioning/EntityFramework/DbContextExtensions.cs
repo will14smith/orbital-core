@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     public static partial class DbContextExtensions
     {

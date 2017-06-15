@@ -13,7 +13,7 @@ using Mono.Cecil.Cil;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal class VersionModelCustomizer : ModelCustomizer
     {

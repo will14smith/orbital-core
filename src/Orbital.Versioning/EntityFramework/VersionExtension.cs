@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     public class VersionExtension : IDbContextOptionsExtension
     {

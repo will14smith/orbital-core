@@ -6,11 +6,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.2" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta6" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Orbital.Versioning\Orbital.Versioning.csproj" />
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Versioning\" />
   </ItemGroup>
 </Project>

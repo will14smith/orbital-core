@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal class VersionExpressionMapper : ExpressionVisitor
     {

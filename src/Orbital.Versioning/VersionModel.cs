@@ -5,7 +5,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Mono.Cecil;
 
-namespace Orbital.Data.Versioning
+namespace Orbital.Versioning
 {
     internal class VersionModel
     {
