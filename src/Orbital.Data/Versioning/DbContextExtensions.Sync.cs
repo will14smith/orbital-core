@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Orbital.Data.Versioning
 {
@@ -8,22 +10,34 @@ namespace Orbital.Data.Versioning
     {
         public static void SyncVersion(this DbContext context)
         {
-            var changeEntries = context.ChangeTracker.Entries()
-                .Where(x => x.State == EntityState.Added || x.State == EntityState.Modified || x.State == EntityState.Deleted)
-                .ToList();
+            var changeEntries = context.ChangeTracker.Entries().Where(ShouldTrack);
+            var versionEntityMappings = context.GetVersionModels();
 
-            var versionEntityMappings = context.GetVersionEntityMappings();
+            var versionEntitiesToAdd = new List<object>();
 
             foreach (var changeEntry in changeEntries)
             {
                 var entity = changeEntry.CurrentValues.ToObject();
-                if (!versionEntityMappings.TryGetValue(changeEntry.Metadata.ClrType.Name, out var versionEntityMapping))
+                var entityTypeName = changeEntry.Metadata.ClrType.FullName;
+
+                if (!versionEntityMappings.TryGetValue(entityTypeName, out var versionEntityMapping))
                 {
-                    throw new InvalidOperationException($"Couldn't find entity mapping for {changeEntry.Metadata.ClrType.Name}");
+                    throw new InvalidOperationException($"Couldn't find entity mapping for {entityTypeName}");
                 }
 
-                context.Add(Activator.CreateInstance(versionEntityMapping.VersionEntityType, entity));
+                versionEntitiesToAdd.Add(Activator.CreateInstance(versionEntityMapping.VersionType, entity));
             }
+
+            context.AddRange(versionEntitiesToAdd);
+        }
+
+        private static bool ShouldTrack(EntityEntry entry)
+        {
+            var state = entry.State;
+
+            return state == EntityState.Added
+                || state == EntityState.Modified
+                || state == EntityState.Deleted;
         }
     }
 }

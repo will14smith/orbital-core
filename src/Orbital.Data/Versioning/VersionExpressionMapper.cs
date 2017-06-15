@@ -3,31 +3,30 @@ using System.Linq.Expressions;
 
 namespace Orbital.Data.Versioning
 {
-    internal class VersionEntityExpressionMapper : ExpressionVisitor
+    internal class VersionExpressionMapper : ExpressionVisitor
     {
-        private readonly VersionEntityMapping _versionEntityMapping;
+        private readonly VersionModel _versionModel;
         private readonly IDictionary<ParameterExpression, ParameterExpression> _parameterMappings = new Dictionary<ParameterExpression, ParameterExpression>();
 
-        public VersionEntityExpressionMapper(VersionEntityMapping versionEntityMapping)
+        public VersionExpressionMapper(VersionModel versionModel)
         {
-            _versionEntityMapping = versionEntityMapping;
+            _versionModel = versionModel;
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            var versionEntityMember = _versionEntityMapping.FindMapping(node.Member);
-            if (versionEntityMember == null)
-            {
-                return base.VisitMember(node);
-            }
-
             var expr = Visit(node.Expression);
-            if (expr.Type == _versionEntityMapping.VersionEntityType)
+            if (expr.Type != _versionModel.VersionType)
             {
-                return Expression.Property(expr, versionEntityMember);
+                return Expression.MakeMemberAccess(expr, node.Member);
             }
 
-            return Expression.MakeMemberAccess(expr, node.Member);
+            if (_versionModel.TryFindMapping(node.Member, out var versionMember))
+            {
+                return Expression.Property(expr, versionMember);
+            }
+
+            return base.VisitMember(node);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
@@ -45,11 +44,11 @@ namespace Orbital.Data.Versioning
             var parameters = new List<ParameterExpression>();
             foreach (var originalParameter in node.Parameters)
             {
-                if (originalParameter.Type == _versionEntityMapping.EntityType)
+                if (originalParameter.Type == _versionModel.EntityType)
                 {
-                    var newParameter = Expression.Parameter(_versionEntityMapping.VersionEntityType, originalParameter.Name);
-                    _parameterMappings.Add(originalParameter, newParameter);
+                    var newParameter = Expression.Parameter(_versionModel.VersionType, originalParameter.Name);
 
+                    _parameterMappings.Add(originalParameter, newParameter);
                     parameters.Add(newParameter);
                 }
                 else

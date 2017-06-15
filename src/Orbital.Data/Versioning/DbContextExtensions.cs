@@ -49,14 +49,14 @@ namespace Orbital.Data.Versioning
                 .Single();
         }
 
-        internal static IReadOnlyDictionary<string, VersionEntityMapping> GetVersionEntityMappings(this DbContext context)
+        internal static IReadOnlyDictionary<string, VersionModel> GetVersionModels(this DbContext context)
         {
             var annotation = context.Model.FindAnnotation(VersionModelCustomizer.ModelMappingAnnotation);
 
-            var versionEntityMappings = annotation?.Value as IReadOnlyDictionary<string, VersionEntityMapping>;
+            var versionEntityMappings = annotation?.Value as IReadOnlyDictionary<string, VersionModel>;
             if (versionEntityMappings == null)
             {
-                throw new InvalidOperationException($"Couldn't find version entity mappings, make sure the {nameof(VersionExtension)} is loaded.");
+                throw new InvalidOperationException($"Couldn't find version entity models, make sure the {nameof(VersionExtension)} is loaded.");
             }
 
             return versionEntityMappings;

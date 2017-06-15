@@ -11,7 +11,10 @@ namespace Orbital.Data.Versioning
             Entity = entity;
         }
         public Version(IVersionEntity<T> versionEntity)
-            : this(versionEntity.Id, versionEntity.Date, versionEntity.ToEntity())
+            : this(
+                  versionId: versionEntity.Id,
+                  date: versionEntity.Date,
+                  entity: versionEntity.ToEntity())
         {
         }
 
