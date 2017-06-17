@@ -24,9 +24,14 @@ namespace Orbital.Versioning.Tests.Integration
         [Fact]
         public void Test()
         {
+            UserMetadataProvider.UserId = Guid.NewGuid();
+
             var builder = new DbContextOptionsBuilder()
                 .UseInMemoryDatabase()
-                .UseVersioning();
+                .UseVersioning(options =>
+                {
+                    options.WithMetadataProvider(new UserMetadataProvider());
+                });
 
             var ctx = new Context(builder.Options);
 
@@ -34,7 +39,7 @@ namespace Orbital.Versioning.Tests.Integration
             var title = "EntityTitle";
             var entity = new Entity { Id = Guid.NewGuid(), Title = title };
             ctx.Entities.Add(entity);
-            
+
             ctx.SyncVersioning();
             var rowsChanged = ctx.SaveChanges();
             Assert.Equal(2, rowsChanged);
@@ -63,6 +68,11 @@ namespace Orbital.Versioning.Tests.Integration
             Assert.Equal(2, versions.Count());
             Assert.Equal(title, versions.First().Entity.Title);
             Assert.Equal(entity.Title, versions.Last().Entity.Title);
+
+            // check metadata
+            var user = versions.First().GetUserMetadata();
+            Assert.NotNull(user);
+            Assert.Equal(UserMetadataProvider.UserId, user.UserId);
         }
 
         [Fact]
@@ -70,7 +80,10 @@ namespace Orbital.Versioning.Tests.Integration
         {
             var builder = new DbContextOptionsBuilder()
                 .UseInMemoryDatabase()
-                .UseVersioning();
+                .UseVersioning(options =>
+                {
+                    options.WithMetadataProvider(new UserMetadataProvider());
+                });
 
             var ctx = new Context(builder.Options);
 

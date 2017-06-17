@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
 
@@ -59,6 +60,31 @@ namespace Orbital.Versioning.Tests
 
             var ipAddressVersionMetadata = Assert.IsAssignableFrom<IVersionEntityWithMetadata<IpAddressMetadataProvider.IpAddressMetadata>>(instance);
             Assert.Equal(ipAddress, ipAddressVersionMetadata.ToMetadata().IpAddress);
+        }
+
+        [Fact]
+        public void WithMetadata_VersionEntityInterface_ToMetadata_Works()
+        {
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[] { new UserMetadataProvider(), new IpAddressMetadataProvider() });
+            var assembly = _versionAssemblyBuilder.Build();
+            versionModel.Assembly = assembly;
+
+            var userId = Guid.NewGuid();
+            var ipAddress = "blah";
+
+            var instance = Activator.CreateInstance(versionModel.VersionType, new Entity(), new UserMetadataProvider.UserMetadata { UserId = userId }, new IpAddressMetadataProvider.IpAddressMetadata { IpAddress = ipAddress });
+
+            var toMetadata = typeof(IVersionEntity<Entity>).GetRuntimeMethod(nameof(IVersionEntity<Entity>.ToMetadata), Type.EmptyTypes);
+            Assert.NotNull(toMetadata);
+
+            var result = toMetadata.Invoke(instance, new object[0]);
+            var metadataResult = Assert.IsAssignableFrom<IReadOnlyDictionary<string, object>>(result);
+
+            var userMetadata = Assert.IsType<UserMetadataProvider.UserMetadata>(metadataResult[nameof(UserMetadataProvider.UserMetadata)]);
+            Assert.Equal(userId, userMetadata.UserId);
+
+            var ipAddressMetadata = Assert.IsType<IpAddressMetadataProvider.IpAddressMetadata>(metadataResult[nameof(IpAddressMetadataProvider.IpAddressMetadata)]);
+            Assert.Equal(ipAddress, ipAddressMetadata.IpAddress);
         }
     }
 }

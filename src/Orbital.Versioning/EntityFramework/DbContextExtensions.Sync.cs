@@ -11,7 +11,7 @@ namespace Orbital.Versioning
         public static void SyncVersioning(this DbContext context)
         {
             var changeEntries = context.ChangeTracker.Entries().Where(ShouldTrack);
-            var versionEntityMappings = context.GetVersionModels();
+            var versionModels = context.GetVersionModels();
 
             var versionEntitiesToAdd = new List<object>();
 
@@ -20,12 +20,20 @@ namespace Orbital.Versioning
                 var entity = changeEntry.CurrentValues.ToObject();
                 var entityTypeName = changeEntry.Metadata.ClrType.FullName;
 
-                if (!versionEntityMappings.TryGetValue(entityTypeName, out var versionEntityMapping))
+                if (!versionModels.TryGetValue(entityTypeName, out var versionModel))
                 {
-                    throw new InvalidOperationException($"Couldn't find entity mapping for {entityTypeName}");
+                    throw new InvalidOperationException($"Couldn't find version model for {entityTypeName}");
                 }
 
-                versionEntitiesToAdd.Add(Activator.CreateInstance(versionEntityMapping.VersionType, entity));
+                var constructorArguments = new List<object> { entity };
+                foreach (var metadataProvider in versionModel.MetadataModels)
+                {
+                    var metadata = metadataProvider.MetadataProvider.GetMetadata();
+
+                    constructorArguments.Add(metadata);
+                }
+
+                versionEntitiesToAdd.Add(Activator.CreateInstance(versionModel.VersionType, constructorArguments.ToArray()));
             }
 
             context.AddRange(versionEntitiesToAdd);

@@ -21,6 +21,7 @@ namespace Orbital.Versioning
         private const string VersionEntityIdName = nameof(IVersionEntity<object>.Id);
         private const string VersionEntityDateName = nameof(IVersionEntity<object>.Date);
         private const string VersionEntityToEntityName = nameof(IVersionEntity<object>.ToEntity);
+        private const string VersionEntityToMetadataName = nameof(IVersionEntity<object>.ToMetadata);
 
         public VersionAssemblyBuilder(string assemblyName = "Autogen.Versioning")
         {
@@ -71,6 +72,7 @@ namespace Orbital.Versioning
             DefineConstructors(versionType, entityType, versionModel);
             // Finish implementing IVersionEntity<TEntity>
             DefineToEntity(versionType, entityType, versionModel);
+            DefineToMetadata(metadata, versionType, versionModel);
 
 
             return versionModel;
@@ -168,7 +170,7 @@ namespace Orbital.Versioning
 
             // entity+metadata constructor
             var entity = new ParameterDefinition(entityType);
-            var metadataParameters = versionModel.MetadataProviders.Select(x => new ParameterDefinition(_module.ImportReference(x.MetadataProvider.MetadataType))).ToArray();
+            var metadataParameters = versionModel.MetadataModels.Select(x => new ParameterDefinition(_module.ImportReference(x.MetadataProvider.MetadataType))).ToArray();
             var entityContructor = type.DefineConstructor(new[] { entity }.Concat(metadataParameters).ToArray());
 
             var entityContructorIL = entityContructor.Body.GetILProcessor();
@@ -196,7 +198,7 @@ namespace Orbital.Versioning
             }
 
             // metadata
-            foreach (var (metadataModel, parameter) in versionModel.MetadataProviders.Zip(metadataParameters, (a, b) => (a, b)))
+            foreach (var (metadataModel, parameter) in versionModel.MetadataModels.Zip(metadataParameters, (a, b) => (a, b)))
             {
                 foreach (var fieldMapping in metadataModel.FieldMappings)
                 {
@@ -241,6 +243,63 @@ namespace Orbital.Versioning
 
             // return entity
             il.Emit(OpCodes.Ldloc, entity);
+            il.Emit(OpCodes.Ret);
+        }
+
+        private void DefineToMetadata(IEnumerable<IVersionMetadataProvider> metadataProviders, TypeDefinition type, VersionModel versionModel)
+        {
+            var method = type.DefineMethod(VersionEntityToMetadataName, MethodAttributes.Public | MethodAttributes.Virtual, _module.ImportReference(typeof(IReadOnlyDictionary<string, object>)));
+            var il = method.Body.GetILProcessor();
+
+            var dictionaryInterfaceType = _module.ImportReference(typeof(IDictionary<string, object>));
+            dictionaryInterfaceType.GenericParameters.Add(new GenericParameter(dictionaryInterfaceType));
+            dictionaryInterfaceType.GenericParameters.Add(new GenericParameter(dictionaryInterfaceType));
+
+            var dictionaryType = _module.ImportReference(typeof(Dictionary<string,object>));
+
+            // HACK: get around the fact that Mono.Cecil doesn't support importing method from generic types yet
+            var dictionaryCtor = new MethodReference(".ctor", _module.TypeSystem.Void, dictionaryType) { HasThis = true };
+            var dictionaryAdd = new MethodReference("Add", _module.TypeSystem.Void, dictionaryInterfaceType) { HasThis = true };
+            dictionaryAdd.Parameters.Add(new ParameterDefinition(dictionaryInterfaceType.GenericParameters[0]));
+            dictionaryAdd.Parameters.Add(new ParameterDefinition(dictionaryInterfaceType.GenericParameters[1]));
+
+            // var dictionary = new Dictionary<string, object>();
+            var dictionary = new VariableDefinition(dictionaryType);
+            method.Body.Variables.Add(dictionary);
+
+            il.Emit(OpCodes.Newobj, dictionaryCtor);
+            il.Emit(OpCodes.Stloc, dictionary);
+
+            foreach (var metadataModel in versionModel.MetadataModels)
+            {
+                // var metadata = new TMetadata();
+                var metadata = new VariableDefinition(_module.ImportReference(metadataModel.MetadataProvider.MetadataType));
+                method.Body.Variables.Add(metadata);
+
+                il.Emit(OpCodes.Newobj, _module.ImportReference(metadataModel.MetadataProvider.MetadataType.GetConstructor()));
+                il.Emit(OpCodes.Stloc, metadata);
+
+                foreach (var fieldMapping in metadataModel.FieldMappings)
+                {
+                    // metadata.A = A;
+                    var metaDataField = fieldMapping.Key;
+                    var versionField = fieldMapping.Value;
+
+                    il.Emit(OpCodes.Ldloc, metadata);
+                    il.Emit(OpCodes.Ldarg_0); // this
+                    il.Emit(OpCodes.Call, versionField.GetMethod);
+                    il.Emit(OpCodes.Callvirt, _module.ImportReference(metaDataField.SetMethod));
+                }
+
+                // dictionary.Add(metadataProvider.Name, metadata);
+                il.Emit(OpCodes.Ldloc, dictionary);
+                il.Emit(OpCodes.Ldstr, metadataModel.MetadataProvider.Name);
+                il.Emit(OpCodes.Ldloc, metadata);
+                il.Emit(OpCodes.Callvirt, dictionaryAdd);
+            }
+
+            // return entity
+            il.Emit(OpCodes.Ldloc, dictionary);
             il.Emit(OpCodes.Ret);
         }
     }

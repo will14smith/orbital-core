@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Orbital.Versioning
 {
@@ -8,5 +9,6 @@ namespace Orbital.Versioning
         DateTime Date { get; set; }
 
         TEntity ToEntity();
+        IReadOnlyDictionary<string, object> ToMetadata();
     }
 }
