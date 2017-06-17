@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
-using System.Reflection;
-using System.Runtime.Loader;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Rocks;
-using MethodAttributes = Mono.Cecil.MethodAttributes;
-using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace Orbital.Versioning
 {
@@ -24,9 +17,6 @@ namespace Orbital.Versioning
         private const string VersionEntityDateName = nameof(IVersionEntity<object>.Date);
         private const string VersionEntityToEntityName = nameof(IVersionEntity<object>.ToEntity);
 
-        private static readonly ConstructorInfo DefaultObjectConstructor = typeof(object).GetConstructor();
-        private static readonly MethodInfo DateTimeUtcNowGetMethod = typeof(DateTime).GetRuntimeProperty(nameof(DateTime.UtcNow)).GetMethod;
-
         public VersionAssemblyBuilder(string assemblyName = "Autogen.Versioning")
         {
             _assembly = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition(assemblyName, new Version(1, 0)), assemblyName, ModuleKind.Dll);
@@ -35,19 +25,14 @@ namespace Orbital.Versioning
             _versionEntityGenericDefinition = _module.ImportReference(typeof(IVersionEntity<>));
         }
 
-        public Assembly Build()
+        public System.Reflection.Assembly Build()
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                _assembly.Write(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                return AssemblyLoadContext.Default.LoadFromStream(memoryStream);
-            }
+            return _assembly.Build();
         }
 
-        public VersionModel Add(IEntityType entityModel)
+        public VersionModel Add(EntityModel entityModel)
         {
-            var entityType = _module.ImportReference(entityModel.ClrType);
+            var entityType = _module.ImportReference(entityModel.EntityType);
             var versionType = _module.DefineType(entityType.Name + "Version", TypeAttributes.Class | TypeAttributes.Public, _module.TypeSystem.Object);
 
             // Implement IVersionEntity<TEntity>
@@ -60,10 +45,10 @@ namespace Orbital.Versioning
             var dateColumn = DefineColumnProperty(versionType, VersionEntityDateName, _module.ImportReference(typeof(DateTime)));
 
             // Copy all the non-navigation columns from the entity, prefix the with Field_ to avoid collisions with version columns
-            var fieldMappings = new Dictionary<IProperty, PropertyDefinition>();
-            foreach (var prop in entityModel.GetProperties())
+            var fieldMappings = new Dictionary<System.Reflection.PropertyInfo, PropertyDefinition>();
+            foreach (var prop in entityModel.Properties)
             {
-                var property = DefineColumnProperty(versionType, "Field_" + prop.Name, _module.ImportReference(prop.ClrType));
+                var property = DefineColumnProperty(versionType, "Field_" + prop.Name, _module.ImportReference(prop.PropertyType));
                 fieldMappings.Add(prop, property);
             }
 
@@ -94,39 +79,27 @@ namespace Orbital.Versioning
 
         private void DefineConstructors(TypeDefinition type, TypeReference entityType, VersionModel versionModel)
         {
-            const string name = ".ctor";
-            const MethodAttributes attr = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-
-            var defaultObjectConstructor = _module.ImportReference(DefaultObjectConstructor);
-
-            // default constructor
-            var defaultContructor = type.DefineMethod(name, attr, _module.TypeSystem.Void);
-            var defaultConstructorIL = defaultContructor.Body.GetILProcessor();
-
-            defaultConstructorIL.Emit(OpCodes.Ldarg_0);
-            defaultConstructorIL.Emit(OpCodes.Call, defaultObjectConstructor);
-            defaultConstructorIL.Emit(OpCodes.Ret);
+            var defaultConstructor = type.DefineDefaultConstructor();
 
             // from entity constructor
-            var entityContructor = type.DefineMethod(name, attr, _module.TypeSystem.Void);
             var entity = new ParameterDefinition(entityType);
-            entityContructor.Parameters.Add(entity);
+            var entityContructor = type.DefineConstructor(entity);
 
             var entityContructorIL = entityContructor.Body.GetILProcessor();
 
             // base()
             entityContructorIL.Emit(OpCodes.Ldarg_0); // this
-            entityContructorIL.Emit(OpCodes.Call, defaultObjectConstructor);
+            entityContructorIL.Emit(OpCodes.Call, defaultConstructor);
 
             // this.Date = DateTime.UtcNow;
             entityContructorIL.Emit(OpCodes.Ldarg_0); // this
-            entityContructorIL.Emit(OpCodes.Call, _module.ImportReference(DateTimeUtcNowGetMethod));
+            entityContructorIL.Emit(OpCodes.Call, _module.ImportReference(System.Reflection.RuntimeReflectionExtensions.GetRuntimeProperty(typeof(DateTime), nameof(DateTime.UtcNow)).GetMethod));
             entityContructorIL.Emit(OpCodes.Call, versionModel.DateColumn.SetMethod);
 
             foreach (var fieldMapping in versionModel.EntityFieldMappings)
             {
                 // this.A = entity.A;
-                var entityField = fieldMapping.Key.PropertyInfo;
+                var entityField = fieldMapping.Key;
                 var historyField = fieldMapping.Value;
 
                 entityContructorIL.Emit(OpCodes.Ldarg_0); // this
@@ -154,7 +127,7 @@ namespace Orbital.Versioning
             foreach (var fieldMapping in versionModel.EntityFieldMappings)
             {
                 // entity.A = A;
-                var entityField = fieldMapping.Key.PropertyInfo;
+                var entityField = fieldMapping.Key;
                 var historyField = fieldMapping.Value;
 
                 il.Emit(OpCodes.Ldloc, entity);

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Mono.Cecil;
 
 namespace Orbital.Versioning
@@ -15,10 +13,10 @@ namespace Orbital.Versioning
         public PropertyDefinition IdColumn { get; }
         public PropertyDefinition DateColumn { get; }
 
-        public IEntityType EntityModel { get; }
-        public IReadOnlyDictionary<IProperty, PropertyDefinition> EntityFieldMappings { get; }
+        public EntityModel EntityModel { get; }
+        public IReadOnlyDictionary<PropertyInfo, PropertyDefinition> EntityFieldMappings { get; }
 
-        public Type EntityType => EntityModel.ClrType;
+        public Type EntityType => EntityModel.EntityType;
         public Type VersionType => Assembly == null
             ? throw new InvalidOperationException("Internal: Assembly is not set yet.")
             : Assembly.GetType(VersionReference.FullName) ?? throw new Exception($"Couldn't find version type ({VersionReference.FullName}) in assembly.");
@@ -28,9 +26,8 @@ namespace Orbital.Versioning
         public VersionModel(
             TypeReference entityReference, TypeReference versionReference,
             PropertyDefinition idColumn, PropertyDefinition dateColumn,
-            IEntityType entityModel, IReadOnlyDictionary<IProperty, PropertyDefinition> entityFieldMappings)
+            EntityModel entityModel, IReadOnlyDictionary<PropertyInfo, PropertyDefinition> entityFieldMappings)
         {
-
             EntityReference = entityReference;
             VersionReference = versionReference;
 
@@ -43,15 +40,20 @@ namespace Orbital.Versioning
 
         public bool TryFindMapping(MemberInfo entityMember, out PropertyInfo versionMember)
         {
-            var versionMemberReference = EntityFieldMappings.Where(x => x.Key.PropertyInfo == entityMember).Select(x => x.Value).FirstOrDefault();
-            if (versionMemberReference == null)
+            if (!(entityMember is PropertyInfo entityProperty))
+            {
+                versionMember = null;
+                return false;
+            }
+
+            if (!EntityFieldMappings.TryGetValue(entityProperty, out var versionMemberReference))
             {
                 versionMember = null;
                 return false;
             }
 
             versionMember = VersionType.GetRuntimeProperty(versionMemberReference.Name);
-            return true;
+            return versionMember != null;
         }
     }
 }

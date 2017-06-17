@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbital.Web.Tests", "test\O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orbital.Versioning", "src\Orbital.Versioning\Orbital.Versioning.csproj", "{08DCBDBF-0D93-4E41-91BB-DF0BB3CABCB5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orbital.Versioning.Tests", "test\Orbital.Versioning.Tests\Orbital.Versioning.Tests.csproj", "{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,18 @@ Global
 		{08DCBDBF-0D93-4E41-91BB-DF0BB3CABCB5}.Release|x64.Build.0 = Release|Any CPU
 		{08DCBDBF-0D93-4E41-91BB-DF0BB3CABCB5}.Release|x86.ActiveCfg = Release|Any CPU
 		{08DCBDBF-0D93-4E41-91BB-DF0BB3CABCB5}.Release|x86.Build.0 = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Debug|x86.Build.0 = Debug|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|x64.Build.0 = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{FCAC6A3F-28CF-47B1-B8FA-641F813BCD7E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

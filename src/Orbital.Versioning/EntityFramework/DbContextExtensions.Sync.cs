@@ -8,7 +8,7 @@ namespace Orbital.Versioning
 {
     public static partial class DbContextExtensions
     {
-        public static void SyncVersion(this DbContext context)
+        public static void SyncVersioning(this DbContext context)
         {
             var changeEntries = context.ChangeTracker.Entries().Where(ShouldTrack);
             var versionEntityMappings = context.GetVersionModels();

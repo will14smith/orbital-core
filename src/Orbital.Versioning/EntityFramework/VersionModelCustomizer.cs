@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using MethodAttributes = Mono.Cecil.MethodAttributes;
-using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace Orbital.Versioning
 {
@@ -27,38 +18,46 @@ namespace Orbital.Versioning
 
             foreach (var modelKvp in models)
             {
-                var model = modelKvp.Value;
+                var efModel = modelKvp.Value.Item1;
+                var model = modelKvp.Value.Item2;
 
                 var entityModel = model.EntityModel;
-                var entityType = entityModel.ClrType;
+                var entityType = entityModel.EntityType;
 
                 modelBuilder.Entity(model.VersionType, entityBuilder =>
                 {
-                    var originalTableName = entityModel.FindAnnotation("Relational:TableName")?.Value ?? entityType.Name;
+                    var originalTableName = efModel.FindAnnotation("Relational:TableName")?.Value ?? entityType.Name;
                     entityBuilder.HasAnnotation("Relational:TableName", originalTableName + "_history");
                 });
             }
 
-            modelBuilder.Model.AddAnnotation(ModelMappingAnnotation, models);
+            modelBuilder.Model.AddAnnotation(ModelMappingAnnotation, models.ToDictionary(x => x.Key, x => x.Value.Item2));
         }
 
-        private static IReadOnlyDictionary<string, VersionModel> BuildModels(ModelBuilder modelBuilder)
+        private static IReadOnlyDictionary<string, (IEntityType, VersionModel)> BuildModels(ModelBuilder modelBuilder)
         {
             var builder = new VersionAssemblyBuilder();
 
             var models = modelBuilder.Model.GetEntityTypes()
                 .ToDictionary(
                     model => model.ClrType.FullName,
-                    model => builder.Add(model));
+                    model => ((IEntityType)model, builder.Add(CreateEntityModel(model))));
 
             var assembly = builder.Build();
 
             foreach (var modelKvp in models)
             {
-                modelKvp.Value.Assembly = assembly;
+                modelKvp.Value.Item2.Assembly = assembly;
             }
 
             return models;
+        }
+
+        private static EntityModel CreateEntityModel(IEntityType model)
+        {
+            return new EntityModel(
+                entityType: model.ClrType,
+                properties: model.GetProperties().Select(x => x.PropertyInfo).ToList());
         }
     }
 }

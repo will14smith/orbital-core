@@ -14,7 +14,7 @@ namespace Orbital.Data.Tests
         {
             var builder = new DbContextOptionsBuilder<OrbitalContext>();
 
-            builder.UseInMemoryDatabase();
+            builder.UseVersioning();
 
             var context = new OrbitalContext(builder.Options);
 

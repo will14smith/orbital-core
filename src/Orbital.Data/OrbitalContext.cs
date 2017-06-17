@@ -25,7 +25,7 @@ namespace Orbital.Data
 
         public override int SaveChanges()
         {
-            this.SyncVersion();
+            this.SyncVersioning();
 
             return base.SaveChanges();
         }

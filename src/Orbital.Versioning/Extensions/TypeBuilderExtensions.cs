@@ -1,3 +1,5 @@
+using System.IO;
+using System.Runtime.Loader;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -65,6 +67,45 @@ namespace Orbital.Versioning
             property.SetMethod = setBuilder;
             
             return property;
+        }
+
+        public static MethodDefinition DefineConstructor(this TypeDefinition type, params ParameterDefinition[] parameters)
+        {
+            const string name = ".ctor";
+            const MethodAttributes attr = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
+
+            var constructor = type.DefineMethod(name, attr, type.Module.TypeSystem.Void);
+
+            foreach (var parameter in parameters)
+            {
+                constructor.Parameters.Add(parameter);
+            }
+
+            return constructor;
+        }
+
+        public static MethodDefinition DefineDefaultConstructor(this TypeDefinition type)
+        {
+            var defaultObjectConstructor = type.Module.ImportReference(typeof(object).GetConstructor());
+
+            var defaultContructor = type.DefineConstructor();
+            var defaultConstructorIL = defaultContructor.Body.GetILProcessor();
+
+            defaultConstructorIL.Emit(OpCodes.Ldarg_0);
+            defaultConstructorIL.Emit(OpCodes.Call, defaultObjectConstructor);
+            defaultConstructorIL.Emit(OpCodes.Ret);
+
+            return defaultContructor;
+        }
+
+        public static System.Reflection.Assembly Build(this AssemblyDefinition assembly)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                assembly.Write(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return AssemblyLoadContext.Default.LoadFromStream(memoryStream);
+            }
         }
     }
 }
