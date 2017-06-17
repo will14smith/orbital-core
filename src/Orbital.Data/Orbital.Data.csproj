@@ -5,13 +5,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orbital.Versioning\Orbital.Versioning.csproj" />
     <ProjectReference Include="..\Orbital.Models\Orbital.Models.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Versioning\" />
   </ItemGroup>
 </Project>

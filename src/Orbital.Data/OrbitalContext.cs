@@ -7,7 +7,7 @@ namespace Orbital.Data
     internal class OrbitalContext : DbContext
     {
         public OrbitalContext(DbContextOptions<OrbitalContext> options)
-            : base(options.WithExtension(new VersionExtension()))
+            : base(options)
         {
         }
 

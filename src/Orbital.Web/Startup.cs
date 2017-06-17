@@ -4,9 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
-using Orbital.Data.Connections;
-using Orbital.Data.Repositories;
-using Orbital.Models.Repositories;
+using Orbital.Data;
 using Orbital.Web.BadgeHolders;
 using Orbital.Web.Badges;
 using Orbital.Web.Clubs;
@@ -26,18 +24,14 @@ namespace Orbital.Web
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-
-            DatabaseMigrator.Migrate(ConnectionString);
         }
 
         public IConfigurationRoot Configuration { get; }
         public string ConnectionString => Configuration["connectionString"];
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDatabase(ConnectionString);
-            services.AddRepositories();
+            services.AddOrbitalData(ConnectionString);
             services.AddServices();
 
             services.AddMvc()
@@ -58,7 +52,6 @@ namespace Orbital.Web
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -71,30 +64,13 @@ namespace Orbital.Web
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Orbital");
             });
+
+            app.ApplicationServices.MigrateOrbitalData();
         }
     }
 
     public static class ServiceExtensions
     {
-        public static void AddDatabase(this IServiceCollection services, string connectionString)
-        {
-            services.AddSingleton<IDbConnectionFactory>(new PostgresqlConnectionFactory(connectionString));
-        }
-
-        public static void AddRepositories(this IServiceCollection services)
-        {
-            services.AddScoped<IBadgeHolderRepository, DatabaseBadgeHolderRepository>();
-            services.AddScoped<IBadgeRepository, DatabaseBadgeRepository>();
-            services.AddScoped<IClubRepository, DatabaseClubRepository>();
-            services.AddScoped<ICompetitionRepository, DatabaseCompetitionRepository>();
-            services.AddScoped<IHandicapRepository, DatabaseHandicapRepository>();
-            services.AddScoped<IPersonRepository, DatabasePersonRepository>();
-            services.AddScoped<IRecordRepository, DatabaseRecordRepository>();
-            // TODO services.AddScoped<IRecordTeamRepository, DatabaseRecordTeamRepository>();
-            services.AddScoped<IRoundRepository, DatabaseRoundRepository>();
-            services.AddScoped<IScoreRepository, DatabaseScoreRepository>();
-        }
-
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IBadgeService, BadgeService>();
