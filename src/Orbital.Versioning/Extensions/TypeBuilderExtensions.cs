@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.Loader;
 using Mono.Cecil;
@@ -100,6 +101,11 @@ namespace Orbital.Versioning
 
         public static System.Reflection.Assembly Build(this AssemblyDefinition assembly)
         {
+            using (var f = File.OpenWrite("C:\\projects\\tmp\\" + Guid.NewGuid()))
+            {
+                assembly.Write(f);
+            }
+
             using (var memoryStream = new MemoryStream())
             {
                 assembly.Write(memoryStream);

@@ -10,6 +10,12 @@ namespace Orbital.Versioning
     {
         public static readonly string ModelMappingAnnotation = "VersionModelMapping";
 
+        private readonly IReadOnlyCollection<IVersionMetadataProvider> _metadata;
+        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata)
+        {
+            _metadata = metadata;
+        }
+
         public override void Customize(ModelBuilder modelBuilder, DbContext dbContext)
         {
             base.Customize(modelBuilder, dbContext);
@@ -34,14 +40,14 @@ namespace Orbital.Versioning
             modelBuilder.Model.AddAnnotation(ModelMappingAnnotation, models.ToDictionary(x => x.Key, x => x.Value.Item2));
         }
 
-        private static IReadOnlyDictionary<string, (IEntityType, VersionModel)> BuildModels(ModelBuilder modelBuilder)
+        private IReadOnlyDictionary<string, (IEntityType, VersionModel)> BuildModels(ModelBuilder modelBuilder)
         {
             var builder = new VersionAssemblyBuilder();
 
             var models = modelBuilder.Model.GetEntityTypes()
                 .ToDictionary(
                     model => model.ClrType.FullName,
-                    model => ((IEntityType)model, builder.Add(CreateEntityModel(model))));
+                    model => ((IEntityType)model, builder.Add(CreateEntityModel(model), _metadata)));
 
             var assembly = builder.Build();
 

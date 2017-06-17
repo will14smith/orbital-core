@@ -2,11 +2,11 @@ using System;
 
 namespace Orbital.Versioning
 {
-    public interface IVersionEntity<out T>
+    public interface IVersionEntity<out TEntity>
     {
         long Id { get; set; }
         DateTime Date { get; set; }
 
-        T ToEntity();
+        TEntity ToEntity();
     }
 }

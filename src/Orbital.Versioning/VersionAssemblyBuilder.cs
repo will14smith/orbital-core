@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace Orbital.Versioning
 {
@@ -12,6 +16,7 @@ namespace Orbital.Versioning
         private readonly ModuleDefinition _module;
 
         private readonly TypeReference _versionEntityGenericDefinition;
+        private readonly TypeReference _versionMetadataGenericDefinition;
 
         private const string VersionEntityIdName = nameof(IVersionEntity<object>.Id);
         private const string VersionEntityDateName = nameof(IVersionEntity<object>.Date);
@@ -23,14 +28,16 @@ namespace Orbital.Versioning
             _module = _assembly.MainModule;
 
             _versionEntityGenericDefinition = _module.ImportReference(typeof(IVersionEntity<>));
+            _versionMetadataGenericDefinition = _module.ImportReference(typeof(IVersionEntityWithMetadata<>));
+            _versionMetadataGenericDefinition.GenericParameters.Add(new GenericParameter("TMetadata", _versionMetadataGenericDefinition));
         }
 
-        public System.Reflection.Assembly Build()
+        public Assembly Build()
         {
             return _assembly.Build();
         }
 
-        public VersionModel Add(EntityModel entityModel)
+        public VersionModel Add(EntityModel entityModel, IReadOnlyCollection<IVersionMetadataProvider> metadata)
         {
             var entityType = _module.ImportReference(entityModel.EntityType);
             var versionType = _module.DefineType(entityType.Name + "Version", TypeAttributes.Class | TypeAttributes.Public, _module.TypeSystem.Object);
@@ -45,24 +52,28 @@ namespace Orbital.Versioning
             var dateColumn = DefineColumnProperty(versionType, VersionEntityDateName, _module.ImportReference(typeof(DateTime)));
 
             // Copy all the non-navigation columns from the entity, prefix the with Field_ to avoid collisions with version columns
-            var fieldMappings = new Dictionary<System.Reflection.PropertyInfo, PropertyDefinition>();
+            var fieldMappings = new Dictionary<PropertyInfo, PropertyDefinition>();
             foreach (var prop in entityModel.Properties)
             {
                 var property = DefineColumnProperty(versionType, "Field_" + prop.Name, _module.ImportReference(prop.PropertyType));
                 fieldMappings.Add(prop, property);
             }
 
-            var versionEntityType = new VersionModel(
+            var versionModel = new VersionModel(
                 entityType, versionType,
                 idColumn, dateColumn,
                 entityModel, fieldMappings);
 
-            // Define the default & entity constructors
-            DefineConstructors(versionType, entityType, versionEntityType);
-            // Finish implementing IVersionEntity<TEntity>
-            DefineToEntity(versionType, entityType, versionEntityType);
+            // Implement all the metadata
+            DefineMetadata(metadata, versionType, versionModel);
 
-            return versionEntityType;
+            // Define the default & entity constructors
+            DefineConstructors(versionType, entityType, versionModel);
+            // Finish implementing IVersionEntity<TEntity>
+            DefineToEntity(versionType, entityType, versionModel);
+
+
+            return versionModel;
         }
 
         private PropertyDefinition DefineColumnProperty(TypeDefinition type, string id, TypeReference propertyType)
@@ -77,13 +88,88 @@ namespace Orbital.Versioning
             return property;
         }
 
+        public class X : IVersionEntityWithMetadata<Entity>
+        {
+            Entity IVersionEntityWithMetadata<Entity>.ToMetadata()
+            {
+                return null;
+            }
+        }
+
+        public class Entity
+        {
+            public int A { get; set; }
+        }
+
+        private void DefineMetadata(IEnumerable<IVersionMetadataProvider> metadataProviders, TypeDefinition type, VersionModel versionModel)
+        {
+            foreach (var metadataProvider in metadataProviders)
+            {
+                // Does this metadataProvider apply to this entity?
+                if (!metadataProvider.AppliesTo(versionModel.EntityModel))
+                {
+                    continue;
+                }
+
+                var metadataType = _module.ImportReference(metadataProvider.MetadataType);
+
+                // map the metadata fields to the version entity
+                var mapping = new Dictionary<PropertyInfo, PropertyDefinition>();
+                foreach (var property in metadataProvider.Properties)
+                {
+                    var column = DefineColumnProperty(type, $"Metadata_{metadataProvider.Name}_{property.Name}", _module.ImportReference(property.PropertyType));
+
+                    mapping.Add(property, column);
+                }
+
+                // register in the model
+                versionModel.AddMetadataProvider(metadataProvider, mapping);
+
+                // implement IVersionEntityWithMetadata<TMetadata>
+                var versionEntity = new GenericInstanceType(_versionMetadataGenericDefinition);
+                versionEntity.GenericArguments.Add(metadataType);
+                type.Interfaces.Add(new InterfaceImplementation(versionEntity));
+
+                // HACK: get around the fact that Mono.Cecil doesn't support importing method from generic types yet
+                var toMetadataName = nameof(IVersionEntityWithMetadata<int>.ToMetadata);
+                var declaringType = _module.ImportReference(typeof(IVersionEntityWithMetadata<>).MakeGenericType(metadataProvider.MetadataType));
+                var toMetadata = type.DefineMethod(declaringType.Name + "." + toMetadataName, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual, metadataType);
+                toMetadata.Overrides.Add(new MethodReference(toMetadataName, _module.ImportReference(typeof(IVersionEntityWithMetadata<>).GetTypeInfo().GenericTypeParameters[0], _versionMetadataGenericDefinition), declaringType) { HasThis = true });
+
+                var il = toMetadata.Body.GetILProcessor();
+
+                var metadata = new VariableDefinition(metadataType);
+                toMetadata.Body.Variables.Add(metadata);
+
+                il.Emit(OpCodes.Newobj, _module.ImportReference(versionModel.EntityType.GetConstructor()));
+                il.Emit(OpCodes.Stloc, metadata);
+
+                foreach (var fieldMapping in mapping)
+                {
+                    // metadata.A = A;
+                    var metadataField = fieldMapping.Key;
+                    var versionField = fieldMapping.Value;
+
+                    il.Emit(OpCodes.Ldloc, metadata);
+                    il.Emit(OpCodes.Ldarg_0); // this
+                    il.Emit(OpCodes.Call, versionField.GetMethod);
+                    il.Emit(OpCodes.Callvirt, _module.ImportReference(metadataField.SetMethod));
+                }
+
+                // return entity
+                il.Emit(OpCodes.Ldloc, metadata);
+                il.Emit(OpCodes.Ret);
+            }
+        }
+
         private void DefineConstructors(TypeDefinition type, TypeReference entityType, VersionModel versionModel)
         {
             var defaultConstructor = type.DefineDefaultConstructor();
 
-            // from entity constructor
+            // entity+metadata constructor
             var entity = new ParameterDefinition(entityType);
-            var entityContructor = type.DefineConstructor(entity);
+            var metadataParameters = versionModel.MetadataProviders.Select(x => new ParameterDefinition(_module.ImportReference(x.MetadataProvider.MetadataType))).ToArray();
+            var entityContructor = type.DefineConstructor(new[] { entity }.Concat(metadataParameters).ToArray());
 
             var entityContructorIL = entityContructor.Body.GetILProcessor();
 
@@ -93,19 +179,36 @@ namespace Orbital.Versioning
 
             // this.Date = DateTime.UtcNow;
             entityContructorIL.Emit(OpCodes.Ldarg_0); // this
-            entityContructorIL.Emit(OpCodes.Call, _module.ImportReference(System.Reflection.RuntimeReflectionExtensions.GetRuntimeProperty(typeof(DateTime), nameof(DateTime.UtcNow)).GetMethod));
+            entityContructorIL.Emit(OpCodes.Call, _module.ImportReference(typeof(DateTime).GetRuntimeProperty(nameof(DateTime.UtcNow)).GetMethod));
             entityContructorIL.Emit(OpCodes.Call, versionModel.DateColumn.SetMethod);
 
+            // entity
             foreach (var fieldMapping in versionModel.EntityFieldMappings)
             {
                 // this.A = entity.A;
-                var entityField = fieldMapping.Key;
-                var historyField = fieldMapping.Value;
+                var entityProperty = fieldMapping.Key;
+                var versionProperty = fieldMapping.Value;
 
                 entityContructorIL.Emit(OpCodes.Ldarg_0); // this
                 entityContructorIL.Emit(OpCodes.Ldarg, entity);
-                entityContructorIL.Emit(OpCodes.Callvirt, _module.ImportReference(entityField.GetMethod));
-                entityContructorIL.Emit(OpCodes.Call, historyField.SetMethod);
+                entityContructorIL.Emit(OpCodes.Callvirt, _module.ImportReference(entityProperty.GetMethod));
+                entityContructorIL.Emit(OpCodes.Call, versionProperty.SetMethod);
+            }
+
+            // metadata
+            foreach (var (metadataModel, parameter) in versionModel.MetadataProviders.Zip(metadataParameters, (a, b) => (a, b)))
+            {
+                foreach (var fieldMapping in metadataModel.FieldMappings)
+                {
+                    // this.A = metadata.A;
+                    var metadataProperty = fieldMapping.Key;
+                    var versionProperty = fieldMapping.Value;
+
+                    entityContructorIL.Emit(OpCodes.Ldarg_0); // this
+                    entityContructorIL.Emit(OpCodes.Ldarg, parameter);
+                    entityContructorIL.Emit(OpCodes.Callvirt, _module.ImportReference(metadataProperty.GetMethod));
+                    entityContructorIL.Emit(OpCodes.Call, versionProperty.SetMethod);
+                }
             }
 
             // return

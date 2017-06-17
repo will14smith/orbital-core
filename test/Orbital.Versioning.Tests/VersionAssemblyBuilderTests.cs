@@ -5,8 +5,16 @@ using Xunit;
 
 namespace Orbital.Versioning.Tests
 {
-    public class VersionAssemblyBuilderTests
+    public partial class VersionAssemblyBuilderTests
     {
+        public class X : IVersionEntityWithMetadata<Entity>
+        {
+            Entity IVersionEntityWithMetadata<Entity>.ToMetadata()
+            {
+                return null;
+            }
+        }
+
         public class Entity
         {
             public int A { get; set; }
@@ -32,7 +40,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void DefaultConstructor_CanActivate()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -44,7 +52,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void IdAndDateProperties_PresentAndWorking()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -79,7 +87,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void PropertyForEachEntityProperty_PresentAndWorking()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -102,7 +110,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void EntityCopyConstructor_PropertiesAreCopied()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -121,7 +129,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void VersionEntityInterface_Implemented()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -131,7 +139,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void VersionEntityInterface_ToEntity_Works()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel);
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[0]);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
