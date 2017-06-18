@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("badge_holder")]
-    internal class BadgeHolderEntity
+    public class BadgeHolderEntity
     {
         public Guid Id { get; set; }
 
@@ -15,6 +15,8 @@ namespace Orbital.Data.Entities
         public DateTime? ConfirmedOn { get; set; }
         public DateTime? MadeOn { get; set; }
         public DateTime? DeliveredOn { get; set; }
+
+        public bool Deleted { get; set; }
 
         [ForeignKey(nameof(BadgeId))]
         public BadgeEntity Badge { get; set; }

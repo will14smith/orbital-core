@@ -5,8 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("person")]
-    internal class PersonEntity
+    public class PersonEntity
     {
+        public PersonEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         public Guid ClubId { get; set; }
@@ -18,6 +23,8 @@ namespace Orbital.Data.Entities
         public string ArcheryGBNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateStartedArchery { get; set; }
+
+        public bool Deleted { get; set; }
 
         [ForeignKey(nameof(ClubId))]
         public ClubEntity Club { get; set; }

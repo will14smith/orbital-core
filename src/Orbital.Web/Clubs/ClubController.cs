@@ -1,12 +1,9 @@
-﻿using System.Linq;
-using Halcyon.HAL;
-using Halcyon.Web.HAL;
+﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Orbital.Web.Helpers;
 
 namespace Orbital.Web.Clubs
 {
-    [Route("api/[controller]")]
+    [Route("clubs")]
     public class ClubController : Controller
     {
         private readonly IClubService _clubService;
@@ -16,18 +13,16 @@ namespace Orbital.Web.Clubs
             _clubService = clubService;
         }
 
-        // GET: api/club
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Index()
         {
             var clubs = _clubService.GetAll();
 
-            return this.Paginate(clubs.Select(ViewModelToResponse).ToList(), "clubs");
+            return View(clubs);
         }
 
-        // GET api/club/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(Guid id)
         {
             var club = _clubService.GetById(id);
             if (club == null)
@@ -35,46 +30,57 @@ namespace Orbital.Web.Clubs
                 return NotFound();
             }
 
-            var response = ViewModelToResponse(club);
-
-            return Ok(response);
+            return View(club);
         }
 
-        // POST api/club
-        [HttpPost]
-        public IActionResult Post([FromBody]ClubInputModel input)
+        [HttpGet("create")]
+        public IActionResult Create()
         {
-            if (input == null)
+            var input = new ClubInputModel();
+
+            return View(input);
+        }
+        [HttpPost("create")]
+        public IActionResult Create(ClubInputModel input)
+        {
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return View(input);
             }
 
-            var item = _clubService.Create(input);
-            var response = ViewModelToResponse(item);
+            var id = _clubService.Create(input);
 
-            return CreatedAtAction(nameof(Get), new { id = item.Id }, response);
+            return RedirectToAction(nameof(Get), new { id = id });
         }
 
-        // PUT api/club/5
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ClubInputModel input)
+        [HttpGet("{id}/edit")]
+        public IActionResult Edit(Guid id)
         {
-            if (input == null)
+            var club = _clubService.GetById(id);
+            if (club == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            input.Id = id;
+            var input = new ClubInputModel(club.Club);
 
-            var item = _clubService.Update(input);
-            var response = ViewModelToResponse(item);
+            return View(input);
+        }
+        [HttpPost("{id}/edit")]
+        public IActionResult Edit(Guid id, ClubInputModel input)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(input);
+            }
 
-            return AcceptedAtAction(nameof(Get), new { id = item.Id }, response);
+            _clubService.Update(id, input);
+
+            return RedirectToAction(nameof(Get), new { id });
         }
 
-        // DELETE api/club/5
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpPost("{id}/delete")]
+        public IActionResult Delete(Guid id)
         {
             var club = _clubService.GetById(id);
             if (club == null)
@@ -83,13 +89,8 @@ namespace Orbital.Web.Clubs
             }
 
             _clubService.Delete(id);
-            return Accepted();
-        }
 
-        private HALResponse ViewModelToResponse(ClubViewModel club)
-        {
-            return new HALResponse(club)
-                .AddLinks(new Link("self", Url.Action("Get", new { id = club.Id })));
+            return RedirectToAction(nameof(Index));
         }
     }
 }

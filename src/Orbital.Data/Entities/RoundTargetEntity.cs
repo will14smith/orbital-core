@@ -4,8 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("round_target")]
-    internal class RoundTargetEntity
+    public class RoundTargetEntity
     {
+        public RoundTargetEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         public Guid RoundId { get; set; }
@@ -18,6 +23,8 @@ namespace Orbital.Data.Entities
         public int FaceSizeUnit { get; set; }
 
         public int ArrowCount { get; set; }
+
+        public bool Deleted { get; set; }
 
         [ForeignKey(nameof(RoundId))]
         public RoundEntity Round { get; set; }

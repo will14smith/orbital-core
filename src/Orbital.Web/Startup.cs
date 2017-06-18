@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Orbital.Data;
-using Orbital.Web.BadgeHolders;
-using Orbital.Web.Badges;
+using Orbital.Versioning;
 using Orbital.Web.Clubs;
-using Orbital.Web.People;
-using Orbital.Web.Rounds;
-using Swashbuckle.AspNetCore.Swagger;
+using Orbital.Web.Helpers;
 
 namespace Orbital.Web
 {
@@ -31,7 +29,15 @@ namespace Orbital.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOrbitalData(ConnectionString);
+            services.AddOrbitalData(options =>
+            {
+                options.UseVersioning(versionOpt =>
+                {
+                    versionOpt.WithMetadataProvider(new UserMetadataProvider());
+                });
+
+                options.UseNpgsql(ConnectionString);
+            });
             services.AddServices();
 
             services.AddMvc()
@@ -43,13 +49,6 @@ namespace Orbital.Web
                     });
                 });
             services.AddLogging();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Orbital", Version = "v1" });
-                c.DescribeAllEnumsAsStrings();
-                c.DescribeStringEnumsInCamelCase();
-            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -57,14 +56,23 @@ namespace Orbital.Web
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseMvc();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            if (env.IsDevelopment())
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Orbital");
-            });
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
+            app.UseStaticFiles();
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
             app.ApplicationServices.MigrateOrbitalData();
         }
     }
@@ -73,11 +81,7 @@ namespace Orbital.Web
     {
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IBadgeService, BadgeService>();
-            services.AddScoped<IBadgeHolderService, BadgeHolderService>();
             services.AddScoped<IClubService, ClubService>();
-            services.AddScoped<IPersonService, PersonService>();
-            services.AddScoped<IRoundService, RoundService>();
         }
     }
 }

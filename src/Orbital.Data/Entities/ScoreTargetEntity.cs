@@ -4,8 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("score_target")]
-    class ScoreTargetEntity
+    public class ScoreTargetEntity
     {
+        public ScoreTargetEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         [ForeignKey(nameof(ScoreId))]
@@ -16,5 +21,7 @@ namespace Orbital.Data.Entities
         public decimal ScoreValue { get; set; }
         public decimal Golds { get; set; }
         public decimal Hits { get; set; }
+
+        public bool Deleted { get; set; }
     }
 }

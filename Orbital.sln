@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orbital.Data.Tests", "test\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D693299-EA2A-41D3-BDC1-64A6990C7F32}"
 	ProjectSection(SolutionItems) = preProject
+		Makefile = Makefile
 		README.md = README.md
 	EndProjectSection
 EndProject

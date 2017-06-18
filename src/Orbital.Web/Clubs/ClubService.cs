@@ -1,68 +1,66 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Orbital.Data;
+using Orbital.Data.Entities;
 using Orbital.Models.Domain;
-using Orbital.Models.Repositories;
 
 namespace Orbital.Web.Clubs
 {
     public class ClubService : IClubService
     {
-        private readonly IClubRepository _clubRepository;
+        private readonly OrbitalContext _ctx;
 
-        public ClubService(IClubRepository clubRepository)
+        public ClubService(OrbitalContext ctx)
         {
-            _clubRepository = clubRepository;
+            _ctx = ctx;
         }
 
-        public IReadOnlyCollection<ClubViewModel> GetAll()
+        public IReadOnlyCollection<Club> GetAll()
         {
-            return _clubRepository.GetAll().Select(ToViewModel).ToList();
+            return _ctx.Clubs
+                .Select(x => new Club(x.Id, x.Name))
+                .ToList();
         }
 
-        public ClubViewModel GetById(int id)
+        public ClubViewModel GetById(Guid id)
         {
-            var club = _clubRepository.GetById(id);
-
-            return club == null ? null : ToViewModel(club);
+            throw new System.NotImplementedException();
         }
 
-        public ClubViewModel Create(ClubInputModel input)
+        public Guid Create(ClubInputModel club)
         {
-            var club = FromInputModel(input);
+            var entity = new ClubEntity { Id = Guid.NewGuid() };
+            PopulateEntity(entity, club);
 
-            var result = _clubRepository.Create(club);
+            _ctx.Clubs.Add(entity);
+            _ctx.SaveChanges();
 
-            return ToViewModel(result);
+            return entity.Id;
         }
 
-        public ClubViewModel Update(ClubInputModel input)
+        public void Update(Guid id, ClubInputModel club)
         {
-            var club = FromInputModel(input);
-
-            var result = _clubRepository.Update(club);
-
-            return ToViewModel(result);
-        }
-
-        public bool Delete(int id)
-        {
-            var club = _clubRepository.GetById(id);
-
-            return _clubRepository.Delete(club);
-        }
-
-        private static ClubViewModel ToViewModel(Club club)
-        {
-            return new ClubViewModel
+            var entity = _ctx.Clubs.Find(id);
+            if (entity == null)
             {
-                Id = club.Id,
-                Name = club.Name
-            };
+                throw new Exception($"Couldn't find club with id = {id} to update");
+            }
+
+            PopulateEntity(entity, club);
+
+            _ctx.Clubs.Update(entity);
+            _ctx.SaveChanges();
         }
 
-        private static Club FromInputModel(ClubInputModel club)
+        public void Delete(Guid id)
         {
-            return new Club(club.Id, club.Name);
+            throw new System.NotImplementedException();
+        }
+
+        private void PopulateEntity(ClubEntity entity, ClubInputModel club)
+        {
+            entity.Name = club.Name;
         }
     }
 }

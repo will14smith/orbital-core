@@ -4,8 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("handicap")]
-    internal class HandicapEntity
+    public class HandicapEntity
     {
+        public HandicapEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         public Guid PersonId { get; set; }
@@ -17,6 +22,8 @@ namespace Orbital.Data.Entities
 
         public bool Indoor { get; set; }
         public int Bowstyle { get; set; }
+
+        public bool Deleted { get; set; }
 
         [ForeignKey(nameof(PersonId))]
         public PersonEntity Person { get; set; }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("competition")]
-    internal class CompetitionEntity
+    public class CompetitionEntity
     {
         public Guid Id { get; set; }
 
@@ -13,6 +13,8 @@ namespace Orbital.Data.Entities
 
         public DateTimeOffset Start { get; set; }
         public DateTimeOffset End { get; set; }
+
+        public bool Deleted { get; set; }
 
         [InverseProperty(nameof(CompetitionRoundEntity.Competition))]
         public List<CompetitionRoundEntity> Rounds { get; set; }

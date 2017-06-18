@@ -5,8 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("round")]
-    internal class RoundEntity
+    public class RoundEntity
     {
+        public RoundEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         public Guid? VariantOfId { get; set; }
@@ -14,6 +19,8 @@ namespace Orbital.Data.Entities
         public string Category { get; set; }
         public string Name { get; set; }
         public bool Indoor { get; set; }
+
+        public bool Deleted { get; set; }
 
         [ForeignKey(nameof(VariantOfId))]
         public RoundEntity ParentRound { get; set; }

@@ -1,0 +1,31 @@
+﻿@using Orbital.Web.Clubs
+@model IReadOnlyCollection<ClubViewModel>
+
+@{
+    ViewBag.Title = "Clubs";
+}
+
+<div class="page-header">
+    <h1>
+        Clubs
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="@Url.Action(nameof(ClubController.Create))" rol="button">Create</a>
+        </div>
+    </h1>
+</div>
+<div class="list-group">
+    @foreach (var club in Model)
+    {
+        <a href="@Url.Action(nameof(ClubController.Get), new { id = club.Id })" class="list-group-item">
+            <h4 class="list-group-item-heading">@club.Name</h4>
+            <p class="list-group-item-text">...</p>
+        </a>
+    }
+
+    @if (!Model.Any())
+    {
+        <a href="#" class="list-group-item disabled">
+            There are no clubs!
+        </a>
+    }
+</div>

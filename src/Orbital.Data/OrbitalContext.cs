@@ -4,7 +4,7 @@ using Orbital.Versioning;
 
 namespace Orbital.Data
 {
-    internal class OrbitalContext : DbContext
+    public class OrbitalContext : DbContext
     {
         public OrbitalContext(DbContextOptions<OrbitalContext> options)
             : base(options)
@@ -28,12 +28,6 @@ namespace Orbital.Data
             this.SyncVersioning();
 
             return base.SaveChanges();
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CompetitionRoundEntity>()
-                .HasKey(nameof(CompetitionRoundEntity.CompetitionId), nameof(CompetitionRoundEntity.RoundId));
         }
     }
 }

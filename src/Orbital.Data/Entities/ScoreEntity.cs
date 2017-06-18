@@ -5,8 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("score")]
-    internal class ScoreEntity
+    public class ScoreEntity
     {
+        public ScoreEntity()
+        {
+            Id = Guid.NewGuid();
+        }
+
         public Guid Id { get; set; }
 
         public Guid PersonId { get; set; }
@@ -23,6 +28,8 @@ namespace Orbital.Data.Entities
         public DateTime ShotAt { get; set; }
         public DateTime EnteredAt { get; set; }
 
+        public bool Deleted { get; set; }
+
         [ForeignKey(nameof(PersonId))]
         public PersonEntity Person { get; set; }
         [ForeignKey(nameof(ClubId))]
@@ -34,7 +41,7 @@ namespace Orbital.Data.Entities
 
         [InverseProperty(nameof(ScoreTargetEntity.Score))]
         public List<ScoreTargetEntity> Targets { get; set; }
-        
+
         [InverseProperty(nameof(HandicapEntity.Score))]
         public List<HandicapEntity> Handicaps { get; set; }
     }
