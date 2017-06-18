@@ -15,6 +15,14 @@ namespace Orbital.Web.Helpers
         }
     }
 
+    public static class UserMetadataProviderExtensions
+    {
+        public static UserMetadata GetUserMetadata<TEntity>(this Version<TEntity> version)
+        {
+            return version.GetMetadata<UserMetadata>(nameof(UserMetadata));
+        }
+    }
+
     public class UserMetadata
     {
         public Guid UserId { get; set; }

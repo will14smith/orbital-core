@@ -8,14 +8,17 @@
 
 <h2>Club Details</h2>
 
-<div class="panel panel-default">
-    <div class="panel-heading">@Model.Club.Name</div>
+<div class="card">
+    <div class="card-block">
+        <h4 class="card-title">@Model.Club.Name</h4>
 
-    <div class="panel-body">
-        ...
+        <div class="btn-group" role="group" aria-label="Controls">
+            <a asp-action="Edit" asp-route-id="@Model.Club.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Club.Id" class="btn btn-danger">Delete</a>
+        </div>
     </div>
 
-    <ul class="list-group">
+    <ul class="list-group list-group-flush">
         <li class="list-group-item">
             Created on <strong>@Model.Versioning.Created.On</strong> by <strong>@Model.Versioning.Created.By</strong>
         </li>
