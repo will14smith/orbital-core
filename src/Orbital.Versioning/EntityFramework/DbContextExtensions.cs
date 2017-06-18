@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Orbital.Versioning
 {
@@ -51,15 +52,13 @@ namespace Orbital.Versioning
 
         internal static IReadOnlyDictionary<string, VersionModel> GetVersionModels(this DbContext context)
         {
-            var annotation = context.Model.FindAnnotation(VersionModelCustomizer.ModelMappingAnnotation);
-
-            var versionEntityMappings = annotation?.Value as IReadOnlyDictionary<string, VersionModel>;
-            if (versionEntityMappings == null)
+            var modelStore = context.Database.GetService<VersionModelStore>();
+            if (modelStore.Models == null)
             {
                 throw new InvalidOperationException($"Couldn't find version entity models, make sure the {nameof(VersionExtension)} is loaded.");
             }
 
-            return versionEntityMappings;
+            return modelStore.Models;
         }
     }
 }

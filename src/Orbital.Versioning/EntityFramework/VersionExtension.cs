@@ -10,7 +10,8 @@ namespace Orbital.Versioning
 
         public void ApplyServices(IServiceCollection services)
         {
-            services.AddTransient<IModelCustomizer, VersionModelCustomizer>(x => new VersionModelCustomizer(Metadata));
+            services.AddSingleton<VersionModelStore>();
+            services.AddTransient<IModelCustomizer, VersionModelCustomizer>(x => new VersionModelCustomizer(Metadata, x.GetRequiredService<VersionModelStore>()));
         }
     }
 }

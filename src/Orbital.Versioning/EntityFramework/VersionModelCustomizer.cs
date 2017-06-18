@@ -8,12 +8,13 @@ namespace Orbital.Versioning
 {
     internal class VersionModelCustomizer : ModelCustomizer
     {
-        public static readonly string ModelMappingAnnotation = "VersionModelMapping";
-
         private readonly IReadOnlyCollection<IVersionMetadataProvider> _metadata;
-        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata)
+        private readonly VersionModelStore _versionModelStore;
+
+        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata, VersionModelStore versionModelStore)
         {
             _metadata = metadata;
+            _versionModelStore = versionModelStore;
         }
 
         public override void Customize(ModelBuilder modelBuilder, DbContext dbContext)
@@ -37,7 +38,7 @@ namespace Orbital.Versioning
                 });
             }
 
-            modelBuilder.Model.AddAnnotation(ModelMappingAnnotation, models.ToDictionary(x => x.Key, x => x.Value.Item2));
+            _versionModelStore.Models = models.ToDictionary(x => x.Key, x => x.Value.Item2);
         }
 
         private IReadOnlyDictionary<string, (IEntityType, VersionModel)> BuildModels(ModelBuilder modelBuilder)
