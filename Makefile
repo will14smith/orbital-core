@@ -10,7 +10,7 @@ setup:
 	cd $(BASE_PATH) && dotnet restore
 
 start:
-	cd $(WEB_PATH) && ASPNETCORE_ENVIRONMENT=Devlopment dotnet watch run
+	cd $(WEB_PATH) && ASPNETCORE_ENVIRONMENT=Development dotnet watch run
 
 migrations-add:
 ifndef NAME

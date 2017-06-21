@@ -5,3 +5,16 @@
 }
 
 <h2>Orbital</h2>
+
+<div id="react-app"></div>
+
+@section Scripts {
+    <script src="~/dist/render.js" asp-append-version="true"></script>
+    <script src="~/dist/form1.js" asp-append-version="true"></script>
+    <script>
+        es6Require(['render', 'form1'],
+            (render, form1) => {
+                render(document.getElementById('react-app'), form1);
+            });
+    </script>
+}
