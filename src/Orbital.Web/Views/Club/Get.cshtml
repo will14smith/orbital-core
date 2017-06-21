@@ -1,0 +1,39 @@
+﻿@using Orbital.Web.Clubs
+@model ClubViewModel
+
+@{
+    ViewBag.Title = "Club - " + Model.Club.Name;
+    Layout = "_Layout";
+}
+
+<h2>Club Details</h2>
+
+<div class="card">
+    <div class="card-block">
+        <h4 class="card-title">@Model.Club.Name</h4>
+
+        <div class="btn-group" role="group" aria-label="Controls">
+            <a asp-action="Edit" asp-route-id="@Model.Club.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Club.Id" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            Created on <strong>@Model.Versioning.Created.On</strong> by <strong>@Model.Versioning.Created.By</strong>
+        </li>
+        @if (Model.Versioning.Modified != null)
+        {
+            <li class="list-group-item">
+                Last modified on <strong>@Model.Versioning.Modified.On</strong> by <strong>@Model.Versioning.Modified.By</strong>
+            </li>
+        }
+        @if (Model.Versioning.Deleted != null)
+        {
+            <li class="list-group-item">
+                Deleted on <strong>@Model.Versioning.Deleted.On</strong> by <strong>@Model.Versioning.Deleted.By</strong>
+            </li>
+        }
+    </ul>
+
+</div>

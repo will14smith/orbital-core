@@ -1,16 +1,25 @@
 ﻿using System;
-using Dapper.Contrib.Extensions;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("competition")]
-    class CompetitionEntity
+    public class CompetitionEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
+        public DateTimeOffset Start { get; set; }
+        public DateTimeOffset End { get; set; }
+
+        public bool Deleted { get; set; }
+
+        [InverseProperty(nameof(CompetitionRoundEntity.Competition))]
+        public List<CompetitionRoundEntity> Rounds { get; set; }
+
+        [InverseProperty(nameof(ScoreEntity.Competition))]
+        public List<ScoreEntity> Scores { get; set; }
     }
 }

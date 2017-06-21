@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Orbital.Models.Domain;
 
 namespace Orbital.Web.Clubs
 {
     public interface IClubService
     {
-        IReadOnlyCollection<ClubViewModel> GetAll();
-        ClubViewModel GetById(int id);
+        IReadOnlyCollection<Club> GetAll();
+        ClubViewModel GetById(Guid id);
 
-        ClubViewModel Create(ClubInputModel club);
-        ClubViewModel Update(ClubInputModel club);
-        bool Delete(int id);
-
+        Guid Create(ClubInputModel club);
+        void Update(Guid id, ClubInputModel club);
+        void Delete(Guid id);
     }
 }

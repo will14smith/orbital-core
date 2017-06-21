@@ -1,16 +1,27 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("score_target")]
-    class ScoreTargetEntity
+    public class ScoreTargetEntity
     {
-        public int Id { get; set; }
+        public ScoreTargetEntity()
+        {
+            Id = Guid.NewGuid();
+        }
 
-        public int ScoreId { get; set; }
+        public Guid Id { get; set; }
 
-        public decimal Score { get; set; }
+        [ForeignKey(nameof(ScoreId))]
+        public ScoreEntity Score { get; set; }
+        public Guid ScoreId { get; set; }
+
+        [Column("Score")]
+        public decimal ScoreValue { get; set; }
         public decimal Golds { get; set; }
         public decimal Hits { get; set; }
+
+        public bool Deleted { get; set; }
     }
 }

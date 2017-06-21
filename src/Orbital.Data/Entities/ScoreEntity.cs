@@ -1,17 +1,23 @@
 ﻿using System;
-using Dapper.Contrib.Extensions;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Orbital.Data.Entities
 {
     [Table("score")]
-    class ScoreEntity
+    public class ScoreEntity
     {
-        public int Id { get; set; }
+        public ScoreEntity()
+        {
+            Id = Guid.NewGuid();
+        }
 
-        public int PersonId { get; set; }
-        public int ClubId { get; set; }
-        public int RoundId { get; set; }
-        public int? CompetitionId { get; set; }
+        public Guid Id { get; set; }
+
+        public Guid PersonId { get; set; }
+        public Guid ClubId { get; set; }
+        public Guid RoundId { get; set; }
+        public Guid? CompetitionId { get; set; }
 
         public int Bowstyle { get; set; }
 
@@ -21,5 +27,22 @@ namespace Orbital.Data.Entities
 
         public DateTime ShotAt { get; set; }
         public DateTime EnteredAt { get; set; }
+
+        public bool Deleted { get; set; }
+
+        [ForeignKey(nameof(PersonId))]
+        public PersonEntity Person { get; set; }
+        [ForeignKey(nameof(ClubId))]
+        public ClubEntity Club { get; set; }
+        [ForeignKey(nameof(RoundId))]
+        public RoundEntity Round { get; set; }
+        [ForeignKey(nameof(CompetitionId))]
+        public CompetitionEntity Competition { get; set; }
+
+        [InverseProperty(nameof(ScoreTargetEntity.Score))]
+        public List<ScoreTargetEntity> Targets { get; set; }
+
+        [InverseProperty(nameof(HandicapEntity.Score))]
+        public List<HandicapEntity> Handicaps { get; set; }
     }
 }

@@ -1,8 +1,17 @@
-﻿namespace Orbital.Web.Clubs
+﻿using Orbital.Models.Domain;
+
+namespace Orbital.Web.Clubs
 {
     public class ClubInputModel
     {
-        public int Id { get; set; }
+        public ClubInputModel()
+        {
+        }
+        public ClubInputModel(Club club)
+        {
+            Name = club.Name;
+        }
+
         public string Name { get; set; }
     }
 }
