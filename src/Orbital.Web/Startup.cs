@@ -10,6 +10,7 @@ using Orbital.Data;
 using Orbital.Versioning;
 using Orbital.Web.Clubs;
 using Orbital.Web.Helpers;
+using Orbital.Web.Rounds;
 
 namespace Orbital.Web
 {
@@ -90,6 +91,7 @@ namespace Orbital.Web
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IClubService, ClubService>();
+            services.AddScoped<IRoundService, RoundService>();
         }
     }
 }
