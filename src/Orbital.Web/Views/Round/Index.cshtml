@@ -1,0 +1,34 @@
+﻿@using Orbital.Web.Rounds
+@model IReadOnlyCollection<Round>
+
+@{
+    ViewBag.Title = "Clubs";
+}
+
+<div class="d-flex justify-content-end">
+    <h2 class="mr-auto p-2">Rounds</h2>
+    <div class="p-2">
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="@Url.Action(nameof(RoundController.Create))" rol="button">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <div class="sr-only">Create</div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="list-group">
+    @foreach (var round in Model)
+    {
+        <a href="@Url.Action(nameof(RoundController.Get), new { id = round.Id })"
+           class="list-group-item list-group-item-action">
+            @round.Name
+        </a>
+    }
+
+    @if (!Model.Any())
+    {
+        <a href="#" class="list-group-item disabled">
+            There are no rounds!
+        </a>
+    }
+</div>

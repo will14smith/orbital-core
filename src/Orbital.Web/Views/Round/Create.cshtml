@@ -1,0 +1,26 @@
+﻿@using Orbital.Web.Rounds
+@model RoundInputModel
+
+@{
+    ViewBag.Title = "Create Round";
+}
+
+<h1>Create Round</h1>
+
+<div id="round-form"></div>
+
+@section Scripts {
+    <script src="~/dist/render.js" asp-append-version="true"></script>
+    <script src="~/dist/round-form.js" asp-append-version="true"></script>
+    <script>
+        es6Require(['render', 'round-form'],
+            (render, form) => {
+                render(document.getElementById('round-form'), form,
+                    {
+                        data: @Json.Serialize(Model),
+                        rounds: @Json.Serialize(ViewData["Rounds"]),
+                        submitUrl: '@Url.Action(nameof(RoundController.Create))'
+                    });
+            });
+    </script>
+}

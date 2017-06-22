@@ -6,8 +6,7 @@ const merge = require('webpack-merge');
 
 const entryPoints = {
     'render': './ClientApp/render.ts',
-    'form1': './ClientApp/form1.tsx',
-    'form2': './ClientApp/form2.tsx',
+    'round-form': './ClientApp/round-form.tsx',
 };
 
 module.exports = (env) => {

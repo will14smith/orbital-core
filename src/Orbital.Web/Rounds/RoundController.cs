@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Orbital.Web.Rounds
@@ -29,7 +30,7 @@ namespace Orbital.Web.Rounds
             {
                 return NotFound();
             }
-            
+
             return View(round);
         }
 
@@ -38,6 +39,8 @@ namespace Orbital.Web.Rounds
         {
             var input = new RoundInputModel();
 
+            ViewData["Rounds"] = _roundService.GetAll().Select(x => new RoundSummaryModel(x)).ToList();
+
             return View(input);
         }
         [HttpPost("create")]
@@ -45,6 +48,8 @@ namespace Orbital.Web.Rounds
         {
             if (!ModelState.IsValid)
             {
+                ViewData["Rounds"] = _roundService.GetAll().Select(x => new RoundSummaryModel(x)).ToList();
+
                 return View(input);
             }
 
@@ -64,6 +69,8 @@ namespace Orbital.Web.Rounds
 
             var input = new RoundInputModel(round.Round);
 
+            ViewData["Rounds"] = _roundService.GetAll().Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
+
             return View(input);
         }
         [HttpPost("{id}/edit")]
@@ -71,6 +78,8 @@ namespace Orbital.Web.Rounds
         {
             if (!ModelState.IsValid)
             {
+                ViewData["Rounds"] = _roundService.GetAll().Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
+
                 return View(input);
             }
 
