@@ -4,6 +4,7 @@ using System.Linq;
 using Orbital.Data;
 using Orbital.Data.Entities;
 using Orbital.Models.Domain;
+using Orbital.Web.Helpers;
 
 namespace Orbital.Web.Rounds
 {
@@ -26,12 +27,28 @@ namespace Orbital.Web.Rounds
 
         public RoundViewModel GetById(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = Find(id);
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return new RoundViewModel(
+                ToDomain(entity),
+                _ctx.GetVersionInfo<RoundEntity>(id)
+            );
+
         }
 
         public Guid Create(RoundInputModel input)
         {
-            throw new NotImplementedException();
+            var entity = new RoundEntity();
+            PopulateEntity(entity, input);
+
+            _ctx.Rounds.Add(entity);
+            _ctx.SaveChanges();
+
+            return entity.Id;
         }
 
         public void Update(Guid id, RoundInputModel input)
@@ -43,7 +60,7 @@ namespace Orbital.Web.Rounds
         {
             throw new NotImplementedException();
         }
-        
+
         private RoundEntity Find(Guid id)
         {
             var entity = _ctx.Rounds.Find(id);
@@ -56,34 +73,56 @@ namespace Orbital.Web.Rounds
         }
         private IReadOnlyCollection<RoundTargetEntity> GetTargets(RoundEntity round)
         {
-            return round.Targets.Where(x => !x.Deleted).ToList();
+            return round.Targets?.Where(x => !x.Deleted).ToList() ?? new List<RoundTargetEntity>();
         }
 
         private Round ToDomain(RoundEntity entity)
         {
             return new Round(
                 entity.Id, entity.VariantOfId,
-                entity.Category,entity.Name, entity.Indoor,
+                entity.Category, entity.Name, entity.Indoor,
                 GetTargets(entity).Select(ToDomain).ToList()
             );
         }
         private RoundTarget ToDomain(RoundTargetEntity entity)
         {
             return new RoundTarget(
-                entity.Id, (ScoringType) entity.ScoringType,
-                new Length(entity.DistanceValue, (LengthUnit) entity.DistanceUnit), 
-                new Length(entity.FaceSizeValue, (LengthUnit) entity.FaceSizeUnit), 
+                entity.Id, (ScoringType)entity.ScoringType,
+                new Length(entity.DistanceValue, (LengthUnit)entity.DistanceUnit),
+                new Length(entity.FaceSizeValue, (LengthUnit)entity.FaceSizeUnit),
                 entity.ArrowCount
             );
         }
 
-        private void PopulateEntity(RoundEntity entity, RoundInputModel round)
+        private static void PopulateEntity(RoundEntity entity, RoundInputModel round)
         {
-            throw new NotImplementedException();
+            entity.VariantOfId = round.VariantOfId;
+
+            entity.Category = round.Category;
+            entity.Name = round.Name;
+            entity.Indoor = round.Indoor;
+
+            entity.Targets = entity.Targets ?? new List<RoundTargetEntity>();
+            entity.Targets.Clear();
+
+            foreach (var target in round.Targets)
+            {
+                var targetEntity = new RoundTargetEntity();
+                PopulateEntity(targetEntity, target);
+
+                entity.Targets.Add(targetEntity);
+            }
         }
-        private void PopulateEntity(RoundTargetEntity entity, RoundTargetInputModel target)
+        private static void PopulateEntity(RoundTargetEntity entity, RoundTargetInputModel target)
         {
-            throw new NotImplementedException();
+            entity.ScoringType = (int)target.ScoringType;
+
+            entity.DistanceValue = target.DistanceValue;
+            entity.DistanceUnit = (int)target.DistanceUnit;
+            entity.FaceSizeValue = target.FaceSizeValue;
+            entity.FaceSizeUnit = (int)target.FaceSizeUnit;
+
+            entity.ArrowCount = target.ArrowCount;
         }
     }
 }

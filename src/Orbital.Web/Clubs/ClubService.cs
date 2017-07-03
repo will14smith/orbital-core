@@ -4,9 +4,7 @@ using System.Linq;
 using Orbital.Data;
 using Orbital.Data.Entities;
 using Orbital.Models.Domain;
-using Orbital.Versioning;
 using Orbital.Web.Helpers;
-using Orbital.Web.Models;
 
 namespace Orbital.Web.Clubs
 {
@@ -37,50 +35,10 @@ namespace Orbital.Web.Clubs
 
             return new ClubViewModel(
                 ToDomain(entity),
-                GetVersionInfo(id)
+                _ctx.GetVersionInfo<ClubEntity>(id)
             );
         }
-
-        private VersionInfo GetVersionInfo(Guid id)
-        {
-            // TODO select a better subset of data
-            var versions = _ctx.GetAllVersions<ClubEntity>(x => x.Id == id).OrderBy(x => x.Date).ToList();
-
-            var created = GetVersionInfoEvent(versions.First());
-
-            var count = versions.Count;
-            if (count == 1)
-            {
-                return new VersionInfo(created, null, null);
-            }
-
-            VersionInfoEvent modified;
-
-            var version = versions[count - 1];
-            if (!version.Entity.Deleted)
-            {
-                modified = GetVersionInfoEvent(version);
-                return new VersionInfo(created, modified, null);
-            }
-
-            var deleted = GetVersionInfoEvent(version);
-            if (count <= 2)
-            {
-                return new VersionInfo(created, null, deleted);
-            }
-
-            modified = GetVersionInfoEvent(versions[count - 2]);
-            return new VersionInfo(created, modified, deleted);
-        }
-
-        private static VersionInfoEvent GetVersionInfoEvent<TEntity>(Version<TEntity> version)
-        {
-            var by = version.GetUserMetadata().UserId;
-            var on = version.Date;
-
-            return new VersionInfoEvent(by, on);
-        }
-
+        
         public Guid Create(ClubInputModel club)
         {
             var entity = new ClubEntity { Id = Guid.NewGuid() };

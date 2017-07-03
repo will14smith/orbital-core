@@ -44,7 +44,7 @@ namespace Orbital.Web.Rounds
             return View(input);
         }
         [HttpPost("create")]
-        public IActionResult Create(RoundInputModel input)
+        public IActionResult Create([FromBody]RoundInputModel input)
         {
             if (!ModelState.IsValid)
             {

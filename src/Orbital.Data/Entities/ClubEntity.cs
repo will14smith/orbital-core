@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("club")]
-    public class ClubEntity
+    public class ClubEntity : IEntity
     {
         public Guid Id { get; set; }
 
