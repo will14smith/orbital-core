@@ -38,7 +38,7 @@ namespace Orbital.Web
             {
                 options.UseVersioning(versionOpt =>
                 {
-                    versionOpt.WithMetadataProvider(new UserMetadataProvider());
+                    versionOpt.WithMetadataProvider(new UserMetadataExtension());
                 });
 
                 options.UseNpgsql(ConnectionString);

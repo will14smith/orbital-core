@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Orbital.Versioning
 {
-    public interface IVersionMetadataProvider
+    public interface IVersionMetadataExtension
     {
         string Name { get; }
         Type MetadataType { get; }
@@ -12,6 +12,15 @@ namespace Orbital.Versioning
 
         bool AppliesTo(EntityModel entity);
 
+        IVersionMetadataProvider GetProvider(IServiceProvider services);
+    }
+    public interface IVersionMetadataExtension<out TMetadata> : IVersionMetadataExtension
+    {
+        new IVersionMetadataProvider<TMetadata> GetProvider(IServiceProvider services);
+    }
+    
+    public interface IVersionMetadataProvider
+    {
         object GetMetadata();
     }
     public interface IVersionMetadataProvider<out TMetadata> : IVersionMetadataProvider

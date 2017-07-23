@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Orbital.Versioning
 {
@@ -10,7 +11,7 @@ namespace Orbital.Versioning
     {
         public static void SyncVersioning(this DbContext context)
         {
-            var changeEntries = context.ChangeTracker.Entries().Where(ShouldTrack);
+            var changeEntries = context.ChangeTracker.Entries().Where(ShouldTrack).ToList();
             var versionModels = context.GetVersionModels();
 
             var versionEntitiesToAdd = new List<object>();
@@ -26,9 +27,10 @@ namespace Orbital.Versioning
                 }
 
                 var constructorArguments = new List<object> { entity };
-                foreach (var metadataProvider in versionModel.MetadataModels)
+                foreach (var metadataExtension in versionModel.MetadataModels)
                 {
-                    var metadata = metadataProvider.MetadataProvider.GetMetadata();
+                    var metadataProvider = metadataExtension.MetadataExtension.GetProvider(context.Database.GetService<IServiceProvider>());
+                    var metadata = metadataProvider.GetMetadata();
 
                     constructorArguments.Add(metadata);
                 }

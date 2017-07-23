@@ -6,12 +6,12 @@ namespace Orbital.Versioning
 {
     public class MetadataModel
     {
-        public IVersionMetadataProvider MetadataProvider { get; }
+        public IVersionMetadataExtension MetadataExtension { get; }
         public IReadOnlyDictionary<PropertyInfo, PropertyDefinition> FieldMappings { get; }
 
-        public MetadataModel(IVersionMetadataProvider metadataProvider, IReadOnlyDictionary<PropertyInfo, PropertyDefinition> fieldMappings)
+        public MetadataModel(IVersionMetadataExtension metadataExtension, IReadOnlyDictionary<PropertyInfo, PropertyDefinition> fieldMappings)
         {
-            MetadataProvider = metadataProvider;
+            MetadataExtension = metadataExtension;
             FieldMappings = fieldMappings;
         }
     }

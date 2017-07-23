@@ -60,14 +60,14 @@ namespace Orbital.Versioning
             return versionMember != null;
         }
 
-        internal void AddMetadataProvider(IVersionMetadataProvider metadataProvider, IReadOnlyDictionary<PropertyInfo, PropertyDefinition> fieldMappings)
+        internal void AddMetadataExtension(IVersionMetadataExtension metadataExtension, IReadOnlyDictionary<PropertyInfo, PropertyDefinition> fieldMappings)
         {
-            if (_metadataModels.Any(x => x.MetadataProvider.Name == metadataProvider.Name))
+            if (_metadataModels.Any(x => x.MetadataExtension.Name == metadataExtension.Name))
             {
-                throw new InvalidOperationException($"Duplicate metadata provider with name {metadataProvider.Name}");
+                throw new InvalidOperationException($"Duplicate metadata extension with name {metadataExtension.Name}");
             }
 
-            _metadataModels.Add(new MetadataModel(metadataProvider, fieldMappings));
+            _metadataModels.Add(new MetadataModel(metadataExtension, fieldMappings));
         }
     }
 }

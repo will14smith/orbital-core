@@ -1,17 +1,41 @@
 ﻿using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.DependencyInjection;
+using Orbital.Data.Entities;
 using Orbital.Versioning;
 
 namespace Orbital.Web.Helpers
 {
-    public class UserMetadataProvider : ReflectionVersionMetadataProvider<UserMetadata>
+    public class UserMetadataExtension : ReflectionVersionMetadataExtension<UserMetadata>
     {
-        public override UserMetadata GetMetadata()
+        public override IVersionMetadataProvider<UserMetadata> GetProvider(IServiceProvider services)
+        {
+            return new UserMetadataProvider(services);
+        }
+    }
+
+    public class UserMetadataProvider : IVersionMetadataProvider<UserMetadata>
+    {
+        private readonly ICurrentDbContext _currentContext;
+
+        public UserMetadataProvider(IServiceProvider services)
+        {
+            _currentContext = services.GetRequiredService<IDbContextServices>().CurrentContext;
+        }
+        
+        public UserMetadata GetMetadata()
         {
             return new UserMetadata
             {
                 // TODO
-                UserId = Guid.NewGuid()
+                UserId = _currentContext.Context.Set<PersonEntity>().First().Id,
             };
+        }
+
+        object IVersionMetadataProvider.GetMetadata()
+        {
+            return GetMetadata();
         }
     }
 

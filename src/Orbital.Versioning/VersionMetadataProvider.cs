@@ -5,21 +5,42 @@ using System.Reflection;
 
 namespace Orbital.Versioning
 {
-    public class VersionMetadataProvider<TMetadata> : ReflectionVersionMetadataProvider<TMetadata>
+    public class VersionMetadataExtension<TMetadata> : ReflectionVersionMetadataExtension<TMetadata>
     {
-        private readonly Func<TMetadata> _valueProvider;
+        private readonly Func<IServiceProvider, TMetadata> _valueProvider;
 
-        public VersionMetadataProvider(Func<TMetadata> valueProvider)
+        public VersionMetadataExtension(Func<IServiceProvider, TMetadata> valueProvider)
         {
             _valueProvider = valueProvider;
         }
 
-        public override TMetadata GetMetadata()
+        public override IVersionMetadataProvider<TMetadata> GetProvider(IServiceProvider services)
         {
-            return _valueProvider();
+            return new VersionMetadataStaticProvider<TMetadata>(_valueProvider(services));
         }
     }
-    public abstract class ReflectionVersionMetadataProvider<TMetadata> : IVersionMetadataProvider<TMetadata>
+
+    public class VersionMetadataStaticProvider<TMetadata> : IVersionMetadataProvider<TMetadata>
+    {
+        private readonly TMetadata _value;
+
+        public VersionMetadataStaticProvider(TMetadata value)
+        {
+            _value = value;
+        }
+
+        public TMetadata GetMetadata()
+        {
+            return _value;
+        }
+
+        object IVersionMetadataProvider.GetMetadata()
+        {
+            return GetMetadata();
+        }
+    }
+
+    public abstract class ReflectionVersionMetadataExtension<TMetadata> : IVersionMetadataExtension<TMetadata>
     {
         public virtual string Name => MetadataType.Name;
         public virtual Type MetadataType => typeof(TMetadata);
@@ -31,11 +52,11 @@ namespace Orbital.Versioning
             return true;
         }
 
-        public abstract TMetadata GetMetadata();
+        public abstract IVersionMetadataProvider<TMetadata> GetProvider(IServiceProvider services);
 
-        object IVersionMetadataProvider.GetMetadata()
+        IVersionMetadataProvider IVersionMetadataExtension.GetProvider(IServiceProvider services)
         {
-            return GetMetadata();
+            return GetProvider(services);
         }
     }
 }

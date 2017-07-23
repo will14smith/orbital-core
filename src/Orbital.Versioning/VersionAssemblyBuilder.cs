@@ -38,7 +38,7 @@ namespace Orbital.Versioning
             return _assembly.Build();
         }
 
-        public VersionModel Add(EntityModel entityModel, IReadOnlyCollection<IVersionMetadataProvider> metadata)
+        public VersionModel Add(EntityModel entityModel, IReadOnlyCollection<IVersionMetadataExtension> metadata)
         {
             var entityType = _module.ImportReference(entityModel.EntityType);
             var versionType = _module.DefineType(entityType.Name + "Version", TypeAttributes.Class | TypeAttributes.Public, _module.TypeSystem.Object);
@@ -72,7 +72,7 @@ namespace Orbital.Versioning
             DefineConstructors(versionType, entityType, versionModel);
             // Finish implementing IVersionEntity<TEntity>
             DefineToEntity(versionType, entityType, versionModel);
-            DefineToMetadata(metadata, versionType, versionModel);
+            DefineToMetadata(versionType, versionModel);
 
 
             return versionModel;
@@ -103,7 +103,7 @@ namespace Orbital.Versioning
             public int A { get; set; }
         }
 
-        private void DefineMetadata(IEnumerable<IVersionMetadataProvider> metadataProviders, TypeDefinition type, VersionModel versionModel)
+        private void DefineMetadata(IEnumerable<IVersionMetadataExtension> metadataProviders, TypeDefinition type, VersionModel versionModel)
         {
             foreach (var metadataProvider in metadataProviders)
             {
@@ -125,7 +125,7 @@ namespace Orbital.Versioning
                 }
 
                 // register in the model
-                versionModel.AddMetadataProvider(metadataProvider, mapping);
+                versionModel.AddMetadataExtension(metadataProvider, mapping);
 
                 // implement IVersionEntityWithMetadata<TMetadata>
                 var versionEntity = new GenericInstanceType(_versionMetadataGenericDefinition);
@@ -170,7 +170,7 @@ namespace Orbital.Versioning
 
             // entity+metadata constructor
             var entity = new ParameterDefinition(entityType);
-            var metadataParameters = versionModel.MetadataModels.Select(x => new ParameterDefinition(_module.ImportReference(x.MetadataProvider.MetadataType))).ToArray();
+            var metadataParameters = versionModel.MetadataModels.Select(x => new ParameterDefinition(_module.ImportReference(x.MetadataExtension.MetadataType))).ToArray();
             var entityContructor = type.DefineConstructor(new[] { entity }.Concat(metadataParameters).ToArray());
 
             var entityContructorIL = entityContructor.Body.GetILProcessor();
@@ -246,7 +246,7 @@ namespace Orbital.Versioning
             il.Emit(OpCodes.Ret);
         }
 
-        private void DefineToMetadata(IEnumerable<IVersionMetadataProvider> metadataProviders, TypeDefinition type, VersionModel versionModel)
+        private void DefineToMetadata(TypeDefinition type, VersionModel versionModel)
         {
             var method = type.DefineMethod(VersionEntityToMetadataName, MethodAttributes.Public | MethodAttributes.Virtual, _module.ImportReference(typeof(IReadOnlyDictionary<string, object>)));
             var il = method.Body.GetILProcessor();
@@ -273,10 +273,10 @@ namespace Orbital.Versioning
             foreach (var metadataModel in versionModel.MetadataModels)
             {
                 // var metadata = new TMetadata();
-                var metadata = new VariableDefinition(_module.ImportReference(metadataModel.MetadataProvider.MetadataType));
+                var metadata = new VariableDefinition(_module.ImportReference(metadataModel.MetadataExtension.MetadataType));
                 method.Body.Variables.Add(metadata);
 
-                il.Emit(OpCodes.Newobj, _module.ImportReference(metadataModel.MetadataProvider.MetadataType.GetConstructor()));
+                il.Emit(OpCodes.Newobj, _module.ImportReference(metadataModel.MetadataExtension.MetadataType.GetConstructor()));
                 il.Emit(OpCodes.Stloc, metadata);
 
                 foreach (var fieldMapping in metadataModel.FieldMappings)
@@ -293,7 +293,7 @@ namespace Orbital.Versioning
 
                 // dictionary.Add(metadataProvider.Name, metadata);
                 il.Emit(OpCodes.Ldloc, dictionary);
-                il.Emit(OpCodes.Ldstr, metadataModel.MetadataProvider.Name);
+                il.Emit(OpCodes.Ldstr, metadataModel.MetadataExtension.Name);
                 il.Emit(OpCodes.Ldloc, metadata);
                 il.Emit(OpCodes.Callvirt, dictionaryAdd);
             }

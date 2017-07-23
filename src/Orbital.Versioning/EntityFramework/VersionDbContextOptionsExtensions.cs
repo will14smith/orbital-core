@@ -16,7 +16,7 @@ namespace Orbital.Versioning
         {
             var extension = optionsBuilder.Options.FindExtension<VersionExtension>() ?? new VersionExtension();
 
-            builder?.Invoke(new VersionDbContextOptionsBuilder(optionsBuilder, extension));
+            builder?.Invoke(new VersionDbContextOptionsBuilder(extension));
 
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 

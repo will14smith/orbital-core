@@ -8,10 +8,10 @@ namespace Orbital.Versioning
 {
     internal class VersionModelCustomizer : ModelCustomizer
     {
-        private readonly IReadOnlyCollection<IVersionMetadataProvider> _metadata;
+        private readonly IReadOnlyCollection<IVersionMetadataExtension> _metadata;
         private readonly VersionModelStore _versionModelStore;
 
-        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata, VersionModelStore versionModelStore, ModelCustomizerDependencies dependencies)
+        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataExtension> metadata, VersionModelStore versionModelStore, ModelCustomizerDependencies dependencies)
             : base(dependencies)
         {           
             _metadata = metadata;

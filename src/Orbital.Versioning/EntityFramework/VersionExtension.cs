@@ -6,7 +6,7 @@ namespace Orbital.Versioning
 {
     public class VersionExtension : IDbContextOptionsExtension
     {
-        internal readonly List<IVersionMetadataProvider> Metadata = new List<IVersionMetadataProvider>();
+        internal readonly List<IVersionMetadataExtension> Metadata = new List<IVersionMetadataExtension>();
 
         public bool ApplyServices(IServiceCollection services)
         {
