@@ -1,0 +1,55 @@
+﻿@model Orbital.Web.Rounds.RoundViewModel
+
+@{
+    ViewBag.Title = "Round - " + Model.Round.Name;
+}
+
+<h2>Round Details</h2>
+
+<div class="card">
+    <div class="card-block">
+        <h4 class="card-title">@Model.Round.Name</h4>
+
+        @if (Model.Round.VariantOfId.HasValue)
+        {
+            <p class="card-text">
+                This a variant of @Model.Round.VariantOfId.Value
+            </p>
+        }
+
+        <p class="card-text">
+            This in the "@Model.Round.Category" @(Model.Round.Indoor ? "indoor" : "outdoor") category.
+        </p>
+
+
+        @foreach (var target in Model.Targets)
+        {
+            <div class="card mt-3">
+                <div class="card-block">
+                    <p class="card-text">
+                        Scoring type is @target.ScoringType
+                    </p>
+                    <p class="card-text">
+                        Distance is <length value="@target.Distance" />
+                    </p>
+                    <p class="card-text">
+                        Face size is <length value="@target.FaceSize" />
+                    </p>
+                    <p class="card-text">
+                        Number of arrows is @target.ArrowCount
+                    </p>
+                </div>
+            </div>
+        }
+
+
+        <div class="btn-group" role="group" aria-label="Controls">
+            <a asp-action="Edit" asp-route-id="@Model.Round.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Round.Id" class="btn btn-danger">Delete</a>
+        </div>
+
+    </div>
+    <div class="card-footer">
+        @await Component.InvokeAsync("VersionInfo", Model.Versioning)
+    </div>
+</div>

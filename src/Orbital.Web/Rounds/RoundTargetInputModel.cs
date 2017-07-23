@@ -1,4 +1,5 @@
-using Orbital.Models.Domain;
+using System;
+using Orbital.Models;
 
 namespace Orbital.Web.Rounds
 {
@@ -9,7 +10,7 @@ namespace Orbital.Web.Rounds
         }
         public RoundTargetInputModel(RoundTarget target)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ScoringType ScoringType { get; set; }

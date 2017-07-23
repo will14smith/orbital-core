@@ -17,5 +17,7 @@
         </div>
     </div>
     
-    @await Component.InvokeAsync("VersionInfo", Model.Versioning)
+    <div class="card-footer">
+        @await Component.InvokeAsync("VersionInfo", Model.Versioning)
+    </div>
 </div>

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +13,7 @@ using Orbital.Versioning;
 using Orbital.Web.Clubs;
 using Orbital.Web.Helpers;
 using Orbital.Web.Rounds;
+using Orbital.Web.Users;
 
 namespace Orbital.Web
 {
@@ -95,6 +98,7 @@ namespace Orbital.Web
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IRoundService, RoundService>();
+            services.AddScoped<IUserQuery, UserQuery>();
         }
     }
 }

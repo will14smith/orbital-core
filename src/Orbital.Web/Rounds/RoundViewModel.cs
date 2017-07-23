@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Orbital.Models.Domain;
+using Orbital.Models;
 using Orbital.Web.Models;
 
 namespace Orbital.Web.Rounds

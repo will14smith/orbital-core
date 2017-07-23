@@ -1,19 +1,22 @@
-﻿@model Orbital.Web.Models.VersionInfo
+﻿@using Humanizer
+@model Orbital.Web.ViewComponents.VersionInfoViewModel
 
-<ul class="list-group list-group-flush">
-    <li class="list-group-item">
-        Created on <strong>@Model.Created.On</strong> by <strong>@Model.Created.By</strong>
-    </li>
+<div class="text-muted">
     @if (Model.Modified != null)
     {
-        <li class="list-group-item">
-            Last modified on <strong>@Model.Modified.On</strong> by <strong>@Model.Modified.By</strong>
-        </li>
+        <small>
+            Last modified @Model.Modified.On.Humanize() by <user user="@Model.Modified.By" />
+        </small>
+        <br />
     }
+    <small>
+        Created @Model.Created.On.Humanize() by <user user="@Model.Created.By" />
+    </small>
     @if (Model.Deleted != null)
     {
-        <li class="list-group-item">
-            Deleted on <strong>@Model.Deleted.On</strong> by <strong>@Model.Deleted.By</strong>
-        </li>
+        <br />
+        <small>
+            Deleted @Model.Deleted.On.Humanize() by <user user="@Model.Deleted.By" />
+        </small>
     }
-</ul>
+</div>

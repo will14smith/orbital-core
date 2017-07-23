@@ -1,7 +1,7 @@
 ﻿import * as React from 'react';
 
-enum ScoringType { Metric = 1, Imperial, FiveZone, SixZone, Worcester }
-enum LengthUnit { Meters = 1, Centimeters, Yards, Feet }
+enum ScoringType { Metric = 0, Imperial, FiveZone, SixZone, Worcester }
+enum LengthUnit { Meters = 0, Centimeters, Yards, Feet }
 
 export interface Data {
     scoringType: ScoringType;

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Orbital.Data;
 using Orbital.Data.Entities;
-using Orbital.Models.Domain;
+using Orbital.Models;
 using Orbital.Web.Helpers;
 
 namespace Orbital.Web.Rounds
@@ -21,6 +22,7 @@ namespace Orbital.Web.Rounds
         {
             return _ctx.Rounds
                 .Where(x => !x.Deleted)
+                .AsEnumerable()
                 .Select(ToDomain)
                 .ToList();
         }
@@ -63,7 +65,7 @@ namespace Orbital.Web.Rounds
 
         private RoundEntity Find(Guid id)
         {
-            var entity = _ctx.Rounds.Find(id);
+            var entity = _ctx.Rounds.Include(x => x.Targets).FirstOrDefault(x => x.Id == id);
             if (entity == null || entity.Deleted)
             {
                 return null;
@@ -73,7 +75,10 @@ namespace Orbital.Web.Rounds
         }
         private IReadOnlyCollection<RoundTargetEntity> GetTargets(RoundEntity round)
         {
-            return round.Targets?.Where(x => !x.Deleted).ToList() ?? new List<RoundTargetEntity>();
+            return round.Targets?
+                       .Where(x => !x.Deleted)
+                       .ToList() 
+                   ?? new List<RoundTargetEntity>();
         }
 
         private Round ToDomain(RoundEntity entity)
