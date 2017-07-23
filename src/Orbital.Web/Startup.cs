@@ -90,6 +90,9 @@ namespace Orbital.Web
     {
         public static void AddServices(this IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IRoundService, RoundService>();
         }

@@ -8,10 +8,25 @@ namespace Orbital.Versioning
     {
         internal readonly List<IVersionMetadataProvider> Metadata = new List<IVersionMetadataProvider>();
 
-        public void ApplyServices(IServiceCollection services)
+        public bool ApplyServices(IServiceCollection services)
         {
             services.AddSingleton<VersionModelStore>();
-            services.AddTransient<IModelCustomizer, VersionModelCustomizer>(x => new VersionModelCustomizer(Metadata, x.GetRequiredService<VersionModelStore>()));
+            services.AddTransient<IModelCustomizer, VersionModelCustomizer>(x => 
+                new VersionModelCustomizer(
+                    Metadata,  
+                    x.GetRequiredService<VersionModelStore>(), 
+                    x.GetRequiredService<ModelCustomizerDependencies>()));
+
+            return false;
+        }
+
+        public long GetServiceProviderHashCode()
+        {
+            return 0;
+        }
+
+        public void Validate(IDbContextOptions options)
+        {
         }
     }
 }

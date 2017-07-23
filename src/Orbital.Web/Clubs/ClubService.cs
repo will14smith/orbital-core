@@ -21,6 +21,7 @@ namespace Orbital.Web.Clubs
         {
             return _ctx.Clubs
                 .Where(x => !x.Deleted)
+                .AsEnumerable()
                 .Select(ToDomain)
                 .ToList();
         }

@@ -11,8 +11,9 @@ namespace Orbital.Versioning
         private readonly IReadOnlyCollection<IVersionMetadataProvider> _metadata;
         private readonly VersionModelStore _versionModelStore;
 
-        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata, VersionModelStore versionModelStore)
-        {
+        public VersionModelCustomizer(IReadOnlyCollection<IVersionMetadataProvider> metadata, VersionModelStore versionModelStore, ModelCustomizerDependencies dependencies)
+            : base(dependencies)
+        {           
             _metadata = metadata;
             _versionModelStore = versionModelStore;
         }
