@@ -38,7 +38,7 @@ namespace Orbital.Versioning
             IdColumn = idColumn;
             DateColumn = dateColumn;
 
-            EntityFieldMappings = entityFieldMappings;
+            EntityFieldMappings = entityFieldMappings.ToDictionary(x => x.Key, x => x.Value, new WeakPropertyInfoEqualityComparer());
             EntityModel = entityModel;
         }
 

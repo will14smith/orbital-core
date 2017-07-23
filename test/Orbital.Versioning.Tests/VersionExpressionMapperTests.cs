@@ -13,19 +13,20 @@ namespace Orbital.Versioning.Tests
 {
     public class VersionExpressionMapperTests
     {
-        public class Entity
+        public interface IEntity
+        {
+            int BaseA { get; set; }
+        }
+        public class Entity : IEntity
         {
             public int A { get; set; }
+            public int BaseA { get; set; }
         }
         public class Version
         {
             public int B { get; set; }
         }
-        public class Other
-        {
-            public int C { get; set; }
-        }
-
+        
         [Fact]
         public void Lambda_NoParameters_DoesNotChange()
         {
@@ -61,6 +62,39 @@ namespace Orbital.Versioning.Tests
             var model = CreateModel(new Dictionary<string, string>
             {
                 {nameof(Entity.A), nameof(Version.B)}
+            });
+            var mapper = new VersionExpressionMapper(model);
+
+            var result = mapper.Visit(input);
+
+            Assert.True(Lambda.ExpressionsEqual(expected, result));
+        }
+
+        [Fact]
+        public void SingleEntityParameterOnInterface_MapsToVersionParameter()
+        {
+            Expression<Func<IEntity, int>> input = x => x.BaseA + 1;
+            Expression<Func<Version, int>> expected = x => x.B + 1;
+
+            var model = CreateModel(new Dictionary<string, string>
+            {
+                {nameof(IEntity.BaseA), nameof(Version.B)}
+            });
+            var mapper = new VersionExpressionMapper(model);
+
+            var result = mapper.Visit(input);
+
+            Assert.True(Lambda.ExpressionsEqual(expected, result));
+        }
+        [Fact]
+        public void SingleEntityParameterOnCastedInterface_MapsToVersionParameter()
+        {
+            Expression<Func<Entity, int>> input = x => ((IEntity)x).BaseA + 1;
+            Expression<Func<Version, int>> expected = x => x.B + 1;
+
+            var model = CreateModel(new Dictionary<string, string>
+            {
+                {nameof(IEntity.BaseA), nameof(Version.B)}
             });
             var mapper = new VersionExpressionMapper(model);
 

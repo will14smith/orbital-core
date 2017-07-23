@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Orbital.Versioning
 {
@@ -29,6 +31,24 @@ namespace Orbital.Versioning
             return base.VisitMember(node);
         }
 
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            // TODO ConvertChecked?
+            if (node.NodeType != ExpressionType.Convert)
+            {
+                return base.VisitUnary(node);
+            }
+
+            var expr = Visit(node.Operand);
+            if (expr.Type != _versionModel.VersionType)
+            {
+                return base.VisitUnary(node);
+            }
+
+            return expr;
+            throw new NotImplementedException();
+        }
+
         protected override Expression VisitParameter(ParameterExpression node)
         {
             if (_parameterMappings.TryGetValue(node, out var mappedParameter))
@@ -44,7 +64,7 @@ namespace Orbital.Versioning
             var parameters = new List<ParameterExpression>();
             foreach (var originalParameter in node.Parameters)
             {
-                if (originalParameter.Type == _versionModel.EntityType)
+                if (originalParameter.Type.GetTypeInfo().IsAssignableFrom(_versionModel.EntityType))
                 {
                     var newParameter = Expression.Parameter(_versionModel.VersionType, originalParameter.Name);
 
