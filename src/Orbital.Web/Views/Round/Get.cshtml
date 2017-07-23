@@ -20,35 +20,27 @@
         <p class="card-text">
             This in the "@Model.Round.Category" @(Model.Round.Indoor ? "indoor" : "outdoor") category.
         </p>
-
-
-        @foreach (var target in Model.Targets)
-        {
-            <div class="card mt-3">
-                <div class="card-block">
-                    <p class="card-text">
-                        Scoring type is @target.ScoringType
-                    </p>
-                    <p class="card-text">
-                        Distance is <length value="@target.Distance" />
-                    </p>
-                    <p class="card-text">
-                        Face size is <length value="@target.FaceSize" />
-                    </p>
-                    <p class="card-text">
-                        Number of arrows is @target.ArrowCount
-                    </p>
-                </div>
-            </div>
-        }
-
-
+        
         <div class="btn-group" role="group" aria-label="Controls">
             <a asp-action="Edit" asp-route-id="@Model.Round.Id" class="btn btn-primary">Edit</a>
             <a asp-action="Delete" asp-route-id="@Model.Round.Id" class="btn btn-danger">Delete</a>
         </div>
-
     </div>
+    
+    @if (Model.Targets.Any())
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var target in Model.Targets)
+            {
+                <li class="list-group-item">
+                    <span>
+                        @target.ArrowCount shot using the @target.ScoringType system at <length value="@target.Distance"/> on a <length value="@target.FaceSize"/> face
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+    
     <div class="card-footer">
         @await Component.InvokeAsync("VersionInfo", Model.Versioning)
     </div>
