@@ -1,7 +1,29 @@
 ﻿import * as React from 'react';
 
-enum ScoringType { Metric = 0, Imperial, FiveZone, SixZone, Worcester }
-enum LengthUnit { Meters = 0, Centimeters, Yards, Feet }
+function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
+    return o.reduce((res, key) => {
+        res[key] = key;
+        return res;
+    }, Object.create(null));
+}
+
+
+export const ScoringType = strEnum([
+    'metric',
+    'imperial',
+    'fiveZone', 
+    'sixZone',
+    'worcester',
+]);
+export type ScoringType = keyof typeof ScoringType;
+
+export const LengthUnit = strEnum([
+    'meters',
+    'centimeters',
+    'yards',
+    'feet',
+]);
+export type LengthUnit = keyof typeof LengthUnit;
 
 export interface Data {
     scoringType: ScoringType;
@@ -42,9 +64,8 @@ export default class RoundTargetForm extends React.Component<FormProps, FormStat
 
                     <div className="form-group">
                         <label htmlFor="scoringType">Scoring</label>
-                        <select name="scoringType" value={this.state.scoringType || 0} onChange={e => this.setState({ scoringType: parseInt(e.target.value, 10) })} className="form-control">
-                            {Object.keys(ScoringType).filter(key => !isNaN(Number(key)))
-                                .map(type => <option key={type} value={type}>{ScoringType[type]}</option>)}
+                        <select name="scoringType" value={this.state.scoringType || 0} onChange={e => this.setState({ scoringType: e.target.value as ScoringType })} className="form-control">
+                            {Object.keys(ScoringType).map(type => <option key={type} value={type}>{ScoringType[type]}</option>)}
                         </select>
                     </div>
 
@@ -56,18 +77,16 @@ export default class RoundTargetForm extends React.Component<FormProps, FormStat
                     <div className="form-group">
                         <label htmlFor="distance">Distance</label>
                         <input name="distance" type="text" value={this.state.distanceValue || ''} onChange={e => this.setState({ distanceValue: parseFloat(e.target.value) })} className="form-control" />
-                        <select name="distance_unit" value={this.state.distanceUnit || 0} onChange={e => this.setState({ distanceUnit: parseInt(e.target.value, 10) })} className="form-control">
-                            {Object.keys(LengthUnit).filter(key => !isNaN(Number(key)))
-                                .map(unit => <option key={unit} value={unit}>{LengthUnit[unit]}</option>)}
+                        <select name="distance_unit" value={this.state.distanceUnit || 0} onChange={e => this.setState({ distanceUnit: e.target.value as LengthUnit })} className="form-control">
+                            {Object.keys(LengthUnit).map(unit => <option key={unit} value={unit}>{LengthUnit[unit]}</option>)}
                         </select>
                     </div>
 
                     <div className="form-group">
                         <label htmlFor="faceSize">Face</label>
                         <input name="faceSize" type="text" value={this.state.faceSizeValue || ''} onChange={e => this.setState({ faceSizeValue: parseFloat(e.target.value) })} className="form-control" />
-                        <select name="faceSize_unit" value={this.state.faceSizeUnit || 0} onChange={e => this.setState({ faceSizeUnit: parseInt(e.target.value, 10) })} className="form-control">
-                            {Object.keys(LengthUnit).filter(key => !isNaN(Number(key)))
-                                .map(unit => <option key={unit} value={unit}>{LengthUnit[unit]}</option>)}
+                        <select name="faceSize_unit" value={this.state.faceSizeUnit || 0} onChange={e => this.setState({ faceSizeUnit: e.target.value as LengthUnit })} className="form-control">
+                            {Object.keys(LengthUnit).map(unit => <option key={unit} value={unit}>{LengthUnit[unit]}</option>)}
                         </select>
                     </div>
                 </div>

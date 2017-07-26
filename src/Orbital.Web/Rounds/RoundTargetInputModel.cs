@@ -1,4 +1,3 @@
-using System;
 using Orbital.Models;
 
 namespace Orbital.Web.Rounds
@@ -10,7 +9,14 @@ namespace Orbital.Web.Rounds
         }
         public RoundTargetInputModel(RoundTarget target)
         {
-            throw new NotImplementedException();
+            ScoringType = target.ScoringType;
+
+            DistanceValue = target.Distance.Value;
+            DistanceUnit = target.Distance.Unit;
+            FaceSizeValue = target.FaceSize.Value;
+            FaceSizeUnit = target.FaceSize.Unit;
+
+            ArrowCount = target.ArrowCount;
         }
 
         public ScoringType ScoringType { get; set; }

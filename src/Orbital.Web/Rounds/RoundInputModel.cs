@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Orbital.Models;
 
 namespace Orbital.Web.Rounds
@@ -11,7 +12,14 @@ namespace Orbital.Web.Rounds
         }
         public RoundInputModel(Round round)
         {
-            throw new NotImplementedException();
+            VariantOfId = round.VariantOfId;
+
+            Category = round.Category;
+            Name = round.Name;
+
+            Indoor = round.Indoor;
+
+            Targets = round.Targets.Select(x => new RoundTargetInputModel(x)).ToList();
         }
 
         public Guid? VariantOfId { get; set; }

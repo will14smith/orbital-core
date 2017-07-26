@@ -2,7 +2,7 @@
 
 import HeaderWithButton from './components/HeaderWithButton';
 
-import TargetForm, { Data as TargetData } from './round-target-form';
+import TargetForm, { Data as TargetData, ScoringType, LengthUnit } from './round-target-form';
 
 interface Data {
     variantOfId: string | null,
@@ -18,6 +18,7 @@ interface Data {
 interface FormProps {
     data: Data,
     rounds: [{ id: string, name: string }],
+    submitUrl: string,
 }
 interface FormState {
     data: Data,
@@ -40,12 +41,12 @@ export default class RoundForm extends React.Component<FormProps, FormState> {
             data: {
                 ...this.state.data,
                 targets: this.state.data.targets.concat({
-                    scoringType: 1,
+                    scoringType: ScoringType.metric,
 
                     distanceValue: 0,
-                    distanceUnit: 1,
+                    distanceUnit: LengthUnit.meters,
                     faceSizeValue: 0,
-                    faceSizeUnit: 1,
+                    faceSizeUnit: LengthUnit.centimeters,
 
                     arrowCount: 0,
                 }),
@@ -73,7 +74,7 @@ export default class RoundForm extends React.Component<FormProps, FormState> {
     submit(e) {
         e.preventDefault();
 
-        fetch('/rounds/create',
+        fetch(this.props.submitUrl,
             {
                 method: 'post',
                 credentials: 'same-origin',
