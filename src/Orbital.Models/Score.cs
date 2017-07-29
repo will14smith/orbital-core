@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NodaTime;
 
@@ -6,29 +7,13 @@ namespace Orbital.Models
 {
     public class Score
     {
-        public Score(int id, Score score)
-            : this(
-                id: id,
-
-                personId: score.PersonId,
-                clubId: score.ClubId,
-                roundId: score.RoundId,
-                competitionId: score.CompetitionId,
-
-                bowstyle: score.Bowstyle,
-
-                totalScore: score.TotalScore,
-                totalGolds: score.TotalGolds,
-                totalHits: score.TotalHits,
-
-                shotAt: score.ShotAt, 
-                enteredAt: score.EnteredAt,
-                
-                targets: score.Targets)
-        {
-        }
-
-        public Score(int id, int personId, int clubId, int roundId, int? competitionId, Bowstyle bowstyle, decimal totalScore, decimal totalGolds, decimal totalHits, Instant shotAt, Instant enteredAt, IReadOnlyCollection<ScoreTarget> targets)
+        public Score(
+            Guid id,
+            Guid personId, Guid clubId, Guid roundId, Guid? competitionId,
+            Bowstyle bowstyle, 
+            decimal totalScore, decimal totalGolds, decimal totalHits, 
+            Instant shotAt, 
+            IReadOnlyCollection<ScoreTarget> targets)
         {
             Id = id;
 
@@ -44,17 +29,16 @@ namespace Orbital.Models
             TotalHits = totalHits;
 
             ShotAt = shotAt;
-            EnteredAt = enteredAt;
 
             Targets = targets;
         }
 
-        public int Id { get; }
+        public Guid Id { get; }
 
-        public int PersonId { get; }
-        public int ClubId { get; }
-        public int RoundId { get; }
-        public int? CompetitionId { get; }
+        public Guid PersonId { get; }
+        public Guid ClubId { get; }
+        public Guid RoundId { get; }
+        public Guid? CompetitionId { get; }
 
         public Bowstyle Bowstyle { get; }
 
@@ -63,7 +47,6 @@ namespace Orbital.Models
         public decimal TotalHits { get; }
 
         public Instant ShotAt { get; }
-        public Instant EnteredAt { get; }
 
         public IReadOnlyCollection<ScoreTarget> Targets { get; }
 
@@ -80,7 +63,6 @@ namespace Orbital.Models
                     && x.TotalGolds == y.TotalGolds
                     && x.TotalHits == y.TotalHits 
                     && x.ShotAt.Equals(y.ShotAt) 
-                    && x.EnteredAt.Equals(y.EnteredAt) 
                     && x.Targets.SequenceEqual(y.Targets, new ScoreTarget.EqualWithoutId());
             }
 
@@ -88,16 +70,15 @@ namespace Orbital.Models
             {
                 unchecked
                 {
-                    var hashCode = obj.PersonId;
-                    hashCode = (hashCode * 397) ^ obj.ClubId;
-                    hashCode = (hashCode * 397) ^ obj.RoundId;
+                    var hashCode = obj.PersonId.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.ClubId.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.RoundId.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.CompetitionId.GetHashCode();
                     hashCode = (hashCode * 397) ^ (int)obj.Bowstyle;
                     hashCode = (hashCode * 397) ^ obj.TotalScore.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.TotalGolds.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.TotalHits.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.ShotAt.GetHashCode();
-                    hashCode = (hashCode * 397) ^ obj.EnteredAt.GetHashCode();
                     hashCode = (hashCode * 397) ^ (obj.Targets?.GetHashCode() ?? 0);
                     return hashCode;
                 }

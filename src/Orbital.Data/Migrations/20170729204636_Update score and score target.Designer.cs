@@ -11,9 +11,10 @@ using System;
 namespace Orbital.Data.Migrations
 {
     [DbContext(typeof(OrbitalContext))]
-    partial class OrbitalContextModelSnapshot : ModelSnapshot
+    [Migration("20170729204636_Update score and score target")]
+    partial class Updatescoreandscoretarget
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

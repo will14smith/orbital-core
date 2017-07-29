@@ -26,6 +26,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Orbital.Data\Orbital.Data.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <!--/-:cnd:noEmit -->
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

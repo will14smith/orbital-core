@@ -32,7 +32,7 @@ make start
 Add a migration:
 
 ```
-make migration-add NAME="migration name"
+make migrations-add NAME="migration name"
 ```
 
 Run migrations:

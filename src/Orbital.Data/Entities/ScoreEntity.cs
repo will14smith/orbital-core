@@ -26,7 +26,6 @@ namespace Orbital.Data.Entities
         public decimal TotalHits { get; set; }
 
         public DateTime ShotAt { get; set; }
-        public DateTime EnteredAt { get; set; }
 
         public bool Deleted { get; set; }
 

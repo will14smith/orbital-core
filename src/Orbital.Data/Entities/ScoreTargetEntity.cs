@@ -16,6 +16,10 @@ namespace Orbital.Data.Entities
         [ForeignKey(nameof(ScoreId))]
         public ScoreEntity Score { get; set; }
         public Guid ScoreId { get; set; }
+        
+        [ForeignKey(nameof(RoundTargetId))]
+        public RoundTargetEntity RoundTarget { get; set; }
+        public Guid RoundTargetId { get; set; }
 
         [Column("Score")]
         public decimal ScoreValue { get; set; }

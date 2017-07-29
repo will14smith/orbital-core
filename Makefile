@@ -16,10 +16,10 @@ migrations-add:
 ifndef NAME
 	$(error NAME is undefined)
 endif
-	cd $(WEB_PATH) && dotnet ef migrations add -c Orbital.Data.OrbitalContext -p ../Orbital.Data/Orbital.Data.csproj "$(NAME)"
+	cd $(WEB_PATH) && ASPNETCORE_ENVIRONMENT=Migations dotnet ef migrations add -c Orbital.Data.OrbitalContext -p ../Orbital.Data/Orbital.Data.csproj "$(NAME)"
 
 migrations-up:
-	cd $(WEB_PATH) && dotnet ef database update -c Orbital.Data.OrbitalContext -p ../Orbital.Data/Orbital.Data.csproj
+	cd $(WEB_PATH) && ASPNETCORE_ENVIRONMENT=Migations dotnet ef database update -c Orbital.Data.OrbitalContext -p ../Orbital.Data/Orbital.Data.csproj
 
 package:
 	echo "TODO"
