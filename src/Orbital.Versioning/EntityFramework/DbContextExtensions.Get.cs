@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace Orbital.Versioning
 {
     public static partial class DbContextExtensions
     {
-        public static IEnumerable<Version<T>> GetAllVersions<T>(this DbContext context, Expression<Func<T, bool>> predicate)
+        public static Task<IEnumerable<Version<T>>> GetAllVersions<T>(this DbContext context, Expression<Func<T, bool>> predicate)
         {
             var versionEntityMappings = context.GetVersionModels();
             if (!versionEntityMappings.TryGetValue(typeof(T).FullName, out var versionEntityMapping))
@@ -19,7 +20,7 @@ namespace Orbital.Versioning
             var setMethod = typeof(DbContext).GetRuntimeMethod("Set", Type.EmptyTypes);
             var set = setMethod.MakeGenericMethod(versionEntityMapping.VersionType).Invoke(context, new object[0]);
 
-            return TransformAndCompile(versionEntityMapping, predicate)(set);
+            return Task.Run(() => TransformAndCompile(versionEntityMapping, predicate)(set));
         }
 
         private static Func<object, IEnumerable<Version<TEntity>>> TransformAndCompile<TEntity>(

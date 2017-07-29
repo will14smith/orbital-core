@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Orbital.Models.Domain;
 
 namespace Orbital.Web.Clubs
 {
     public interface IClubService
     {
-        IReadOnlyCollection<Club> GetAll();
-        ClubViewModel GetById(Guid id);
+        Task<IReadOnlyCollection<Club>> GetAll();
+        Task<ClubViewModel> GetById(Guid id);
 
-        Guid Create(ClubInputModel club);
-        void Update(Guid id, ClubInputModel club);
-        void Delete(Guid id);
+        Task<Guid> Create(ClubInputModel club);
+        Task Update(Guid id, ClubInputModel club);
+        Task Delete(Guid id);
     }
 }

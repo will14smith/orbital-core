@@ -1,22 +1,41 @@
 ﻿@using Humanizer
 @model Orbital.Web.ViewComponents.VersionInfoViewModel
 
-<div class="text-muted">
-    @if (Model.Modified != null)
-    {
-        <small>
-            Last modified @Model.Modified.On.Humanize() by <user user="@Model.Modified.By" />
-        </small>
+@if (Model.Modified == null && Model.Deleted == null && Model.Created == null)
+{
+    <div class="text-danger">
+        <small>No version information found!</small>
+    </div>
+}
+else
+{
+    <div class="text-muted">
+        @if (Model.Modified != null)
+        {
+            <small>
+                Last modified @Model.Modified.On.Humanize() by <user user="@Model.Modified.By" />
+            </small>
+            if (Model.Deleted != null || Model.Created != null)
+            {
+                <br />
+            }
+        }
         <br />
-    }
-    <small>
-        Created @Model.Created.On.Humanize() by <user user="@Model.Created.By" />
-    </small>
-    @if (Model.Deleted != null)
-    {
-        <br />
-        <small>
-            Deleted @Model.Deleted.On.Humanize() by <user user="@Model.Deleted.By" />
-        </small>
-    }
-</div>
+        @if (Model.Deleted != null)
+        {
+            <small>
+                Deleted @Model.Deleted.On.Humanize() by <user user="@Model.Deleted.By" />
+            </small>
+            if (Model.Created != null)
+            {
+                <br />
+            }
+        }
+        @if (Model.Created != null)
+        {
+            <small>
+                Created @Model.Created.On.Humanize() by <user user="@Model.Created.By" />
+            </small>
+        }
+    </div>
+}

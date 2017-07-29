@@ -1,13 +1,13 @@
 ﻿@using Orbital.Models
 @using Orbital.Web.Rounds
-@model IReadOnlyCollection<Orbital.Models.Round>
+@model IReadOnlyCollection<Round>
 
 @{
-    ViewBag.Title = "Clubs";
+    ViewBag.Title = "Rounds";
 }
 
 <div class="d-flex justify-content-end">
-    <h2 class="mr-auto p-2">Rounds</h2>
+    <h2 class="mr-auto p-2">@ViewBag.Title</h2>
     <div class="p-2">
         <div class="btn-group" role="group">
             <a class="btn btn-default" href="@Url.Action(nameof(RoundController.Create))" role="button">

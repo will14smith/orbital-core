@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Orbital.Data.Entities;
 using Orbital.Versioning;
 
@@ -28,6 +30,15 @@ namespace Orbital.Data
             this.SyncVersioning();
 
             return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess, 
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            this.SyncVersioning();
+            
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Orbital.Web.ViewComponents
     {
         public VersionInfoViewModel(VersionInfoEventViewModel created, VersionInfoEventViewModel modified, VersionInfoEventViewModel deleted)
         {
-            Created = created ?? throw new ArgumentNullException(nameof(created));
+            Created = created;
             Modified = modified;
             Deleted = deleted;
         }

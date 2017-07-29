@@ -2,11 +2,23 @@
 
 namespace Orbital.Versioning.Tests
 {
-    public class UserMetadataProvider : ReflectionVersionMetadataProvider<UserMetadataProvider.UserMetadata>
+    public class UserMetadataExtension : ReflectionVersionMetadataExtension<UserMetadataProvider.UserMetadata>
     {
-        public override UserMetadata GetMetadata()
+        public override IVersionMetadataProvider<UserMetadataProvider.UserMetadata> GetProvider(IServiceProvider services)
+        {
+            return new UserMetadataProvider();
+        }
+    }
+
+    public class UserMetadataProvider : IVersionMetadataProvider<UserMetadataProvider.UserMetadata>
+    {
+        public UserMetadata GetMetadata()
         {
             return new UserMetadata { UserId = UserId };
+        }
+        object IVersionMetadataProvider.GetMetadata()
+        {
+            return GetMetadata();
         }
 
         public class UserMetadata

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Orbital.Data;
 using Orbital.Data.Entities;
 using Orbital.Models.Domain;
@@ -17,43 +19,41 @@ namespace Orbital.Web.Clubs
             _ctx = ctx;
         }
 
-        public IReadOnlyCollection<Club> GetAll()
+        public async Task<IReadOnlyCollection<Club>> GetAll()
         {
-            return _ctx.Clubs
-                .Where(x => !x.Deleted)
-                .AsEnumerable()
-                .Select(ToDomain)
-                .ToList();
+            var clubs = await _ctx.Clubs.Where(x => !x.Deleted).ToListAsync();
+
+            return clubs.Select(ToDomain).ToList();
         }
 
-        public ClubViewModel GetById(Guid id)
+        public async Task<ClubViewModel> GetById(Guid id)
         {
-            var entity = Find(id);
+            var entity = await Find(id);
             if (entity == null)
             {
                 return null;
             }
 
-            return new ClubViewModel(
-                ToDomain(entity),
-                _ctx.GetVersionInfo<ClubEntity>(id)
-            );
+            var domain = ToDomain(entity);
+            var versionInfo = await _ctx.GetVersionInfo<ClubEntity>(id);
+
+            return new ClubViewModel(domain, versionInfo);
         }
-        
-        public Guid Create(ClubInputModel club)
+
+        public async Task<Guid> Create(ClubInputModel club)
         {
             var entity = new ClubEntity { Id = Guid.NewGuid() };
             PopulateEntity(entity, club);
 
-            _ctx.Clubs.Add(entity);
-            _ctx.SaveChanges();
+            await _ctx.Clubs.AddAsync(entity);
+            await _ctx.SaveChangesAsync();
 
             return entity.Id;
         }
 
-        public void Update(Guid id, ClubInputModel club)
+        public async Task Update(Guid id, ClubInputModel club)
         {
-            var entity = Find(id);
+            var entity = await Find(id);
             if (entity == null)
             {
                 throw new Exception($"Couldn't find club with id = {id} to update");
@@ -62,26 +62,26 @@ namespace Orbital.Web.Clubs
             PopulateEntity(entity, club);
 
             _ctx.Clubs.Update(entity);
-            _ctx.SaveChanges();
+            await _ctx.SaveChangesAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            var entity = Find(id);
+            var entity = await Find(id);
             if (entity == null)
             {
-                throw new Exception($"Couldn't find club with id = {id} to update");
+                throw new Exception($"Couldn't find club with id = {id} to delete");
             }
 
             entity.Deleted = true;
 
             _ctx.Clubs.Update(entity);
-            _ctx.SaveChanges();
+            await _ctx.SaveChangesAsync();
         }
 
-        private ClubEntity Find(Guid id)
+        private async Task<ClubEntity> Find(Guid id)
         {
-            var entity = _ctx.Clubs.Find(id);
+            var entity = await _ctx.Clubs.FindAsync(id);
             if (entity == null || entity.Deleted)
             {
                 return null;
@@ -90,12 +90,12 @@ namespace Orbital.Web.Clubs
             return entity;
         }
 
-        private Club ToDomain(ClubEntity entity)
+        private static Club ToDomain(ClubEntity entity)
         {
             return new Club(entity.Id, entity.Name);
         }
 
-        private void PopulateEntity(ClubEntity entity, ClubInputModel club)
+        private static void PopulateEntity(ClubEntity entity, ClubInputModel club)
         {
             entity.Name = club.Name;
         }

@@ -84,13 +84,14 @@ export default class RoundForm extends React.Component<FormProps, FormState> {
                 },
                 body: JSON.stringify(this.state.data),
             }).then(response => {
-            if (!response.ok) {
-                // todo display error
-            } else {
-                const location = response.headers['Location'];
-                window.location.href = location;
-            }
-        });
+                if (!response.ok) {
+                    throw response;
+                } else {
+                    return response.json();
+                }
+            }).then(({ url }) => {
+                window.location.href = url;
+            });
     }
 
     render() {

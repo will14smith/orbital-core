@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -22,15 +23,15 @@ namespace Orbital.Versioning.Tests.Integration
         }
 
         [Fact]
-        public void Test()
+        public async void Test()
         {
             UserMetadataProvider.UserId = Guid.NewGuid();
 
             var builder = new DbContextOptionsBuilder()
-                .UseInMemoryDatabase()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .UseVersioning(options =>
                 {
-                    options.WithMetadataProvider(new UserMetadataProvider());
+                    options.WithMetadataExtension(new UserMetadataExtension());
                 });
 
             var ctx = new Context(builder.Options);
@@ -48,7 +49,7 @@ namespace Orbital.Versioning.Tests.Integration
             Assert.NotNull(lookedUpEntity);
             Assert.Equal(entity.Title, lookedUpEntity.Title);
 
-            var versions = ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
+            var versions = await ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
             Assert.Equal(1, versions.Count());
             Assert.Equal(entity.Title, versions.First().Entity.Title);
 
@@ -64,7 +65,8 @@ namespace Orbital.Versioning.Tests.Integration
             Assert.NotNull(lookedUpEntity);
             Assert.Equal(entity.Title, lookedUpEntity.Title);
 
-            versions = ctx.GetAllVersions<Entity>(x => x.Id == entity.Id).OrderBy(x => x.VersionId).ToList();
+            versions = await ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
+            versions = versions.OrderBy(x => x.VersionId).ToList();
             Assert.Equal(2, versions.Count());
             Assert.Equal(title, versions.First().Entity.Title);
             Assert.Equal(entity.Title, versions.Last().Entity.Title);
@@ -76,13 +78,13 @@ namespace Orbital.Versioning.Tests.Integration
         }
 
         [Fact]
-        public void Test_NoSync()
+        public async Task Test_NoSync()
         {
             var builder = new DbContextOptionsBuilder()
-                .UseInMemoryDatabase()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .UseVersioning(options =>
                 {
-                    options.WithMetadataProvider(new UserMetadataProvider());
+                    options.WithMetadataExtension(new UserMetadataExtension());
                 });
 
             var ctx = new Context(builder.Options);
@@ -99,7 +101,7 @@ namespace Orbital.Versioning.Tests.Integration
             Assert.NotNull(lookedUpEntity);
             Assert.Equal(entity.Title, lookedUpEntity.Title);
 
-            var versions = ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
+            var versions = await ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
             Assert.Equal(0, versions.Count());
 
             // update
@@ -113,7 +115,8 @@ namespace Orbital.Versioning.Tests.Integration
             Assert.NotNull(lookedUpEntity);
             Assert.Equal(entity.Title, lookedUpEntity.Title);
 
-            versions = ctx.GetAllVersions<Entity>(x => x.Id == entity.Id).OrderBy(x => x.VersionId).ToList();
+            versions = await ctx.GetAllVersions<Entity>(x => x.Id == entity.Id);
+            versions = versions.OrderBy(x => x.VersionId).ToList();
             Assert.Equal(0, versions.Count());
         }
     }

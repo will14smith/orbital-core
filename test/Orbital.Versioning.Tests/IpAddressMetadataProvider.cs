@@ -1,12 +1,26 @@
-﻿namespace Orbital.Versioning.Tests
+﻿using System;
+
+namespace Orbital.Versioning.Tests
 {
-    public class IpAddressMetadataProvider : ReflectionVersionMetadataProvider<IpAddressMetadataProvider.IpAddressMetadata>
+    public class IpAddressMetadataExtension : ReflectionVersionMetadataExtension<IpAddressMetadataProvider.IpAddressMetadata>
     {
-        public override IpAddressMetadata GetMetadata()
+        public override IVersionMetadataProvider<IpAddressMetadataProvider.IpAddressMetadata> GetProvider(IServiceProvider services)
+        {
+            return new IpAddressMetadataProvider();
+        }
+    }
+
+
+    public class IpAddressMetadataProvider : IVersionMetadataProvider<IpAddressMetadataProvider.IpAddressMetadata>
+    {
+        public IpAddressMetadata GetMetadata()
         {
             return new IpAddressMetadata { IpAddress = IpAddress };
         }
-
+        object IVersionMetadataProvider.GetMetadata()
+        {
+            return GetMetadata();
+        }
 
         public class IpAddressMetadata
         {

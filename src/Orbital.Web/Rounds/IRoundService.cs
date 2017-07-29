@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Orbital.Models;
 
 namespace Orbital.Web.Rounds
 {
     public interface IRoundService
     {
-        IReadOnlyCollection<Round> GetAll();
+        Task<IReadOnlyCollection<Round>> GetAll();
 
-        RoundViewModel GetById(Guid id);
+        Task<RoundViewModel> GetById(Guid id);
 
-        Guid Create(RoundInputModel input);
-        void Update(Guid id, RoundInputModel input);
-        void Delete(Guid id);
+        Task<Guid> Create(RoundInputModel input);
+        Task Update(Guid id, RoundInputModel input);
+        Task Delete(Guid id);
     }
 }

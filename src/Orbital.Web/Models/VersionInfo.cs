@@ -1,12 +1,10 @@
-using System;
-
 namespace Orbital.Web.Models
 {
     public class VersionInfo
     {
         public VersionInfo(VersionInfoEvent created, VersionInfoEvent modified, VersionInfoEvent deleted)
         {
-            Created = created ?? throw new ArgumentNullException(nameof(created));
+            Created = created;
             Modified = modified;
             Deleted = deleted;
         }

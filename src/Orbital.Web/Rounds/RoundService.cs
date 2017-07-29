@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Orbital.Data;
 using Orbital.Data.Entities;
@@ -18,54 +19,77 @@ namespace Orbital.Web.Rounds
             _ctx = ctx;
         }
 
-        public IReadOnlyCollection<Round> GetAll()
+        public async Task<IReadOnlyCollection<Round>> GetAll()
         {
-            return _ctx.Rounds
-                .Where(x => !x.Deleted)
-                .AsEnumerable()
-                .Select(ToDomain)
-                .ToList();
+            var rounds = await _ctx.Rounds.Where(x => !x.Deleted).ToListAsync();
+
+            return rounds.Select(ToDomain).ToList();
         }
 
-        public RoundViewModel GetById(Guid id)
+        public async Task<RoundViewModel> GetById(Guid id)
         {
-            var entity = Find(id);
+            var entity = await Find(id);
             if (entity == null)
             {
                 return null;
             }
 
+            var domain = ToDomain(entity);
+            var versionInfo = await _ctx.GetVersionInfo<RoundEntity>(id);
+
             return new RoundViewModel(
-                ToDomain(entity),
-                _ctx.GetVersionInfo<RoundEntity>(id)
+                domain,
+                versionInfo
             );
 
         }
 
-        public Guid Create(RoundInputModel input)
+        public async Task<Guid> Create(RoundInputModel input)
         {
             var entity = new RoundEntity();
             PopulateEntity(entity, input);
 
             _ctx.Rounds.Add(entity);
-            _ctx.SaveChanges();
+            await _ctx.SaveChangesAsync();
 
             return entity.Id;
         }
 
-        public void Update(Guid id, RoundInputModel input)
+        public async Task Update(Guid id, RoundInputModel input)
         {
-            throw new NotImplementedException();
+            var entity = await Find(id);
+            if (entity == null)
+            {
+                throw new Exception($"Couldn't find club with id = {id} to update");
+            }
+
+            // TODO check for variant cycles
+            
+            PopulateEntity(entity, input);
+
+            _ctx.Rounds.Update(entity);
+            await _ctx.SaveChangesAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = await Find(id);
+            if (entity == null)
+            {
+                throw new Exception($"Couldn't find club with id = {id} to delete");
+            }
+
+            // TODO check for non-deleted variants
+
+            entity.Deleted = true;
+
+            _ctx.Rounds.Update(entity);
+            await _ctx.SaveChangesAsync();
         }
 
-        private RoundEntity Find(Guid id)
+        private async Task<RoundEntity> Find(Guid id)
         {
-            var entity = _ctx.Rounds.Include(x => x.Targets).FirstOrDefault(x => x.Id == id);
+            var entity = await _ctx.Rounds.Include(x => x.Targets).FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null || entity.Deleted)
             {
                 return null;
@@ -73,15 +97,14 @@ namespace Orbital.Web.Rounds
 
             return entity;
         }
-        private IReadOnlyCollection<RoundTargetEntity> GetTargets(RoundEntity round)
+
+        private static IEnumerable<RoundTargetEntity> GetTargets(RoundEntity round)
         {
-            return round.Targets?
-                       .Where(x => !x.Deleted)
-                       .ToList() 
+            return round.Targets?.Where(x => !x.Deleted)
                    ?? new List<RoundTargetEntity>();
         }
 
-        private Round ToDomain(RoundEntity entity)
+        private static Round ToDomain(RoundEntity entity)
         {
             return new Round(
                 entity.Id, entity.VariantOfId,
@@ -89,7 +112,7 @@ namespace Orbital.Web.Rounds
                 GetTargets(entity).Select(ToDomain).ToList()
             );
         }
-        private RoundTarget ToDomain(RoundTargetEntity entity)
+        private static RoundTarget ToDomain(RoundTargetEntity entity)
         {
             return new RoundTarget(
                 entity.Id, (ScoringType)entity.ScoringType,
@@ -110,6 +133,11 @@ namespace Orbital.Web.Rounds
             entity.Targets = entity.Targets ?? new List<RoundTargetEntity>();
             entity.Targets.Clear();
 
+            if (round.Targets == null)
+            {
+                return;
+            }
+            
             foreach (var target in round.Targets)
             {
                 var targetEntity = new RoundTargetEntity();

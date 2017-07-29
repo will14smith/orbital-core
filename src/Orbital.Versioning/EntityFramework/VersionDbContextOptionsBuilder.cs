@@ -11,7 +11,7 @@ namespace Orbital.Versioning
             _extension = extension;
         }
 
-        public VersionDbContextOptionsBuilder WithMetadataProvider(IVersionMetadataExtension metadataExtension)
+        public VersionDbContextOptionsBuilder WithMetadataExtension(IVersionMetadataExtension metadataExtension)
         {
             _extension.Metadata.Add(metadataExtension);
             return this;

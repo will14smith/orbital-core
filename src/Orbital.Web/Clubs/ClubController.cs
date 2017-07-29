@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Orbital.Web.Clubs
@@ -14,17 +15,17 @@ namespace Orbital.Web.Clubs
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var clubs = _clubService.GetAll();
+            var clubs = await _clubService.GetAll();
 
             return View(clubs);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            var club = _clubService.GetById(id);
+            var club = await _clubService.GetById(id);
             if (club == null)
             {
                 return NotFound();
@@ -41,22 +42,22 @@ namespace Orbital.Web.Clubs
             return View(input);
         }
         [HttpPost("create")]
-        public IActionResult Create(ClubInputModel input)
+        public async Task<IActionResult> Create(ClubInputModel input)
         {
             if (!ModelState.IsValid)
             {
                 return View(input);
             }
 
-            var id = _clubService.Create(input);
+            var id = await _clubService.Create(input);
 
             return RedirectToAction(nameof(Get), new { id = id });
         }
 
         [HttpGet("{id}/edit")]
-        public IActionResult Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var club = _clubService.GetById(id);
+            var club = await _clubService.GetById(id);
             if (club == null)
             {
                 return NotFound();
@@ -67,20 +68,20 @@ namespace Orbital.Web.Clubs
             return View(input);
         }
         [HttpPost("{id}/edit")]
-        public IActionResult Edit(Guid id, ClubInputModel input)
+        public async Task<IActionResult> Edit(Guid id, ClubInputModel input)
         {
             if (!ModelState.IsValid)
             {
                 return View(input);
             }
 
-            _clubService.Update(id, input);
+            await _clubService.Update(id, input);
 
             return RedirectToAction(nameof(Get), new { id });
         }
 
         [HttpPost("{id}/delete")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var club = _clubService.GetById(id);
             if (club == null)
@@ -88,7 +89,7 @@ namespace Orbital.Web.Clubs
                 return NotFound();
             }
 
-            _clubService.Delete(id);
+            await _clubService.Delete(id);
 
             return RedirectToAction(nameof(Index));
         }

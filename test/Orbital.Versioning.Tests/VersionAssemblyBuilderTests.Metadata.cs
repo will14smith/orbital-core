@@ -7,10 +7,12 @@ namespace Orbital.Versioning.Tests
 {
     public partial class VersionAssemblyBuilderTests
     {
+        private static readonly IVersionMetadataExtension[] Extensions = { new UserMetadataExtension(), new IpAddressMetadataExtension() };
+
         [Fact]
         public void WithMetadata_DefaultConstructor_CanActivate()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[] { new UserMetadataProvider(), new IpAddressMetadataProvider() });
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, Extensions);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -22,7 +24,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void WithMetadata_CopyConstructor_SetsMetadataFields()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[] { new UserMetadataProvider(), new IpAddressMetadataProvider() });
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, Extensions);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -46,7 +48,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void MetadataInterface_Implemented()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[] { new UserMetadataProvider(), new IpAddressMetadataProvider() });
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, Extensions);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 
@@ -65,7 +67,7 @@ namespace Orbital.Versioning.Tests
         [Fact]
         public void WithMetadata_VersionEntityInterface_ToMetadata_Works()
         {
-            var versionModel = _versionAssemblyBuilder.Add(_entityModel, new IVersionMetadataProvider[] { new UserMetadataProvider(), new IpAddressMetadataProvider() });
+            var versionModel = _versionAssemblyBuilder.Add(_entityModel, Extensions);
             var assembly = _versionAssemblyBuilder.Build();
             versionModel.Assembly = assembly;
 

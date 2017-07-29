@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Orbital.Web.Rounds
@@ -15,17 +17,17 @@ namespace Orbital.Web.Rounds
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var rounds = _roundService.GetAll();
+            var rounds = await _roundService.GetAll();
 
             return View(rounds);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            var round = _roundService.GetById(id);
+            var round = await _roundService.GetById(id);
             if (round == null)
             {
                 return NotFound();
@@ -35,33 +37,36 @@ namespace Orbital.Web.Rounds
         }
 
         [HttpGet("create")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var input = new RoundInputModel();
 
-            ViewData["Rounds"] = _roundService.GetAll().Select(x => new RoundSummaryModel(x)).ToList();
+            var rounds = await _roundService.GetAll();
+            ViewData["Rounds"] = rounds.Select(x => new RoundSummaryModel(x)).ToList();
 
             return View(input);
         }
+
         [HttpPost("create")]
-        public IActionResult Create([FromBody]RoundInputModel input)
+        public async Task<IActionResult> Create([FromBody] RoundInputModel input)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["Rounds"] = _roundService.GetAll().Select(x => new RoundSummaryModel(x)).ToList();
+                var rounds = await _roundService.GetAll();
+                ViewData["Rounds"] = rounds.Select(x => new RoundSummaryModel(x)).ToList();
 
                 return View(input);
             }
 
-            var id = _roundService.Create(input);
+            var id = await _roundService.Create(input);
 
-            return RedirectToAction(nameof(Get), new { id = id });
+            return RedirectToGet(id);
         }
 
         [HttpGet("{id}/edit")]
-        public IActionResult Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var round = _roundService.GetById(id);
+            var round = await _roundService.GetById(id);
             if (round == null)
             {
                 return NotFound();
@@ -69,27 +74,30 @@ namespace Orbital.Web.Rounds
 
             var input = new RoundInputModel(round.Round);
 
-            ViewData["Rounds"] = _roundService.GetAll().Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
+            var rounds = await _roundService.GetAll();
+            ViewData["Rounds"] = rounds.Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
 
             return View(input);
         }
+
         [HttpPost("{id}/edit")]
-        public IActionResult Edit(Guid id, RoundInputModel input)
+        public async Task<IActionResult> Edit(Guid id, [FromBody] RoundInputModel input)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["Rounds"] = _roundService.GetAll().Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
+                var rounds = await _roundService.GetAll();
+                ViewData["Rounds"] = rounds.Where(x => x.Id != id).Select(x => new RoundSummaryModel(x)).ToList();
 
                 return View(input);
             }
 
-            _roundService.Update(id, input);
+            await _roundService.Update(id, input);
 
-            return RedirectToAction(nameof(Get), new { id });
+            return RedirectToGet(id);
         }
 
         [HttpPost("{id}/delete")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var round = _roundService.GetById(id);
             if (round == null)
@@ -97,10 +105,17 @@ namespace Orbital.Web.Rounds
                 return NotFound();
             }
 
-            _roundService.Delete(id);
+            await _roundService.Delete(id);
 
             return RedirectToAction(nameof(Index));
+        }
 
+        private IActionResult RedirectToGet(Guid id)
+        {
+            var response = Json(new {url = Url.Action(nameof(Get), new {id = id})});
+            response.StatusCode = (int) HttpStatusCode.Accepted;
+
+            return response;
         }
     }
 }
