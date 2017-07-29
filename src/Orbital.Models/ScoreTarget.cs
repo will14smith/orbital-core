@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class ScoreTarget
     {

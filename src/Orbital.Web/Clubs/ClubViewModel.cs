@@ -1,4 +1,4 @@
-﻿using Orbital.Models.Domain;
+﻿using Orbital.Models;
 using Orbital.Web.Models;
 
 namespace Orbital.Web.Clubs

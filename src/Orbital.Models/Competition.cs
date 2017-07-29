@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Competition
     {
@@ -17,7 +18,7 @@ namespace Orbital.Models.Domain
         {
         }
 
-        public Competition(int id, string name, DateTime start, DateTime end, IReadOnlyCollection<int> rounds)
+        public Competition(int id, string name, Instant start, Instant end, IReadOnlyCollection<int> rounds)
         {
             Id = id;
             Name = name;
@@ -29,8 +30,8 @@ namespace Orbital.Models.Domain
         public int Id { get; }
         public string Name { get; }
 
-        public DateTime Start { get; }
-        public DateTime End { get; }
+        public Instant Start { get; }
+        public Instant End { get; }
 
         public IReadOnlyCollection<int> Rounds { get; }
 

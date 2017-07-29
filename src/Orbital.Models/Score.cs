@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Score
     {
@@ -28,7 +28,7 @@ namespace Orbital.Models.Domain
         {
         }
 
-        public Score(int id, int personId, int clubId, int roundId, int? competitionId, Bowstyle bowstyle, decimal totalScore, decimal totalGolds, decimal totalHits, DateTime shotAt, DateTime enteredAt, IReadOnlyCollection<ScoreTarget> targets)
+        public Score(int id, int personId, int clubId, int roundId, int? competitionId, Bowstyle bowstyle, decimal totalScore, decimal totalGolds, decimal totalHits, Instant shotAt, Instant enteredAt, IReadOnlyCollection<ScoreTarget> targets)
         {
             Id = id;
 
@@ -62,8 +62,8 @@ namespace Orbital.Models.Domain
         public decimal TotalGolds { get; }
         public decimal TotalHits { get; }
 
-        public DateTime ShotAt { get; }
-        public DateTime EnteredAt { get; }
+        public Instant ShotAt { get; }
+        public Instant EnteredAt { get; }
 
         public IReadOnlyCollection<ScoreTarget> Targets { get; }
 

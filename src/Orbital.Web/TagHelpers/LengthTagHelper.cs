@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 using Orbital.Models;
-using Orbital.Models.Domain;
 
 namespace Orbital.Web.TagHelpers
 {

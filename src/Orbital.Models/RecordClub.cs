@@ -1,10 +1,10 @@
-using System;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class RecordClub
     {
-        public RecordClub(int clubId, DateTime activeFrom, DateTime activeTo)
+        public RecordClub(int clubId, Instant activeFrom, Instant activeTo)
         {
             ClubId = clubId;
 
@@ -14,8 +14,8 @@ namespace Orbital.Models.Domain
 
         public int ClubId { get; }
 
-        public DateTime ActiveFrom { get; }
-        public DateTime ActiveTo { get; }
+        public Instant ActiveFrom { get; }
+        public Instant ActiveTo { get; }
 
         public override bool Equals(object obj)
         {

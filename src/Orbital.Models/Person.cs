@@ -1,6 +1,7 @@
 using System;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Person
     {
@@ -23,7 +24,7 @@ namespace Orbital.Models.Domain
             string name,
             Gender gender, Bowstyle? bowstyle = null,
             string archeryGBNumber = null,
-            DateTime? dateOfBirth = null, DateTime? dateStartedArchery = null
+            LocalDate? dateOfBirth = null, LocalDate? dateStartedArchery = null
           )
         {
             Id = id;
@@ -48,8 +49,35 @@ namespace Orbital.Models.Domain
         public Gender Gender { get; }
         public Bowstyle? Bowstyle { get; }
         public string ArcheryGBNumber { get; }
-        public DateTime? DateOfBirth { get; }
-        public DateTime? DateStartedArchery { get; }
+        public LocalDate? DateOfBirth { get; }
+        public LocalDate? DateStartedArchery { get; }
+
+        public decimal? GetAge(LocalDate? now = null)
+        {
+            if (!DateOfBirth.HasValue)
+            {
+                return null;
+            }
+
+            var from = now ?? SystemClock.Instance.GetCurrentInstant().InUtc().Date;
+
+            var period = Period.Between(DateOfBirth.Value, from, PeriodUnits.Years | PeriodUnits.Days);
+
+            return period.Years + Math.Round(period.Days / 365m, 1);
+        }
+        public Skill GetSkill(LocalDate? now = null)
+        {
+            if (!DateStartedArchery.HasValue)
+            {
+                return Skill.Experienced;
+            }
+
+            var from = now ?? SystemClock.Instance.GetCurrentInstant().InUtc().Date;
+
+            var period = Period.Between(DateStartedArchery.Value, from, PeriodUnits.Years);
+
+            return period.Years >= 1 ? Skill.Experienced : Skill.Novice;
+        }
 
         public override bool Equals(object obj)
         {

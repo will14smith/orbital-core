@@ -1,5 +1,3 @@
-using System;
-
 namespace Orbital.Versioning
 {
     public class VersionDbContextOptionsBuilder

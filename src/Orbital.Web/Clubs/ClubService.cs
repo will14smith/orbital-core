@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Orbital.Data;
 using Orbital.Data.Entities;
-using Orbital.Models.Domain;
+using Orbital.Models;
 using Orbital.Web.Helpers;
 
 namespace Orbital.Web.Clubs

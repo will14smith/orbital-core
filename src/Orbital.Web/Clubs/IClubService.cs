@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orbital.Models.Domain;
+using Orbital.Models;
 
 namespace Orbital.Web.Clubs
 {

@@ -1,6 +1,7 @@
 ﻿using System;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Handicap
     {
@@ -18,7 +19,7 @@ namespace Orbital.Models.Domain
         {
         }
 
-        public Handicap(int id, int personId, int? scoreId, HandicapType type, DateTime date, int value, HandicapIdentifier identifier)
+        public Handicap(int id, int personId, int? scoreId, HandicapType type, Instant date, int value, HandicapIdentifier identifier)
         {
             Id = id;
             PersonId = personId;
@@ -35,7 +36,7 @@ namespace Orbital.Models.Domain
         public int? ScoreId { get; }
 
         public HandicapType Type { get; }
-        public DateTime Date { get; }
+        public Instant Date { get; }
         public int Value { get; }
 
         public HandicapIdentifier Identifier { get; }

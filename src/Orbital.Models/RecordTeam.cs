@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using NodaTime;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class RecordTeam
     {
-        public RecordTeam(int id, int recordId, int clubId, int competitionId, DateTime dateSet, DateTime? dateConfirmed, DateTime? dateBroken, DateTime? dateRevoked, IReadOnlyCollection<RecordTeamMember> members)
+        public RecordTeam(int id, int recordId, int clubId, int competitionId, Instant dateSet, Instant? dateConfirmed, Instant? dateBroken, Instant? dateRevoked, IReadOnlyCollection<RecordTeamMember> members)
         {
             Id = id;
 
@@ -26,10 +27,10 @@ namespace Orbital.Models.Domain
         public int ClubId { get; }
         public int? CompetitionId { get; }
 
-        public DateTime DateSet { get; }
-        public DateTime? DateConfirmed { get; }
-        public DateTime? DateBroken { get; }
-        public DateTime? DateRevoked { get; }
+        public Instant DateSet { get; }
+        public Instant? DateConfirmed { get; }
+        public Instant? DateBroken { get; }
+        public Instant? DateRevoked { get; }
 
         public IReadOnlyCollection<RecordTeamMember> Members { get; }
     }

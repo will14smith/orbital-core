@@ -9,4 +9,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NodaTime" Version="2.2.0" />
+  </ItemGroup>
 </Project>

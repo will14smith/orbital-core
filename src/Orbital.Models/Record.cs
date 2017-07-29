@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Record
     {

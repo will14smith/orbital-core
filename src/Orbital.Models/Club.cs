@@ -1,6 +1,6 @@
 using System;
 
-namespace Orbital.Models.Domain
+namespace Orbital.Models
 {
     public class Club
     {
