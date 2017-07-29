@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Orbital.Data.Entities
 {
     [Table("person")]
-    public class PersonEntity
+    public class PersonEntity : IEntity
     {
         public PersonEntity()
         {

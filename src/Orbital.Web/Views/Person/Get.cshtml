@@ -1,0 +1,46 @@
+﻿@using Orbital.Web.People
+@model PersonViewModel
+
+@{
+    var person = Model.Person;
+    ViewBag.Title = "Person - " + person.Name;
+}
+
+<h2>Person Details</h2>
+
+<div class="card">
+    <div class="card-block">
+        <h4 class="card-title">@person.Name</h4>
+
+        <div class="btn-group" role="group" aria-label="Controls">
+            <a asp-action="Edit" asp-route-id="@person.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@person.Id" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"><span><strong>Club:</strong> @Model.Club.Name</span></li>
+        <li class="list-group-item"><span><strong>Gender:</strong> @person.Gender</span></li>
+        @if (person.Bowstyle.HasValue)
+        {
+            <li class="list-group-item"><span><strong>Preferred style:</strong> @person.Bowstyle.Value</span></li>
+        }
+        @if (!string.IsNullOrEmpty(person.ArcheryGBNumber))
+        {
+        <li class="list-group-item"><span><strong>AGB Number:</strong> @person.ArcheryGBNumber</span></li>
+        }
+        @if (person.DateOfBirth.HasValue)
+        {
+        <li class="list-group-item"><span><strong>Age:</strong> @person.GetAge()</span></li>
+        }
+        @if (person.DateStartedArchery.HasValue)
+        {
+            <li class="list-group-item"><span><strong>Skill:</strong> @person.GetSkill()</span></li>
+        }
+    </ul>
+
+
+    <div class="card-footer">
+        @await Component.InvokeAsync("VersionInfo", Model.Versioning)
+    </div>
+</div>

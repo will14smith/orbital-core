@@ -1,0 +1,34 @@
+﻿@using Orbital.Web.People
+@model IReadOnlyCollection<Person>
+
+@{
+    ViewBag.Title = "People";
+}
+
+<div class="d-flex justify-content-end">
+    <h2 class="mr-auto p-2">@ViewBag.Title</h2>
+    <div class="p-2">
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="@Url.Action(nameof(PersonController.Create))" rol="button">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <div class="sr-only">Create</div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="list-group">
+    @foreach (var person in Model)
+    {
+        <a href="@Url.Action(nameof(PersonController.Get), new { id = person.Id })"
+           class="list-group-item list-group-item-action">
+            @person.Name
+        </a>
+    }
+
+    @if (!Model.Any())
+    {
+        <a href="#" class="list-group-item disabled">
+            There are no people!
+        </a>
+    }
+</div>

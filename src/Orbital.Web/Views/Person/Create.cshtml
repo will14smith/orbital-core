@@ -1,0 +1,47 @@
+﻿@model Orbital.Web.People.PersonInputModel
+
+@{
+    ViewBag.Title = "Create Person";
+}
+
+<h1>Create Person</h1>
+
+<form method="POST" asp-action="Create">
+    <div class="form-group">
+        <label asp-for="ClubId">Club</label>
+        <select asp-for="ClubId" asp-items="@ViewBag.Clubs" class="form-control">
+            <option>Please select one</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" type="text" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Gender">Gender</label>
+        <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
+            <option>Please select one</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Bowstyle">Preferred style</label>
+        <select asp-for="Bowstyle" asp-items="Html.GetEnumSelectList<Bowstyle>()" class="form-control">
+            <option>- None -</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ArcheryGBNumber">AGB number</label>
+        <input asp-for="ArcheryGBNumber" type="text" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DateOfBirth">Date of birth</label>
+        <input asp-for="DateOfBirth" type="text" asp-format="{0:yyyy-MM-dd}" placeholder="YYYY-MM-DD" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DateStartedArchery">Date started archery</label>
+        <input asp-for="DateStartedArchery" type="text" asp-format="{0:yyyy-MM-dd}" placeholder="YYYY-MM-DD" class="form-control" />
+    </div>
+    <div>
+        <button type="submit" class="btn btn-default">Create</button>
+    </div>
+</form>

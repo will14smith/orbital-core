@@ -12,6 +12,7 @@ using Orbital.Data;
 using Orbital.Versioning;
 using Orbital.Web.Clubs;
 using Orbital.Web.Helpers;
+using Orbital.Web.People;
 using Orbital.Web.Rounds;
 using Orbital.Web.Users;
 
@@ -98,6 +99,7 @@ namespace Orbital.Web
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IRoundService, RoundService>();
+            services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IUserQuery, UserQuery>();
         }
     }
