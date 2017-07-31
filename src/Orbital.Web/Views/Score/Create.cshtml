@@ -1,0 +1,30 @@
+﻿@using Orbital.Web.Scores
+@model ScoreInputModel
+
+@{
+    ViewBag.Title = "Create Score";
+}
+
+<h1>Create Score</h1>
+
+<div id="score-form"></div>
+
+@section Scripts {
+    <script src="~/dist/render.js" asp-append-version="true"></script>
+    <script src="~/dist/score-form.js" asp-append-version="true"></script>
+    <script>
+        es6Require(['render', 'score-form'],
+            (render, form) => {
+                render(document.getElementById('score-form'), form,
+                    {
+                        data: @Json.Serialize(Model),
+                        people: @Json.Serialize(ViewData["people"]),
+                        clubs: @Json.Serialize(ViewData["clubs"]),
+                        bowstyles: @Json.Serialize(ViewData["bowstyles"]),
+                        rounds: @Json.Serialize(ViewData["rounds"]),
+                        competitions: @Json.Serialize(ViewData["competitions"]),
+                        submitUrl: '@Url.Action(nameof(ScoreController.Create))'
+                    });
+            });
+    </script>
+}

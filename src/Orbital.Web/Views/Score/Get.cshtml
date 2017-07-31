@@ -1,0 +1,47 @@
+﻿@model Orbital.Web.Rounds.RoundViewModel
+
+@{
+    ViewBag.Title = "Round - " + Model.Round.Name;
+}
+
+<h2>Round Details</h2>
+
+<div class="card">
+    <div class="card-block">
+        <h4 class="card-title">@Model.Round.Name</h4>
+
+        @if (Model.Round.VariantOfId.HasValue)
+        {
+            <p class="card-text">
+                This a variant of @Model.Round.VariantOfId.Value
+            </p>
+        }
+
+        <p class="card-text">
+            This in the "@Model.Round.Category" @(Model.Round.Indoor ? "indoor" : "outdoor") category.
+        </p>
+        
+        <div class="btn-group" role="group" aria-label="Controls">
+            <a asp-action="Edit" asp-route-id="@Model.Round.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Round.Id" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    
+    @if (Model.Targets.Any())
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var target in Model.Targets)
+            {
+                <li class="list-group-item">
+                    <span>
+                        @target.ArrowCount shot using the @target.ScoringType system at <length value="@target.Distance"/> on a <length value="@target.FaceSize"/> face
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+    
+    <div class="card-footer">
+        @await Component.InvokeAsync("VersionInfo", Model.Versioning)
+    </div>
+</div>

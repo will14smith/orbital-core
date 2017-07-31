@@ -1,0 +1,34 @@
+﻿@using Orbital.Web.Scores
+@model IReadOnlyCollection<Score>
+
+@{
+    ViewBag.Title = "Scores";
+}
+
+<div class="d-flex justify-content-end">
+    <h2 class="mr-auto p-2">@ViewBag.Title</h2>
+    <div class="p-2">
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="@Url.Action(nameof(ScoreController.Create))" role="button">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <div class="sr-only">Create</div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="list-group">
+    @foreach (var score in Model)
+    {
+        <a href="@Url.Action(nameof(ScoreController.Get), new { id = score.Id })"
+           class="list-group-item list-group-item-action">
+            @score
+        </a>
+    }
+
+    @if (!Model.Any())
+    {
+        <a href="#" class="list-group-item disabled">
+            There are no scores!
+        </a>
+    }
+</div>
